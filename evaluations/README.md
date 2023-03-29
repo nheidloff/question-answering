@@ -46,10 +46,17 @@ verify_answer="Answer"
 input_folder_name = "inputs"
 input_excel_filename = "input_excel.xlsx"
 output_question_resp_anwser = "output_question_resp_anwser.csv"
-output_metrics_csv_filename = "output_metrics.csv"
+output_question_resp_anwser_excel = "output_question_resp_anwser_excel.xlsx"
 output_error_log = "error.log"
 output_session_id = "1680027XXX"
 output_folder_name = "outputs"
+```
+
+## Create `/evaluations/outputs` and `/evaluations/inputs` folder
+
+```sh
+mkdir ./evaluations/outputs
+mkdir ./evaluations/inputs
 ```
 
 ## Execute command line application
@@ -64,5 +71,8 @@ python3 evaluate.py
 
 * Output files
 
-    * It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables.
-    * It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **CSV:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
+
+    * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    
+    * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
