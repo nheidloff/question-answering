@@ -24,6 +24,7 @@ RUN mkdir outputs
 RUN mkdir inputs
 
 COPY evaluate.py /app
-COPY .env /app
+COPY generate_env-config.sh /app
+COPY docker_entrypoint.sh /app
 
-CMD ["python", "evaluate.py"]
+CMD ["/bin/sh","docker_entrypoint.sh"]

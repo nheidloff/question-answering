@@ -38,18 +38,18 @@ cat ./env_template > .env
 ```
 
 ```sh
-endpoint = "/YOUR_VALUE"
-api_url = "YOUR_VALUE"
-username='apikey'
-password='YOUR_VALUE'
-verify_answer="Answer"
-input_folder_name = "inputs"
-input_excel_filename = "input_excel.xlsx"
-output_question_resp_anwser = "output_question_resp_anwser.csv"
-output_question_resp_anwser_excel = "output_question_resp_anwser_excel.xlsx"
-output_error_log = "error.log"
-output_session_id = "1680027XXX"
-output_folder_name = "outputs"
+export endpoint="/YOUR_VALUE"
+export api_url="YOUR_VALUE"
+export username='apikey'
+export password='YOUR_VALUE'
+export verify_answer="Answer"
+export input_folder_name="inputs"
+export input_excel_filename="input_excel.xlsx"
+export output_question_resp_anwser="output_question_resp_anwser.csv"
+export output_question_resp_anwser_excel="output_question_resp_anwser_excel.xlsx"
+export output_error_log="error.log"
+export output_session_id="1680027XXX"
+export output_folder_name="outputs"
 ```
 
 ## Create `/evaluations/outputs` and `/evaluations/inputs` folder
@@ -81,18 +81,8 @@ python3 evaluate.py
 
 ### 2. Execute as container
 
-#### 2.1 Build container
+#### 2.1 Build and run container
 
 ```sh
-version="v0.0.1"
-image_name="evaluate"
-docker build -t $image_name:$version .
-```
-
-#### 2.2 Start container
-
-```sh
-version="v0.0.1"
-image_name="evaluate"
-docker run -it --rm -v $(pwd)/outputs:/app/outputs -v $(pwd)/inputs:/app/inputs $image_name:$version
+sh build_and_start_container.sh
 ```

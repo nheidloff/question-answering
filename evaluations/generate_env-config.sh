@@ -5,20 +5,18 @@
 ########################################
 cat <<EOF
 # Microservice endpoint and extraction
-endpoint = "${endpoint}"
-api_url ="${api_url}"
-username="${username}"
-password="${password}"
-verify_answer="${verify_answer}"
-
+export endpoint="${endpoint}"
+export api_url="${api_url}"
+export username="${username}"
+export password="${password}"
+export verify_answer="${verify_answer}"
 # inputs
-input_excel_filename = "${input_excel_filename}"
-input_folder_name = "${input_folder_name}"
-
+export input_excel_filename="${input_excel_filename}"
+export input_folder_name="${input_folder_name}"
 # outputs
-output_question_resp_anwser_excel = "${output_question_resp_anwser_excel}"
-output_question_resp_anwser = "${output_question_resp_anwser}"
-output_error_log = "${output_error_log}"
-output_session_id = "${output_session_id}"
-output_folder_name = "${output_folder_name }"
+export output_question_resp_anwser_excel="${output_question_resp_anwser_excel}"
+export output_question_resp_anwser="${output_question_resp_anwser}"
+export output_error_log="${output_error_log}"
+export output_session_id="${output_session_id}"
+export output_folder_name="${output_folder_name}"
 EOF
