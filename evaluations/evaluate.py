@@ -21,10 +21,10 @@ api_url = os.environ.get("api_url")
 username=os.environ.get("username")
 password=os.environ.get("password")
 verify_answer=os.environ.get("verify_answer")
-output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
-output_metrics_csv_filename = os.environ.get("output_metrics_csv_filename")
 input_excel_filename = os.environ.get("input_excel_filename")
 input_folder_name = os.environ.get("input_folder_name")
+output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
+output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
 output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
@@ -38,7 +38,7 @@ print(f"Password: {password}")
 print(f"Verify answer: {verify_answer}")
 print(f"Input Excel: {input_excel_filename}")
 print(f"Output CSV: {output_question_resp_anwser}")
-print(f"Output Metrics CSV: {output_metrics_csv_filename}")
+print(f"Output Excel: {output_question_resp_anwser_excel}")
 print(f"Sesssion ID output prefix: {output_session_id}")
 print(f"Error log: {output_error_log}")
 print(f"Input folder: {input_folder_name}")
@@ -59,6 +59,35 @@ def get_output_path():
         return directory
 
 # ******************************************
+# Bleu prepare date functions 
+
+def bleu_run(input_filename):
+    header, rows = bleu_get_data(input_filename)
+    header = list(header.keys())
+    return header, rows
+
+def bleu_get_data(input_filename):
+    rows = list()
+    header = ['question', 'response', 'golden_anwser']
+
+    try:
+        workbook = openpyxl.load_workbook(input_filename)
+        ws = workbook['temp_data']
+    except:
+        print(f"Error: Could not open {input_filename}\n")
+    
+    for row in ws.iter_rows(values_only=True):
+        rows.append(row)
+
+    return bleu_from_list_to_dict(header), rows
+
+def bleu_from_list_to_dict(header):
+    indices = [i for i in range(0, len(header))]
+    header = {k: v for k, v in zip(header, indices)}
+    print ( header )
+    return header
+
+# ******************************************
 # Define logging
 logger = logging.getLogger(output_session_id + "_" + output_error_log)
 logger.setLevel(logging.INFO)
@@ -67,6 +96,24 @@ file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
+# Select the active worksheet
+def create_output_workbook (workbook_name):
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.create_sheet("temp_data")
+        worksheet.title = "temp_data"
+
+        worksheet['A1'] = 'question'
+        worksheet['B1'] = 'answer'
+        worksheet['C1'] = 'golden_anwser'
+
+        # Add a header to the worksheet
+        # header_text = 'Temp Response Values'
+        # worksheet.header_footer.oddHeader.text = header_text
+
+        # Save the workbook as a new Excel file
+        workbook.save(workbook_name)
+        return workbook
 
 # ******************************************
 # load input excel
@@ -133,7 +180,6 @@ def invoke_qa(question):
         # 1. send request
         response = requests.post(request_url, auth=(username, password), json=question_obj)
         
-        print(f"---")
         print(f"Status  : {response.status_code}")
         status_code = response.status_code
         
@@ -190,21 +236,19 @@ def invoke_qa(question):
 def main(args):
 
         # Does input data exist?
-        # False: Invoke the microservice
-        # True: Use an existing csv file
-        input_data_exists = False
+        # - False: Invoke the microservice
+        # - True: Use an existing csv file
+        input_data_exists = True
 
-        answers = []
-        golds = [[]]
         output_directory = get_output_path()
         input_directory = get_input_path()
+        workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
 
                         # 1.1 load data from input file 
-                        print(f"******* prepare input file ********\n")
-                        
+                        print(f"******* prepare input file ********\n")    
                         excel_input_filepath = input_directory + "/" + input_excel_filename                       
                         header, rows = load_input_excel(excel_input_filepath) 
                         print(f"Input header: {header}\n")                    
@@ -216,7 +260,7 @@ def main(args):
                         golden_answer = row[1]
                         print(f"Golden answer: {golden_answer}\n")
                         
-                        # 1.2. Prepare a output file for logging the test results
+                        # 1.2. Prepare an output file for logging the execution results
                         csv_output_filepath = output_directory + "/"  + output_session_id + "_" +  output_question_resp_anwser
                         csvfile = open(csv_output_filepath,'w',encoding='utf-8')
                         csvfile_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -224,8 +268,11 @@ def main(args):
                         stripped_line = [cell.strip() for cell in csv_line]
                         csvfile_writer.writerow(stripped_line)
                         test_results = []
+                        
+                        # 1.3. Prepare a temp output excel for logging the execution results
+                        workbook = create_output_workbook(workbook_name_file)
 
-                        # 1.3. invoke endpoint with questions and write the test results
+                        # 1.4. invoke endpoint with questions and write the test results
                         i = 0
                         j = 0
                         print(f"******* invoke RESP API ********\n")
@@ -234,6 +281,7 @@ def main(args):
                                 if (len(very_golden_answer) != 0):
                                         question = row[0]
                                         golden_answer = row[1]
+                                        print(f"--- Request{i} ---")
                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
                                         if ((verify == True) and (len(row[1]) != 0)):
                                                 # 1.3.1 build input for the model evaluation
@@ -243,10 +291,21 @@ def main(args):
                                                 answers.append(answer_text)
                                                 golds[0].append(golden_answer)
 
-                                                # 1.3.2 add the values to the output file
+                                                # 1.3.2 add the values to the output csv file
                                                 csv_line = [str(i),question,answer_text,golden_answer]
                                                 stripped_line = [cell.strip() for cell in csv_line]
                                                 csvfile_writer.writerow(stripped_line)
+                                                
+                                                # 1.3.3 add the values to the output temp excel file
+                                                # set value for cell B2=2
+                                                j+1
+                                                workbook = openpyxl.load_workbook(workbook_name_file)
+                                                worksheet = workbook['temp_data']
+                                                worksheet.cell(row=(j+1), column=1).value = question
+                                                worksheet.cell(row=(j+1), column=2).value = answer_text
+                                                worksheet.cell(row=(j+1), column=3).value = golden_answer
+                                                workbook.save(workbook_name_file)
+
                                         else:
                                                 message = "Problem in data value: " + str(i) + "____" + "Question: " + question
                                                 logger.error(message)
@@ -254,59 +313,26 @@ def main(args):
                                         message = "Data value " + str(i) + " ____" + " 'Golden answer' is emtpy: " + row[1]
                                         logger.error(message)
                                 i = i + 1
-                                
+                        workbook.save(workbook_name_file)      
                         csvfile.close()                    
-        else:
-                # 2. Existing test file with answers and golden answers in a csv file
-                filepath = output_directory + "/"  + output_session_id + "_" +  output_question_resp_anwser
-                answers, golds = load_existing_eval_values(filepath)
         
-        print(f"Answer count: {len(answers)} and Golden Answer count: {len(golds[0])}")
-        
-        # 3. Create metrics
-        if (len(answers) == len(golds[0])):
+        # 2. Create eval output         
+        header, rows = bleu_run(workbook_name_file)
+        header = bleu_from_list_to_dict(header)
+        responses = [row[header['response']] for row in rows]
+        golds = [[row[header['golden_anwser']]] for row in rows]
 
-                # 3.1. Prepare a csv metrics file
-                filepath = output_directory + "/" + output_session_id + "_" + output_metrics_csv_filename
-                csvfile = open(filepath,'w',encoding='utf-8')
-                csvfile_writer = csv.writer(csvfile)
-                csv_line = ['count', 'answer', 'golden_answer', 'bleu', 'rouge'] 
-                csvfile_writer.writerow(csv_line)
+        metric = load_metric("sacrebleu")
+        metric.add_batch(predictions=responses, references=golds)
+        sacrebleu = metric.compute()["score"]
 
-                count = len(answers)
-                for i in range(count):
-                        very_answers = []
-                        very_answers.append(answers[i])
+        metric = load_metric("rouge")
+        metric.add_batch(predictions=responses, references=golds)
+        rouge = metric.compute()["rougeL"]
 
-                        verify_golds = [[]]
-                        verify_golds[0].append(golds[0][i])
-
-                        # claculate bleu
-                        metric = load_metric("sacrebleu")
-                        # eval.load("sacrebleu") new
-                        # load_metric("sacrebleu") old
-                        metric.add_batch(predictions=very_answers, references=verify_golds)
-                        sacrebleu = metric.compute()["score"]
-
-                        # claculate rouge
-                        metric = load_metric("rouge")
-                        #load_metric("rouge") old
-                        # eval.load("rouge") new
-                        metric.add_batch(predictions=very_answers, references=verify_golds)
-                        rouge = metric.compute()["rougeL"]
-
-                        print (f"Gold: {verify_golds[0][0]:{30}}\nAnswer: {very_answers[0]}")
-                        print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
-                        csv_line = [ i, str(very_answers[0]), str(verify_golds[0][0]),str(sacrebleu), str(rouge.mid.fmeasure)] 
-                        csvfile_writer.writerow(csv_line)
-                csvfile.close()
+        print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    #parser.add_argument('url', required = False, type=str, help='URL of the REST endpoint')
-    #parser.add_argument('username', required = False, type=str, help='Username for Basic Auth')
-    #parser.add_argument('password', required = False, type=str, help='Password for Basic Auth')
-    #parser.add_argument('--json-value', required = False, type=str, default='{}', help='JSON value to send to the endpoint')
-    #parser.add_argument('--output-file', required = False, type=str, help='File to save the response to')
     args = parser.parse_args()
     main(args)
