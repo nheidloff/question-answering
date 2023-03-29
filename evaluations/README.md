@@ -38,21 +38,30 @@ cat ./env_template > .env
 ```
 
 ```sh
-endpoint = "/YOUR_VALUE"
-api_url = "YOUR_VALUE"
-username='apikey'
-password='YOUR_VALUE'
-verify_answer="Answer"
-input_folder_name = "inputs"
-input_excel_filename = "input_excel.xlsx"
-output_question_resp_anwser = "output_question_resp_anwser.csv"
-output_metrics_csv_filename = "output_metrics.csv"
-output_error_log = "error.log"
-output_session_id = "1680027XXX"
-output_folder_name = "outputs"
+export endpoint="/YOUR_VALUE"
+export api_url="YOUR_VALUE"
+export username='apikey'
+export password='YOUR_VALUE'
+export verify_answer="Answer"
+export input_folder_name="inputs"
+export input_excel_filename="input_excel.xlsx"
+export output_question_resp_anwser="output_question_resp_anwser.csv"
+export output_question_resp_anwser_excel="output_question_resp_anwser_excel.xlsx"
+export output_error_log="error.log"
+export output_session_id="1680027XXX"
+export output_folder_name="outputs"
 ```
 
-## Execute command line application
+## Create `/evaluations/outputs` and `/evaluations/inputs` folder
+
+```sh
+mkdir ./evaluations/outputs
+mkdir ./evaluations/inputs
+```
+
+## Run application
+
+### 1. Execute as command line application
 
 ```sh
 python3 evaluate.py
@@ -64,5 +73,16 @@ python3 evaluate.py
 
 * Output files
 
-    * It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables.
-    * It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **CSV:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
+
+    * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    
+    * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+
+### 2. Execute as container
+
+#### 2.1 Build and run container
+
+```sh
+sh build_and_start_container.sh
+```
