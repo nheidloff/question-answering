@@ -59,7 +59,9 @@ mkdir ./evaluations/outputs
 mkdir ./evaluations/inputs
 ```
 
-## Execute command line application
+## Run application
+
+### 1. Execute as command line application
 
 ```sh
 python3 evaluate.py
@@ -76,3 +78,21 @@ python3 evaluate.py
     * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
     * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+
+### 2. Execute as container
+
+#### 2.1 Build container
+
+```sh
+version="v0.0.1"
+image_name="evaluate"
+docker build -t $image_name:$version .
+```
+
+#### 2.2 Start container
+
+```sh
+version="v0.0.1"
+image_name="evaluate"
+docker run -it --rm -v $(pwd)/outputs:/app/outputs -v $(pwd)/inputs:/app/inputs $image_name:$version
+```

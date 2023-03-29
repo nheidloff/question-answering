@@ -230,7 +230,6 @@ def invoke_qa(question):
                         answer_text_list = []
                         return answer_text, answer_text_len,  answer_text_list, False
 
-
 # ******************************************
 # Execution
 def main(args):
@@ -238,7 +237,10 @@ def main(args):
         # Does input data exist?
         # - False: Invoke the microservice
         # - True: Use an existing csv file
-        input_data_exists = True
+        input_data_exists = False
+        # Needs to be cleaned
+        answers = []
+        golds = [[]]
 
         output_directory = get_output_path()
         input_directory = get_input_path()
