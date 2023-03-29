@@ -1,0 +1,65 @@
+readnik.md 
+
+data/product-doc
+
+metrics/*
+!metrics/sample/
+
+evaluations/error.log
+evaluations/env
+evaluations/__pycache__
+evaluations/test_input_export_from_excel.csv
+evaluations/test_input_excel.xlsx
+evaluations/metrics_output.csv
+evaluations/IBM_Gen_AI_Q_and_A_Consolidated.xlsx
+evaluations/test_output.csv
+evaluations/Book1.xlsx
+evaluations/outputs/*
+evaluations/inputs/*
+
+#Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+.flattened-pom.xml
+
+mvnw
+mvnw.cmd
+.mvn
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
+
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
+.factorypath
+
+# OSX
+.DS_Store
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+readnik.md

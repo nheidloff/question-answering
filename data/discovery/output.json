@@ -1,0 +1,366 @@
+{
+    "matching_results": 2,
+    "retrieval_details": {
+        "document_retrieval_strategy": "untrained"
+    },
+    "aggregations": [
+        {
+            "type": "term",
+            "field": "enriched_text.entities.text",
+            "name": "entities",
+            "results": [
+                {
+                    "key": "$190.00",
+                    "matching_results": 1
+                },
+                {
+                    "key": "$34 billion",
+                    "matching_results": 1
+                },
+                {
+                    "key": "175",
+                    "matching_results": 1
+                },
+                {
+                    "key": "IBM",
+                    "matching_results": 1
+                },
+                {
+                    "key": "IBM Closes Landmark Acquisition",
+                    "matching_results": 1
+                },
+                {
+                    "key": "Kubernetes",
+                    "matching_results": 1
+                },
+                {
+                    "key": "Linux",
+                    "matching_results": 1
+                },
+                {
+                    "key": "NYSE",
+                    "matching_results": 1
+                },
+                {
+                    "key": "October 2018",
+                    "matching_results": 1
+                },
+                {
+                    "key": "Red Hat",
+                    "matching_results": 1
+                }
+            ]
+        }
+    ],
+    "results": [
+        {
+            "document_id": "2ea6e0c222f6d3fbe005ac22bf5fb12d",
+            "result_metadata": {
+                "collection_id": "7801e618-8411-2538-0000-0186cbc7aed4",
+                "document_retrieval_source": "search",
+                "confidence": 0.15055
+            },
+            "enriched_text": [
+                {
+                    "entities": [
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.9399875,
+                                    "location": {
+                                        "end": 3,
+                                        "begin": 0
+                                    },
+                                    "text": "IBM"
+                                },
+                                {
+                                    "confidence": 0.83948433,
+                                    "location": {
+                                        "end": 13,
+                                        "begin": 10
+                                    },
+                                    "text": "IBM"
+                                },
+                                {
+                                    "confidence": 0.973224,
+                                    "location": {
+                                        "end": 96,
+                                        "begin": 93
+                                    },
+                                    "text": "IBM"
+                                },
+                                {
+                                    "confidence": 0.9581365,
+                                    "location": {
+                                        "end": 414,
+                                        "begin": 411
+                                    },
+                                    "text": "IBM"
+                                },
+                                {
+                                    "confidence": 0.9177415,
+                                    "location": {
+                                        "end": 514,
+                                        "begin": 511
+                                    },
+                                    "text": "IBM"
+                                }
+                            ],
+                            "text": "IBM",
+                            "type": "Organization"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.8162227,
+                                    "location": {
+                                        "end": 9,
+                                        "begin": 5
+                                    },
+                                    "text": "NYSE"
+                                }
+                            ],
+                            "text": "NYSE",
+                            "type": "Organization"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.82068604,
+                                    "location": {
+                                        "end": 26,
+                                        "begin": 19
+                                    },
+                                    "text": "Red Hat"
+                                },
+                                {
+                                    "confidence": 0.6316248,
+                                    "location": {
+                                        "end": 164,
+                                        "begin": 157
+                                    },
+                                    "text": "Red Hat"
+                                },
+                                {
+                                    "confidence": 0.7772974,
+                                    "location": {
+                                        "end": 324,
+                                        "begin": 317
+                                    },
+                                    "text": "Red Hat"
+                                },
+                                {
+                                    "confidence": 0.61323273,
+                                    "location": {
+                                        "end": 526,
+                                        "begin": 519
+                                    },
+                                    "text": "Red Hat"
+                                }
+                            ],
+                            "text": "Red Hat",
+                            "type": "Organization"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.8263437,
+                                    "location": {
+                                        "end": 42,
+                                        "begin": 37
+                                    },
+                                    "text": "today"
+                                }
+                            ],
+                            "text": "today",
+                            "type": "Date"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.9994006,
+                                    "location": {
+                                        "end": 176,
+                                        "begin": 169
+                                    },
+                                    "text": "$190.00"
+                                }
+                            ],
+                            "text": "$190.00",
+                            "type": "Money"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.995286,
+                                    "location": {
+                                        "end": 258,
+                                        "begin": 247
+                                    },
+                                    "text": "$34 billion"
+                                }
+                            ],
+                            "text": "$34 billion",
+                            "type": "Money"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.8,
+                                    "location": {
+                                        "end": 489,
+                                        "begin": 486
+                                    },
+                                    "text": "175"
+                                }
+                            ],
+                            "text": "175",
+                            "type": "Number"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.72652733,
+                                    "location": {
+                                        "end": 660,
+                                        "begin": 655
+                                    },
+                                    "text": "Linux"
+                                }
+                            ],
+                            "text": "Linux",
+                            "type": "Organization"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.8210125,
+                                    "location": {
+                                        "end": 675,
+                                        "begin": 665
+                                    },
+                                    "text": "Kubernetes"
+                                }
+                            ],
+                            "text": "Kubernetes",
+                            "type": "Organization"
+                        }
+                    ]
+                }
+            ],
+            "metadata": {
+                "parent_document_id": "2ea6e0c222f6d3fbe005ac22bf5fb12d",
+                "customer_id": "IBMid-0600000RGH"
+            },
+            "extracted_metadata": {
+                "sha1": "2C9730E016387AF2C3815C2F92E0F2534C22263C",
+                "filename": "1.json",
+                "file_type": "json"
+            },
+            "text": [
+                "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
+            ],
+            "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
+            "url": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+            "document_passages": [
+                {
+                    "passage_text": "<em>IBM</em> (NYSE<em>:</em><em>IBM</em>) and <em>Red</em> <em>Hat</em> announced today that they have closed the transaction under which <em>IBM</em> <em>acquired</em> all of the issued and outstanding common shares of <em>Red</em> <em>Hat</em> for $190.00 per share in cash, representing a total equity value of approximately $34 billion.",
+                    "start_offset": 0,
+                    "end_offset": 259,
+                    "field": "text",
+                    "answers": [
+                        {
+                            "answer_text": "$190.00 per share in cash",
+                            "start_offset": 169,
+                            "end_offset": 194,
+                            "confidence": 0.6790031
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "document_id": "cc64fc7995c848ae5d5350dc2978c77e",
+            "result_metadata": {
+                "collection_id": "7801e618-8411-2538-0000-0186cbc7aed4",
+                "document_retrieval_source": "search",
+                "confidence": 0.01395
+            },
+            "enriched_text": [
+                {
+                    "entities": [
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.89771426,
+                                    "location": {
+                                        "end": 80,
+                                        "begin": 68
+                                    },
+                                    "text": "October 2018"
+                                }
+                            ],
+                            "text": "October 2018",
+                            "type": "Date"
+                        },
+                        {
+                            "model_name": "natural_language_understanding",
+                            "mentions": [
+                                {
+                                    "confidence": 0.49426216,
+                                    "location": {
+                                        "end": 113,
+                                        "begin": 82
+                                    },
+                                    "text": "IBM Closes Landmark Acquisition"
+                                }
+                            ],
+                            "text": "IBM Closes Landmark Acquisition",
+                            "type": "Organization"
+                        }
+                    ]
+                }
+            ],
+            "metadata": {
+                "parent_document_id": "cc64fc7995c848ae5d5350dc2978c77e",
+                "customer_id": "IBMid-0600000RGH"
+            },
+            "extracted_metadata": {
+                "sha1": "4DA78225E168A7D1D54725DF32F99983A6D7B79F",
+                "filename": "2.json",
+                "file_type": "json"
+            },
+            "text": [
+                "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
+            ],
+            "title": "IBM acquires Red Hat",
+            "url": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
+            "document_passages": [
+                {
+                    "passage_text": "<em>IBM</em> <em>acquires</em> <em>Red</em> <em>Hat</em>",
+                    "start_offset": 0,
+                    "end_offset": 20,
+                    "field": "title",
+                    "answers": [
+                        {
+                            "answer_text": "IBM acquires Red Hat",
+                            "start_offset": 0,
+                            "end_offset": 20,
+                            "confidence": 0.07588528
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

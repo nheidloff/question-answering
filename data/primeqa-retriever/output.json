@@ -1,0 +1,33 @@
+[{
+	"answer": {
+		"text": "October 2018.",
+		"confidence_score": 1.0,
+		"start_char_offset": 68,
+		"end_char_offset": 81,
+		"context_index": 0
+	},
+	"document": {
+		"text": "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat.",
+		"score": 0.06113,
+		"confidence": 1.0,
+		"document_id": "cc64fc7995c848ae5d5350dc2978c77e",
+		"title": "IBM acquires Red Hat",
+		"url": "https://www.ibm.com/support/pages/ibm-acquires-red-hat"
+	}
+}, {
+	"answer": {
+		"text": "$190.00 per share in cash",
+		"confidence_score": 0.7,
+		"start_char_offset": 169,
+		"end_char_offset": 194,
+		"context_index": 1
+	},
+	"document": {
+		"text": "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds.",
+		"score": 0.04406,
+		"confidence": 0.0,
+		"document_id": "2ea6e0c222f6d3fbe005ac22bf5fb12d",
+		"title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
+		"url": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future"
+	}
+}]

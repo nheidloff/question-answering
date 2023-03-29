@@ -1,0 +1,47 @@
+{
+    "matching_results": 2,
+    "retrievalDetails": {
+      "document_retrieval_strategy": "untrained"
+    },
+    "results": [
+      {
+        "document_id": "c3b1150c-a630-43a9-bcec-55bf3bf1c8b7",
+        "title": "IBM acquires Red Hat",
+        "text": [
+          "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
+        ],
+        "link": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
+        "document_passages": [
+          {
+            "passage_text": "October 2018.",
+            "passageAnswers": [
+              {
+                "answer_text": "October 2018.",
+                "confidence": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "document_id": "21d98dfa-ee58-46a6-9e79-95194f55ee3c",
+        "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
+        "text": [
+          "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
+        ],
+        "link": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+        "document_passages": [
+          {
+            "passage_text": "$190.00 per share in cash",
+            "passageAnswers": [
+              {
+                "answer_text": "$190.00 per share in cash",
+                "confidence": 0.699999988079071
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

@@ -1,0 +1,222 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "question-answering API",
+    "version": "1.0.0-SNAPSHOT"
+  },
+  "servers": [
+    {
+      "url": "https://mock-api.zuhvp4cwkui.us-east.codeengine.appdomain.cloud",
+      "description": "Code Engine Mock application"
+    }
+  ],
+  "security": [
+    {"basicAuth":[]}
+  ],
+  "paths": {
+    "/query": {
+      "post": {
+        "tags": [
+          "Answer Resource"
+        ],
+        "summary": "Get an answer",
+        "description": "Get an answer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Answer successfully returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Answer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        },
+        "security": [
+          {
+            "apikey": []
+          }
+        ]
+      }
+    },
+    "/query-mock-confident": {
+      "post": {
+        "tags": [
+          "Answer Resource"
+        ],
+        "summary": "Get a mocked answer with high confidence",
+        "description": "Get a mocked answer with high confidence",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apikey": []
+          }
+        ]
+      }
+    },
+    "/query-mock-not-confident": {
+      "post": {
+        "tags": [
+          "Answer Resource"
+        ],
+        "summary": "Get a mocked answer with low confidence",
+        "description": "Get a mocked answer with low confidence",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apikey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth" : {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "matching_results": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "retrievalDetails": {
+            "$ref": "#/components/schemas/RetrievalDetails"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Result"
+            }
+          }
+        }
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        }
+      },
+      "DocumentPassage": {
+        "type": "object",
+        "properties": {
+          "passage_text": {
+            "type": "string"
+          },
+          "passageAnswers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PassageAnswer"
+            }
+          }
+        }
+      },
+      "PassageAnswer": {
+        "type": "object",
+        "properties": {
+          "answer_text": {
+            "type": "string"
+          },
+          "confidence": {
+            "format": "double",
+            "type": "number"
+          }
+        }
+      },
+      "Result": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "link": {
+            "type": "string"
+          },
+          "document_passages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentPassage"
+            }
+          }
+        }
+      },
+      "RetrievalDetails": {
+        "type": "object",
+        "properties": {
+          "document_retrieval_strategy": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
