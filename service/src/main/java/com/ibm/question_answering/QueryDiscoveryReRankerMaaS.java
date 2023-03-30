@@ -151,10 +151,17 @@ public class QueryDiscoveryReRankerMaaS {
     }
 
     public String getDiscoveryResultAsText(com.ibm.question_answering.Answer discoveryAnswer, int index) {
+        Result discoveryResult = discoveryAnswer.results.get(index);
         String output = "";
-        for (int i = 0; i < discoveryAnswer.results.get(index).text.text.length; i++) {
-            output = output + discoveryAnswer.results.get(index).text.text[i] + " ";
-        }
+        if (discoveryResult.text != null) {
+            if (discoveryResult.text.text != null) {                            
+                if (discoveryResult.text.text.length > 0) {
+                    for (int i = 0; i < discoveryAnswer.results.get(index).text.text.length; i++) {
+                        output = output + discoveryAnswer.results.get(index).text.text[i] + " ";
+                    }
+                }
+            }
+        }        
         return output;
     }
 

@@ -127,6 +127,7 @@ public class Metrics {
     String tsMaaSStart;
     String tsMaaSEnd;
     String sizeDiscoveryResults;
+    String sizeDiscoverySentResults;
     String sizeReRankerInputs;
     String sizeReRankerResults;
 
@@ -137,6 +138,7 @@ public class Metrics {
     String directoryAndFileNameMetadata;
     String directoryAndfileNameRuns;
     String directoryAndfileNameLastRun;
+    boolean reRankerUsed = false;
 
     public void end() {
         this.tsEnd = getTimestamp();
@@ -165,6 +167,9 @@ public class Metrics {
         this.endpoint = uriInfo.getPath();
         this.url = uriInfo.getRequestUri().toString();
         this.query = query;   
+
+        this.resultReRanker = new String[10];
+        this.resultReRankerChunkIds = new String[10];
     }
 
     void writeRun() {
@@ -255,6 +260,7 @@ public class Metrics {
         this.rrId = id;
         this.rrModel = model;
         this.tsRRStart = getTimestamp();
+        this.reRankerUsed = true;
     }
 
     public void reRankerStopped(DocumentScore[][] result) {
@@ -262,8 +268,6 @@ public class Metrics {
         if ((result != null) && (result.length > 0)) {
             this.sizeReRankerResults = String.valueOf(result[0].length);
             
-            this.resultReRanker = new String[10];
-            this.resultReRankerChunkIds = new String[10];
             for (int index = 0; index < result[0].length; index++) {
                 if (index < 10) {
                     String resultString = "";
@@ -287,6 +291,7 @@ public class Metrics {
         this.tsDiscoveryEnd = getTimestamp();
         if (result != null) {
             this.sizeDiscoveryResults = String.valueOf(result.matching_results);
+            this.sizeDiscoverySentResults = String.valueOf(result.results.size());
             this.resultDiscovery = new String[10];
             this.resultDiscoveryChunkIds = new String[10];
             for (int index = 0; index < resultDiscovery.length; index++) {
@@ -356,7 +361,9 @@ public class Metrics {
             writer.write("\n");
             writer.write("### Watson Discovery" + "\n");
             writer.write("\n");
-            writer.write("*Results:* " + this.sizeDiscoveryResults + "\n");
+            writer.write("*Results (matching):* " + this.sizeDiscoveryResults + "\n");
+            writer.write("\n");
+            writer.write("*Results (returned):* " + this.sizeDiscoverySentResults + "\n");
             writer.write("\n");
             writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
             writer.write("\n");
@@ -370,30 +377,32 @@ public class Metrics {
             writer.write("\n");
             writer.write("<details><summary>Result 3</summary> " + this.resultDiscovery[2] + "</details>\n\n");
             writer.write("\n");
-            writer.write("### Re-Ranker" + "\n");
-            writer.write("\n");
-            writer.write("*ID:* " + this.rrId + "\n");
-            writer.write("\n");
-            writer.write("*Model:* " + this.rrModel + "\n");
-            writer.write("\n");
-            writer.write("*Duration in Milliseconds:* " + getDuration(this.tsRRStart, this.tsRREnd) + "\n");
-            writer.write("\n");
-            writer.write("*Input Documents Max:* " + this.rrAmountInputDocuments + "\n");
-            writer.write("\n");
-            writer.write("*Input Documents Actual:* " + this.sizeReRankerInputs + "\n");
-            writer.write("\n");
-            writer.write("*Ouput Documents Actual:* " + this.sizeReRankerResults + "\n");
-            writer.write("\n");
-            writer.write("*Result 1 chunckid:* " + this.resultReRankerChunkIds[0] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 1</summary> " + this.resultReRanker[0] + "</details>\n\n");
-            writer.write("*Result 2 chunckid:* " + this.resultReRankerChunkIds[1] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 2</summary> " + this.resultReRanker[1] + "</details>\n\n");
-            writer.write("*Result 3 chunckid:* " + this.resultReRankerChunkIds[2] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 3</summary> " + this.resultReRanker[2] + "</details>\n\n");
-            writer.write("\n");
+            if (this.reRankerUsed == true) {
+                writer.write("### Re-Ranker" + "\n");
+                writer.write("\n");
+                writer.write("*ID:* " + this.rrId + "\n");
+                writer.write("\n");
+                writer.write("*Model:* " + this.rrModel + "\n");
+                writer.write("\n");
+                writer.write("*Duration in Milliseconds:* " + getDuration(this.tsRRStart, this.tsRREnd) + "\n");
+                writer.write("\n");
+                writer.write("*Input Documents Max:* " + this.rrAmountInputDocuments + "\n");
+                writer.write("\n");
+                writer.write("*Input Documents Actual:* " + this.sizeReRankerInputs + "\n");
+                writer.write("\n");
+                writer.write("*Ouput Documents Actual:* " + this.sizeReRankerResults + "\n");
+                writer.write("\n");
+                writer.write("*Result 1 chunckid:* " + this.resultReRankerChunkIds[0] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 1</summary> " + this.resultReRanker[0] + "</details>\n\n");
+                writer.write("*Result 2 chunckid:* " + this.resultReRankerChunkIds[1] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 2</summary> " + this.resultReRanker[1] + "</details>\n\n");
+                writer.write("*Result 3 chunckid:* " + this.resultReRankerChunkIds[2] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 3</summary> " + this.resultReRanker[2] + "</details>\n\n");
+                writer.write("\n");
+            }
             writer.write("### Model as a Service" + "\n");
             writer.write("\n");
             writer.write("*MaaS Model:* " + this.llmName + "\n");

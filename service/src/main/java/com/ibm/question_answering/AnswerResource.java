@@ -37,6 +37,9 @@ public class AnswerResource {
     AnswerResourceUtilities utilities;
 
     @Inject
+    QueryDiscoveryMaaS queryDiscoveryMaaS;
+
+    @Inject
     Metrics metrics;
 
     @Inject
@@ -92,9 +95,29 @@ public class AnswerResource {
 
         metrics.start(uriInfo, utilities.getQuery(data));
 
+        utilities.checkAuthorization(apikey);
         Answer output;
-        //output = queryPrimeAndMaaS.query(getQuery(data), true, false);
         output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), true, false);
+        output = utilities.removeRedundantDocuments(output);
+
+        metrics.end();
+        return output;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-discovery-maas")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+        summary = "Returns answer from Discovery and MaaS (with proxy, without summaries)",
+        description = "Returns answer from Discovery and MaaS (with proxy, without summaries)"
+    )
+    public Answer queryDiscoveryAndMaaSProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryDiscoveryMaaS.query(utilities.getQuery(data), true, false);
         output = utilities.removeRedundantDocuments(output);
 
         metrics.end();
