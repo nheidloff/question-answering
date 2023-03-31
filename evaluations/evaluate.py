@@ -13,6 +13,7 @@ import evaluate as eval
 import sacrebleu as scb
 import logging
 import openpyxl
+import time
 
 # ******************************************
 # Global variables
@@ -28,21 +29,24 @@ output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_
 output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
+number_of_retrys = os.environ.get("number_of_retrys")
 
 print("*************************")
-print("Environment configuration:")
-print(f"Endpoint: {endpoint}")
-print(f"API URL: {api_url}")
-print(f"Username: {username}")
-print(f"Password: {password}")
-print(f"Verify answer: {verify_answer}")
-print(f"Input Excel: {input_excel_filename}")
-print(f"Output CSV: {output_question_resp_anwser}")
-print(f"Output Excel: {output_question_resp_anwser_excel}")
-print(f"Sesssion ID output prefix: {output_session_id}")
-print(f"Error log: {output_error_log}")
-print(f"Input folder: {input_folder_name}")
-print(f"Output folder: {output_folder_name}")
+print("Environment configurations of 'evalute':")
+print("")
+print(f"- Endpoint: {endpoint}")
+print(f"- API URL: {api_url}")
+print(f"- Retrys: {number_of_retrys}")
+print(f"- Username: {username}")
+print(f"- Password: {password}")
+print(f"- Verify answer: {verify_answer}\n")
+print(f"- Input Excel: {input_excel_filename}")
+print(f"- Input folder name: {input_folder_name}\n")
+print(f"- Output folder name: {output_folder_name}")
+print(f"- Sesssion ID output prefix: {output_session_id}")
+print(f"- Output CSV: {output_question_resp_anwser}")
+print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
+print(f"- Error log name: {output_error_log}")
 
 # ******************************************
 # get os path information
@@ -59,7 +63,7 @@ def get_output_path():
         return directory
 
 # ******************************************
-# Bleu prepare date functions 
+# Bleu prepare eval data functions 
 
 def bleu_run(input_filename):
     header, rows = bleu_get_data(input_filename)
@@ -189,6 +193,7 @@ def invoke_qa(question):
                 answer_text_list = []
                 # Log errors for the status_code
                 message = "Response code: " + str(status_code) + "____" + "Question object: " + json.dumps(question_obj)
+                print(f"Error: {message}")
                 logger.error(message)
                 return answer_text, answer_text_len, answer_text_list, False
         else:
@@ -238,69 +243,83 @@ def main(args):
         # - False: Invoke the microservice
         # - True: Use an existing csv file
         input_data_exists = False
-        # Needs to be cleaned
-        answers = []
+        
+        # Temp list for creating output files
         golds = [[]]
 
         output_directory = get_output_path()
+        print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
+        print(f"- Input dir: {input_directory}")
         workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
+        csv_output_filepath = output_directory + "/"  + output_session_id + "_" +  output_question_resp_anwser
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
 
                         # 1.1 load data from input file 
-                        print(f"******* prepare input file ********\n")    
+                        print(f"******* prepare input data from file {input_excel_filename} ********\n")    
                         excel_input_filepath = input_directory + "/" + input_excel_filename                       
                         header, rows = load_input_excel(excel_input_filepath) 
-                        print(f"Input header: {header}\n")                    
+                        print(f"- Input header: {header}")                    
                         input_len=len(rows)
-                        print(f"Input len: {input_len}\n")
+                        print(f"- Input len: {input_len}")
                         row = rows[0]
                         question = row[0]
-                        print(f"Question: {question}\n")
+                        print(f"- First question: {question}")
                         golden_answer = row[1]
-                        print(f"Golden answer: {golden_answer}\n")
+                        print(f"- First golden answer: {golden_answer}")
                         
                         # 1.2. Prepare an output file for logging the execution results
-                        csv_output_filepath = output_directory + "/"  + output_session_id + "_" +  output_question_resp_anwser
                         csvfile = open(csv_output_filepath,'w',encoding='utf-8')
                         csvfile_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
                         csv_line = ['count','question','answer','golden_answer']
                         stripped_line = [cell.strip() for cell in csv_line]
                         csvfile_writer.writerow(stripped_line)
-                        test_results = []
                         
-                        # 1.3. Prepare a temp output excel for logging the execution results
+                        # 1.3. Prepare an output excel for logging the execution results
                         workbook = create_output_workbook(workbook_name_file)
 
                         # 1.4. invoke endpoint with questions and write the test results
                         i = 0
                         j = 0
-                        print(f"******* invoke RESP API ********\n")
+                        print(f"******* invoke REST API ********\n")
                         for row in rows:
                                 very_golden_answer = row[1]
                                 if (len(very_golden_answer) != 0):
                                         question = row[0]
                                         golden_answer = row[1]
-                                        print(f"--- Request{i} ---")
+                                        print(f"--- Request {i} ---")
                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
-                                        if ((verify == True) and (len(row[1]) != 0)):
-                                                # 1.3.1 build input for the model evaluation
-                                                j = j + 1
-                                                row_value = [j,question,answer_text,golden_answer]
-                                                test_results.append(row_value)
-                                                answers.append(answer_text)
-                                                golds[0].append(golden_answer)
+                                        
+                                        # 1.4.1 Retry if the request didn't work
+                                        if (verify != True):
+                                                print(f"--- Retry the request {i} for {number_of_retrys } times and wait for 3 sec ---")
+                                                retrys = number_of_retrys
+                                                retrys_count = 1
+                                                
+                                                while (retrys_count != retrys):
+                                                        time.sleep(3.0)
+                                                        print(f"Retry counter : {retrys_count} ---")
+                                                        answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
+                                                        retrys_count = retrys_count + 1
+                                                        if (verify == True):
+                                                                break
+                                                        else:
+                                                                message = "Retry: " + str(retrys_count) + " for request " + str(i) + "didn't work"
+                                                                print(message)
+                                                                logger.error(message)
 
-                                                # 1.3.2 add the values to the output csv file
+                                        # 1.4.2 Request work and a anwser contains content
+                                        if ((verify == True) and (len(row[1]) != 0)):
+                                                # 1.4.3 add the values to the output csv file
                                                 csv_line = [str(i),question,answer_text,golden_answer]
                                                 stripped_line = [cell.strip() for cell in csv_line]
                                                 csvfile_writer.writerow(stripped_line)
                                                 
-                                                # 1.3.3 add the values to the output temp excel file
+                                                # 1.4.4 add the values to the output temp excel file
                                                 # set value for cell B2=2
-                                                j+1
+                                                j = j + 1
                                                 workbook = openpyxl.load_workbook(workbook_name_file)
                                                 worksheet = workbook['temp_data']
                                                 worksheet.cell(row=(j+1), column=1).value = question
@@ -310,15 +329,17 @@ def main(args):
 
                                         else:
                                                 message = "Problem in data value: " + str(i) + "____" + "Question: " + question
+                                                print(f"Error: {message}")
                                                 logger.error(message)
                                 else:
                                         message = "Data value " + str(i) + " ____" + " 'Golden answer' is emtpy: " + row[1]
+                                        print(f"Error: {message}")
                                         logger.error(message)
                                 i = i + 1
                         workbook.save(workbook_name_file)      
                         csvfile.close()                    
         
-        # 2. Create eval output         
+        # 2. Create evalution blue result output         
         header, rows = bleu_run(workbook_name_file)
         header = bleu_from_list_to_dict(header)
         responses = [row[header['response']] for row in rows]
@@ -331,7 +352,11 @@ def main(args):
         metric = load_metric("rouge")
         metric.add_batch(predictions=responses, references=golds)
         rouge = metric.compute()["rougeL"]
-
+        
+        print (f"******* outputs for session: {output_session_id} ********")
+        print (f"CSV   output file : {csv_output_filepath}")
+        print (f"Excel output file : {workbook_name_file}\n")
+        print (f"******* Bleu result based on {len(responses)} responses ********")
         print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
 
 if __name__ == "__main__":

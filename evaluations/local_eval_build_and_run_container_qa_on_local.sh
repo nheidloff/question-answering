@@ -1,13 +1,22 @@
 #!/bin/bash
 
 source ./.env
-echo "$endpoint"
 
 export version="v0.0.1"
-export image_name="evaluate"
+export image_name="evaluation-local"
+export host_ip_addr=$host_ip
 
+mkdir $(pwd)/outputs
+mkdir $(pwd)/inputs
+
+echo "***** BUILD evaluation container ******"
 docker build -t $image_name:$version .
-docker run --name="evaluation-run" -it --rm -v $(pwd)/outputs:/app/outputs -v $(pwd)/inputs:/app/inputs \
+
+echo "***** START evaluation container ******"
+docker run --name="evaluation-run" -it --rm \
+                --add-host host.docker.internal:${host_ip_addr} \
+                -v $(pwd)/outputs:/app/outputs \
+                -v $(pwd)/inputs:/app/inputs \
                 -e endpoint="$endpoint" \
                 -e api_url="$api_url" \
                 -e username="$username" \
@@ -20,4 +29,5 @@ docker run --name="evaluation-run" -it --rm -v $(pwd)/outputs:/app/outputs -v $(
                 -e output_error_log="$output_error_log" \
                 -e output_session_id="$output_session_id" \
                 -e output_folder_name="$output_folder_name" \
+                -e export number_of_retrys="$export number_of_retrys" \
                 $image_name:$version
