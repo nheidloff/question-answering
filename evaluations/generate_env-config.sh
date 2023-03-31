@@ -19,4 +19,7 @@ export output_question_resp_anwser="${output_question_resp_anwser}"
 export output_error_log="${output_error_log}"
 export output_session_id="${output_session_id}"
 export output_folder_name="${output_folder_name}"
+export number_of_retrys="${number_of_retrys}"
+# NOT NEEDED INSIDE EVALUTE APPLICATION
+# export host_ip="${number_of_retrys}"
 EOF

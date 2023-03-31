@@ -81,6 +81,10 @@ function deploy_ce_application(){
                                    --env EXPERIMENT_LLM_MAX_NEW_TOKENS="$EXPERIMENT_LLM_MAX_NEW_TOKENS" \
                                    --env EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS="$EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS" \
                                    --env EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS="$EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS" \
+                                   --env EXPERIMENT_RERANKER_MODEL="$EXPERIMENT_RERANKER_MODEL" \
+                                   --env EXPERIMENT_RERANKER_ID="$EXPERIMENT_RERANKER_ID" \
+                                   --env EXPERIMENT_METRICS_SESSION="$EXPERIMENT_METRICS_SESSION" \
+                                   --env EXPERIMENT_METRICS_DIRECTORY="$EXPERIMENT_METRICS_DIRECTORY" \
                                    --max-scale $CE_APP_MAX_SCALE \
                                    --min-scale $CE_APP_MIN_SCALE \
                                    --port $CE_APP_PORT 

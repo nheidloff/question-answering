@@ -50,6 +50,11 @@ export output_question_resp_anwser_excel="output_question_resp_anwser_excel.xlsx
 export output_error_log="error.log"
 export output_session_id="1680027XXX"
 export output_folder_name="outputs"
+export number_of_retrys="5"
+# Only needed when you run 
+# question answering microservice and evaluate container
+# on the same local machine.
+export host_ip=""
 ```
 
 ## Create `/evaluations/outputs` and `/evaluations/inputs` folder
@@ -79,10 +84,61 @@ python3 evaluate.py
     
     * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
-### 2. Execute as container
+### 2. Execute as a local container
 
-#### 2.1 Build and run container
+#### 2.1 Build and run as a local container and the `question answering service` **doesn't run** on the same machine local machine as a container
 
 ```sh
-sh build_and_start_container.sh
+sh qa_ce_and_eval_local_build_and_run_container.sh
 ```
+
+* Example output:
+
+```sh
+...
+******* invoke REST API ********
+
+--- Request0 ---
+Status  : 200
+Question: My question?
+Answer  : The answer.
+--- Request1 ---
+Status  : 200
+Question: My question?
+Answer  : The answer.
+--- Request2 ---
+...
+```
+
+#### 2.2 Build and run as a local container and the `question answering service` **does run** on the same machine local machine as a container
+
+1. In this situation you need to get the local host IP address and save it, to use the address later 
+
+```sh
+ifconfig | grep 192.
+```
+
+Example output:
+
+You should see your local host IP address.
+In that situation it is the `192.168.178.36`.
+
+Insert the IP address in your `.env` file:
+
+```sh
+# Only needed when you run 
+# question answering microservice and evaluate container
+# on the same local machine.
+export host_ip=""
+```
+
+2. Execute the bash script in a new terminal session.
+
+```sh
+sh qa_local_and_eval_local_build_and_run_container.sh
+```
+
+
+
+
+
