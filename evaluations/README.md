@@ -73,11 +73,11 @@ python3 evaluate.py
 
 * Output files
 
-    * **CSV:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
+    * **CSV:** It creates a file in the `outputs` folder `outputs/1680027XXX_2023-03-31_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
 
-    * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_2023-03-31_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
-    * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **Error Log:** It creates a file in the `outputs` folder `outputs/2023-03-31_1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
 ### 2. Execute as a local container
 

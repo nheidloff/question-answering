@@ -94,9 +94,9 @@ def bleu_from_list_to_dict(header):
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "_" + output_error_log)
+logger = logging.getLogger(str(date.today()) + "_" + output_session_id + "_" + output_error_log)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + date.today() + "_" + output_session_id + "_" + output_error_log)
+file_handler = logging.FileHandler(get_output_path() + "/" + str(date.today()) + "_" + output_session_id + "_" + output_error_log)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
@@ -249,7 +249,7 @@ def main(args):
         golds = [[]]
         
         # Get date to be added to the file names
-        today = date.today()
+        today = str(date.today())
 
         output_directory = get_output_path()
         print(f"- Output dir: {output_directory}")
