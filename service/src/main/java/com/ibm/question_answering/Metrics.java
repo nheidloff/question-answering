@@ -3,6 +3,7 @@ package com.ibm.question_answering;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.reranker.DocumentScore;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -287,26 +288,26 @@ public class Metrics {
         this.tsDiscoveryStart = getTimestamp();
     }
 
-    public void discoveryStopped(com.ibm.question_answering.Answer result) {
+    public void discoveryStopped(com.ibm.question_answering.Answer answer) {
         this.tsDiscoveryEnd = getTimestamp();
-        if (result != null) {
-            this.sizeDiscoveryResults = String.valueOf(result.matching_results);
-            this.sizeDiscoverySentResults = String.valueOf(result.results.size());
+        if (answer != null) {
+            this.sizeDiscoveryResults = String.valueOf(answer.matching_results);
+            this.sizeDiscoverySentResults = String.valueOf(answer.results.size());
             this.resultDiscovery = new String[10];
             this.resultDiscoveryChunkIds = new String[10];
-            for (int index = 0; index < resultDiscovery.length; index++) {
+
+            int amountResults = answer.results.size();
+            if (amountResults > 10) {
+                amountResults = 10;
+            }
+            
+            for (int index = 0; index < amountResults; index++) {
                 String resultString = "";
                 String resultStringChuckId = "";
-                if (index <= result.results.size()) {
-                    if (result.results.get(index).text != null) {
-                        if (result.results.get(index).text.text != null) {
-                            if (result.results.get(index).text.text.length > 0) {
-                                resultString = result.results.get(index).title + ". " + result.results.get(index).text.text[0];
-                                resultStringChuckId = result.results.get(index).chunckid;
-                            }
-                        }
-                    }                    
-                }    
+                if (index <= answer.results.size()) {
+                    resultString = RelevantOutput.getDiscoveryResultAsText(answer, index);
+                    resultStringChuckId = answer.results.get(index).chunckid;
+                }
                 this.resultDiscovery[index] = resultString;
                 this.resultDiscoveryChunkIds[index] = resultStringChuckId;
             }
@@ -369,13 +370,13 @@ public class Metrics {
             writer.write("\n");
             writer.write("*Result 1 chunckid:* " + this.resultDiscoveryChunkIds[0] + "\n");
             writer.write("\n");
-            writer.write("<details><summary>Result 1</summary> " + this.resultDiscovery[0] + "</details>\n\n");
+            writer.write("<details><summary>Result 1</summary>" + this.resultDiscovery[0] + "</details>\n\n");
             writer.write("*Result 2 chunckid:* " + this.resultDiscoveryChunkIds[1] + "\n");
             writer.write("\n");
-            writer.write("<details><summary>Result 2</summary> " + this.resultDiscovery[1] + "</details>\n\n");
+            writer.write("<details><summary>Result 2</summary>" + this.resultDiscovery[1] + "</details>\n\n");
             writer.write("*Result 3 chunckid:* " + this.resultDiscoveryChunkIds[3] + "\n");
             writer.write("\n");
-            writer.write("<details><summary>Result 3</summary> " + this.resultDiscovery[2] + "</details>\n\n");
+            writer.write("<details><summary>Result 3</summary>" + this.resultDiscovery[2] + "</details>\n\n");
             writer.write("\n");
             if (this.reRankerUsed == true) {
                 writer.write("### Re-Ranker" + "\n");
@@ -394,13 +395,13 @@ public class Metrics {
                 writer.write("\n");
                 writer.write("*Result 1 chunckid:* " + this.resultReRankerChunkIds[0] + "\n");
                 writer.write("\n");
-                writer.write("<details><summary>Result 1</summary> " + this.resultReRanker[0] + "</details>\n\n");
+                writer.write("<details><summary>Result 1</summary>" + this.resultReRanker[0] + "</details>\n\n");
                 writer.write("*Result 2 chunckid:* " + this.resultReRankerChunkIds[1] + "\n");
                 writer.write("\n");
-                writer.write("<details><summary>Result 2</summary> " + this.resultReRanker[1] + "</details>\n\n");
+                writer.write("<details><summary>Result 2</summary>" + this.resultReRanker[1] + "</details>\n\n");
                 writer.write("*Result 3 chunckid:* " + this.resultReRankerChunkIds[2] + "\n");
                 writer.write("\n");
-                writer.write("<details><summary>Result 3</summary> " + this.resultReRanker[2] + "</details>\n\n");
+                writer.write("<details><summary>Result 3</summary>" + this.resultReRanker[2] + "</details>\n\n");
                 writer.write("\n");
             }
             writer.write("### Model as a Service" + "\n");

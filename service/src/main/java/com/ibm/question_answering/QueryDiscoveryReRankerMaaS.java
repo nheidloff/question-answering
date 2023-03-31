@@ -4,10 +4,9 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import com.ibm.question_answering.discovery.AskDiscoveryService;
+import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.maas.AskModelAsAService;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.prompts.QuestionAnswering;
@@ -82,7 +81,7 @@ public class QueryDiscoveryReRankerMaaS {
         DocumentScore[] documentsAndScoresInput = new DocumentScore[inputReRankerAmountDocuments];
         for (int index = 0; index < inputReRankerAmountDocuments; index++) {
             Document document = new Document();
-            document.text = getDiscoveryResultAsText(discoveryAnswer, index);
+            document.text = RelevantOutput.getDiscoveryResultAsText(discoveryAnswer, index);
             document.document_id = discoveryAnswer.results.get(index).document_id;
             document.title = discoveryAnswer.results.get(index).title;
             documentsAndScoresInput[index] = new DocumentScore(document, discoveryAnswer.results.get(index).result_metadata.confidence);            
@@ -147,21 +146,6 @@ public class QueryDiscoveryReRankerMaaS {
                 output = discoveryAnswer.results.get(index).url;
             }
         }
-        return output;
-    }
-
-    public String getDiscoveryResultAsText(com.ibm.question_answering.Answer discoveryAnswer, int index) {
-        Result discoveryResult = discoveryAnswer.results.get(index);
-        String output = "";
-        if (discoveryResult.text != null) {
-            if (discoveryResult.text.text != null) {                            
-                if (discoveryResult.text.text.length > 0) {
-                    for (int i = 0; i < discoveryAnswer.results.get(index).text.text.length; i++) {
-                        output = output + discoveryAnswer.results.get(index).text.text[i] + " ";
-                    }
-                }
-            }
-        }        
         return output;
     }
 
