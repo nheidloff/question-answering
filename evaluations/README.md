@@ -89,7 +89,7 @@ python3 evaluate.py
 #### 2.1 Build and run as a local container and the `question answering service` **doesn't run** on the same machine local machine as a container
 
 ```sh
-sh local_eval_build_and_run_container.sh
+sh qa_ce_and_eval_local_build_and_run_container.sh
 ```
 
 * Example output:
@@ -135,7 +135,7 @@ export host_ip=""
 2. Execute the bash script in a new terminal session.
 
 ```sh
-sh local_eval_build_and_run_container.sh
+sh qa_local_and_eval_local_build_and_run_container.sh
 ```
 
 

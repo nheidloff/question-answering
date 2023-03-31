@@ -14,9 +14,9 @@ docker build -t $image_name:$version .
 
 echo "***** START evaluation container ******"
 docker run --name="evaluation-run" -it --rm \
-                --add-host host.docker.internal:${host_ip_addr} \
-                -v $(pwd)/outputs:/app/outputs \
-                -v $(pwd)/inputs:/app/inputs \
+                --add-host host.docker.internal:"${host_ip_addr}" \
+                -v ${pwd}/outputs:/app/outputs \
+                -v ${pwd}/inputs:/app/inputs \
                 -e endpoint="$endpoint" \
                 -e api_url="$api_url" \
                 -e username="$username" \
@@ -29,5 +29,5 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_error_log="$output_error_log" \
                 -e output_session_id="$output_session_id" \
                 -e output_folder_name="$output_folder_name" \
-                -e export number_of_retrys="$export number_of_retrys" \
+                -e number_of_retrys="$number_of_retrys" \
                 $image_name:$version
