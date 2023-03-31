@@ -349,6 +349,9 @@ def main(args):
         responses = [row[header['response']] for row in rows]
         golds = [[row[header['golden_anwser']]] for row in rows]
 
+        #print(f"Response {responses}")
+        #print(f"golds {golds}")
+
         metric = load_metric("sacrebleu")
         metric.add_batch(predictions=responses, references=golds)
         sacrebleu = metric.compute()["score"]
@@ -360,7 +363,8 @@ def main(args):
         print (f"******* outputs for session: {output_session_id} ********")
         print (f"CSV   output file : {csv_output_filepath}")
         print (f"Excel output file : {workbook_name_file}\n")
-        print (f"******* Bleu result based on {len(responses)} responses ********")
+        count = len(responses) - 1
+        print (f"******* Bleu result based on {count} responses ********")
         print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
 
 if __name__ == "__main__":
