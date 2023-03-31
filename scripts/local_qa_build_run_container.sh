@@ -12,7 +12,11 @@ echo "****** BUILD *********"
 cd $(pwd)/../service
 docker build -f $dockerfile_path -t $image_name:$version .
 
-echo "****** BUILD *********"
+echo "***** STOP and DELETE existing '$name' container ******"
+docker container stop -f "$name"
+docker container rm -f "$name"
+
+echo "****** RUN '$name' container *********"
 cd $(pwd)/../service
 docker run -i --rm -p 8080:8080 --name $name \
   -e QA_API_KEY=${QA_API_KEY} \

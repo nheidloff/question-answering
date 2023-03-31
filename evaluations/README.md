@@ -1,4 +1,4 @@
-# evaluations
+# Evaluations
 
 ## Used main libraries
 
@@ -25,15 +25,10 @@ python3 -m pip install rouge_score
 pip3 freeze > requirements.txt
 ```
 
-* Use to install from the requirements file
-
-```sh
-pip install -r requirements.txt
-```
-
 ## Create an `.env` file
 
 ```sh
+cd YOUR_PATH/question-answering/evaluations
 cat ./env_template > .env
 ```
 
@@ -121,7 +116,7 @@ ifconfig | grep 192.
 Example output:
 
 You should see your local host IP address.
-In that situation it is the `192.168.178.36`.
+In our example below the value is the IP `192.168.178.36`.
 
 Insert the IP address in your `.env` file:
 
@@ -129,7 +124,7 @@ Insert the IP address in your `.env` file:
 # Only needed when you run 
 # question answering microservice and evaluate container
 # on the same local machine.
-export host_ip=""
+export host_ip="192.168.178.36"
 ```
 
 2. Execute the bash script in a new terminal session.
