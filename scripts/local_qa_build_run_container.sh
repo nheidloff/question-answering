@@ -8,9 +8,16 @@ export image_name="question-answering-local"
 export dockerfile_path="$(pwd)/../service/src/main/docker/Dockerfile.jvm"
 export name=question-answering-service
 
+# temp set metrics problem with '../' in the question-answering service
+tmp_home=$(pwd)
+cd ..
+project_path=$(pwd)
+cd $tmp_home
+
 echo "****** BUILD *********"
 cd $(pwd)/../service
 docker build -f $dockerfile_path -t $image_name:$version .
+cd $tmp_home
 
 echo "***** STOP and DELETE existing '$name' container ******"
 docker container stop -f "$name"
@@ -38,8 +45,9 @@ docker run -i --rm -p 8080:8080 --name $name \
   -e EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS} \
   -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
+  -e EXPERIMENT_METRICS_SESSION_ID=${EXPERIMENT_METRICS_SESSION_ID} \
   -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
   -e EXPERIMENT_METRICS_SESSION=${EXPERIMENT_METRICS_RUN} \
-  -e EXPERIMENT_METRICS_DIRECTORY=${EXPERIMENT_METRICS_DIRECTORY} \
-  -v $(pwd)/../metrics:/deployments/metrics \
+  -v "${project_path}"/metrics/myrun:/deployments/metrics \
   $image_name:$version
+cd $tmp_home
