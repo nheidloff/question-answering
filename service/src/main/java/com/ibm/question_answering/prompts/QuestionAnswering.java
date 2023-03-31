@@ -18,6 +18,14 @@ Question: <<QUESTION>>
 
 Answer: """;
 
+/* 
+    public final String template = """
+<<CONTEXT>>
+
+User: <<QUESTION>>
+Agent:""";
+*/
+
     public String getPrompt(String query, String context) {
         String output = template;
         output = output.replace(CONTEXT, context);

@@ -5,6 +5,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.ibm.question_answering.discovery.AskDiscoveryService;
+import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.maas.AskModelAsAService;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.prompts.QuestionAnswering;
@@ -14,7 +15,7 @@ import com.ibm.question_answering.reranker.DocumentScore;
 
 @ApplicationScoped
 public class QueryDiscoveryMaaS {
-    
+      
     @Inject
     QueryDiscoveryReRankerMaaS queryDiscoveryReRankerMaaS;
 
@@ -93,7 +94,7 @@ public class QueryDiscoveryMaaS {
                     for (int index = 0; index < discoveryAnswer.results.size(); index++) {
                         Result discoveryResult = discoveryAnswer.results.get(index);
                         Document document = new Document();
-                        document.text = queryDiscoveryReRankerMaaS.getDiscoveryResultAsText(discoveryAnswer, index);
+                        document.text = RelevantOutput.getDiscoveryResultAsText(discoveryAnswer, index);
                         document.document_id = discoveryResult.document_id;
                         document.title = discoveryResult.title;
                         DocumentScore documentScore = new DocumentScore(document, discoveryResult.result_metadata.confidence);
