@@ -28,23 +28,25 @@ The answer to the question "When and for how much did IBM acquire Red Hat?" is g
 
 ## Endpoints
 
-There are several endpoints to test and compare results. Two main flows:
+There are several endpoints to test and compare results. Main flows:
 
-1. /query-primeqa-maaas: Returns answer from PrimeQA (connected to Discovery) and MaaS (with proxy, without summaries)
-2. /query-discovery-reranker-maas: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)
+1. /query-discovery-reranker-maas: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries, with metrics)
+2. /query-discovery-maas: Returns answer from Discovery and MaaS (with proxy, without summaries, with metrics)
+3. /query-primeqa-maas: Returns answer from PrimeQA (connected to Discovery) and MaaS (with proxy, without summaries)
 
 Further endpoints can be used for testing:
 
+* /query: Same as /query-discovery-reranker-maas
+* /query-discovery-reranker-maas-no-proxy: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (without proxy, without summaries, with metrics)
+* /query-discovery-maas-no-proxy: Returns answer from Discovery and MaaS (no proxy, without summaries, with metrics)
+* /query-primeqa-maas-no-proxy: Returns answer from PrimeQA (connected to Discovery) and MaaS (without proxy, without summaries)
 * /query-discovery: Returns answer from Watson Discovery
 * /query-reranker: Returns answer from the reranker on PrimeQA with mock documents (model: drdecr)
 * /query-primeqa: Returns answer from PrimeQA (retriever: Watson Discovery; reader: PrimeQA/nq_tydi_sq1-reader-xlmr_large)
 * /query-maas: Returns answer from MaaS (aka BAM; model: FLAN-UL2)
-* /query-primeqa-maas-no-proxy: Returns answer from PrimeQA (connected to Discovery) and MaaS (without proxy, without summaries)
-* /query-discovery-reranker-maas-no-proxy: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (without proxy, without summaries)
 * /query-primeqa-maas-summaries: Returns answer from PrimeQA and MaaS (with proxy, with summaries)
 * /query-mock-confident: Returns hardcoded data for a confident answer
 * /query-mock-not-confident: Returns hardcoded data for a non confident answer
-* /query: Same as /query-discovery-reranker-maas
 
 *Flow 1: /query-primeqa-maaas: Returns answer from PrimeQA (connected to Discovery) and MaaS*
 

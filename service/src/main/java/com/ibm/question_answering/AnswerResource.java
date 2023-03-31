@@ -94,14 +94,48 @@ public class AnswerResource {
         //System.out.println("query: " + getQuery(data));
 
         metrics.start(uriInfo, utilities.getQuery(data));
-
         utilities.checkAuthorization(apikey);
         Answer output;
         output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), true, false);
         output = utilities.removeRedundantDocuments(output);
-
         metrics.end();
         return output;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-discovery-reranker-maas")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)",
+            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)"
+    )
+    public Answer queryDiscoveryAndReRankerAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), true, false);
+        output = utilities.removeRedundantDocuments(output);
+        metrics.end();
+        return output;       
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-discovery-reranker-maas-no-proxy")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)",
+            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)"
+    )
+    public Answer queryDiscoveryAndReRankerAndMaaSNoProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), false, false);
+        output = utilities.removeRedundantDocuments(output);
+        metrics.end();
+        return output;        
     }
 
     @POST
@@ -114,12 +148,28 @@ public class AnswerResource {
     )
     public Answer queryDiscoveryAndMaaSProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         metrics.start(uriInfo, utilities.getQuery(data));
-
         utilities.checkAuthorization(apikey);
         Answer output;
         output = queryDiscoveryMaaS.query(utilities.getQuery(data), true, false);
         output = utilities.removeRedundantDocuments(output);
+        metrics.end();
+        return output;
+    }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-discovery-maas-no-proxy")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+        summary = "Returns answer from Discovery and MaaS (no proxy, without summaries)",
+        description = "Returns answer from Discovery and MaaS (no proxy, without summaries)"
+    )
+    public Answer queryDiscoveryAndMaaSNoProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryDiscoveryMaaS.query(utilities.getQuery(data), false, false);
+        output = utilities.removeRedundantDocuments(output);
         metrics.end();
         return output;
     }
@@ -138,38 +188,6 @@ public class AnswerResource {
         output = queryPrimeAndMaaS.query(utilities.getQuery(data), true, false);
         output = utilities.removeRedundantDocuments(output);
         return output;
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/query-discovery-reranker-maas")
-    @SecurityRequirement(name = "apikey")
-    @Operation(
-            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)",
-            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)"
-    )
-    public Answer queryDiscoveryAndReRankerAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
-        utilities.checkAuthorization(apikey);
-        Answer output;
-        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), true, false);
-        output = utilities.removeRedundantDocuments(output);
-        return output;        
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/query-discovery-reranker-maas-no-proxy")
-    @SecurityRequirement(name = "apikey")
-    @Operation(
-            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)",
-            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries)"
-    )
-    public Answer queryDiscoveryAndReRankerAndMaaSNoProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
-        utilities.checkAuthorization(apikey);
-        Answer output;
-        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data), false, false);
-        output = utilities.removeRedundantDocuments(output);
-        return output;        
     }
 
     @POST
