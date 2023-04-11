@@ -46,8 +46,8 @@ public class RelevantOutput {
                     String passageText = passage.passage_text;
                     passageText = passageText.replace("<em>", "");
                     passageText = passageText.replace("</em>", "");
-                    passageText = passageText.replace("\u0000", "");                        
-                    output = output + passageText + " ";
+                    passageText = passageText.replace("\u0000", " ");                        
+                    output = passageText;
                 }
             }
         }               

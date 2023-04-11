@@ -16,6 +16,10 @@ public class Input {
         this.collection_ids[0] = collectionId;
 
         this.count = count;
+
+        this.passages = new Passages();
+
+        table_results = new TableResults();
     }
     
     public String collection_ids[];
@@ -27,4 +31,8 @@ public class Input {
     public String natural_language_query;
 
     public int count;
+
+    public Passages passages;
+
+    public TableResults table_results;
 }

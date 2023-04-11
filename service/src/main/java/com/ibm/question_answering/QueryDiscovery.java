@@ -12,6 +12,6 @@ public class QueryDiscovery {
 
     public Answer query(String query) {
         
-        return askDiscoveryService.ask(query, 10);   
+        return askDiscoveryService.ask(query);   
     }
 }
