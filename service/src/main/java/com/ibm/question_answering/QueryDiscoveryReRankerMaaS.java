@@ -105,7 +105,7 @@ public class QueryDiscoveryReRankerMaaS {
 
         Answer output = queryPrimeAndMaaS.queryMaaS(answerDocuments, query, proxy, summaries);
         String answerAsText = output.results.get(0).text.text[0];
-        answerAsText = removeEverythingAfterLastDot(answerAsText);
+        //answerAsText = removeEverythingAfterLastDot(answerAsText);
         String[] text = new String[1];
         text[0] = answerAsText;
         output.results.get(0).text.text = text;

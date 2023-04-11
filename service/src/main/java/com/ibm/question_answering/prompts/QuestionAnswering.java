@@ -9,6 +9,7 @@ public class QuestionAnswering {
     public final static String CONTEXT = "<<CONTEXT>>";
     public final static String QUESTION = "<<QUESTION>>";
 
+/* 
     public final String template = """
 Answer the following question after reading the text.
 
@@ -17,14 +18,14 @@ Text: <<CONTEXT>>
 Question: <<QUESTION>>
 
 Answer: """;
+*/
 
-/* 
     public final String template = """
 <<CONTEXT>>
 
 User: <<QUESTION>>
 Agent:""";
-*/
+
 
     public String getPrompt(String query, String context) {
         String output = template;
