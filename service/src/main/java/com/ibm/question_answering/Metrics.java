@@ -42,7 +42,8 @@ public class Metrics {
         "RERANKER_MAX_INPUT_DOCUMENTS",
         "RERANKER_MODEL",
         "RERANKER_ID",
-        "URL"
+        "URL",
+        "DISCOVERY_MAX_OUTPUT_DOCUMENTS"
     };
 
     final String[] headersRuns = {
@@ -131,6 +132,7 @@ public class Metrics {
     String sizeDiscoverySentResults;
     String sizeReRankerInputs;
     String sizeReRankerResults;
+    String discoveryMaxDocuments;
 
     final String fileNameMetadata = "Metadata.csv";
     final String fileNameRuns = "Runs.csv";
@@ -247,6 +249,7 @@ public class Metrics {
                 data.add(this.rrModel);
                 data.add(this.rrId);
                 data.add(this.url);
+                data.add(this.discoveryMaxDocuments);
 
                 csvPrinterMetadata.printRecord(data);
                 csvPrinterMetadata.flush();
@@ -284,8 +287,9 @@ public class Metrics {
         }
     }
 
-    public void discoveryStarted() {
+    public void discoveryStarted(int maxDocuments) {
         this.tsDiscoveryStart = getTimestamp();
+        this.discoveryMaxDocuments = String.valueOf(maxDocuments);
     }
 
     public void discoveryStopped(com.ibm.question_answering.Answer answer) {
@@ -366,15 +370,17 @@ public class Metrics {
             writer.write("\n");
             writer.write("*Results (returned):* " + this.sizeDiscoverySentResults + "\n");
             writer.write("\n");
+            writer.write("*Results (max):* " + this.discoveryMaxDocuments + "\n");
+            writer.write("\n");            
             writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
             writer.write("\n");
-            writer.write("*Result 1 chunckid:* " + this.resultDiscoveryChunkIds[0] + "\n");
+            writer.write("*Result 1 chunckid or document_id:* " + this.resultDiscoveryChunkIds[0] + "\n");
             writer.write("\n");
             writer.write("<details><summary>Result 1</summary>" + this.resultDiscovery[0] + "</details>\n\n");
-            writer.write("*Result 2 chunckid:* " + this.resultDiscoveryChunkIds[1] + "\n");
+            writer.write("*Result 2 chunckid or document_id:* " + this.resultDiscoveryChunkIds[1] + "\n");
             writer.write("\n");
             writer.write("<details><summary>Result 2</summary>" + this.resultDiscovery[1] + "</details>\n\n");
-            writer.write("*Result 3 chunckid:* " + this.resultDiscoveryChunkIds[3] + "\n");
+            writer.write("*Result 3 chunckid or document_id:* " + this.resultDiscoveryChunkIds[3] + "\n");
             writer.write("\n");
             writer.write("<details><summary>Result 3</summary>" + this.resultDiscovery[2] + "</details>\n\n");
             writer.write("\n");
@@ -393,13 +399,13 @@ public class Metrics {
                 writer.write("\n");
                 writer.write("*Ouput Documents Actual:* " + this.sizeReRankerResults + "\n");
                 writer.write("\n");
-                writer.write("*Result 1 chunckid:* " + this.resultReRankerChunkIds[0] + "\n");
+                writer.write("*Result 1 chunckid or document_id:* " + this.resultReRankerChunkIds[0] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 1</summary>" + this.resultReRanker[0] + "</details>\n\n");
-                writer.write("*Result 2 chunckid:* " + this.resultReRankerChunkIds[1] + "\n");
+                writer.write("*Result 2 chunckid or document_id:* " + this.resultReRankerChunkIds[1] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 2</summary>" + this.resultReRanker[1] + "</details>\n\n");
-                writer.write("*Result 3 chunckid:* " + this.resultReRankerChunkIds[2] + "\n");
+                writer.write("*Result 3 chunckid or document_id:* " + this.resultReRankerChunkIds[2] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 3</summary>" + this.resultReRanker[2] + "</details>\n\n");
                 writer.write("\n");

@@ -44,12 +44,6 @@ public class QueryDiscoveryMaaS {
     Metrics metrics;
 
     public Answer query(String query, boolean proxy, boolean summaries) {
-        int rerankerMaxInputDocuments = 10;
-        if (rerankerMaxInputDocumentsOptionalString.isPresent()) {
-            try {
-                rerankerMaxInputDocuments = Integer.parseInt(rerankerMaxInputDocumentsOptionalString.get());
-            } catch (Exception e) {}
-        }
         int llmMaxInputDocuments = 5;
         if (llmMaxInputDocumentsOptionalString.isPresent()) {
             try {
@@ -58,7 +52,7 @@ public class QueryDiscoveryMaaS {
         }
         
         // 1. Discovery
-        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query, rerankerMaxInputDocuments);   
+        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
         if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
             return MockAnswers.getEmptyAnswer();
         }

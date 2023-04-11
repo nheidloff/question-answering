@@ -64,13 +64,14 @@ public class QueryDiscoveryReRankerMaaS {
         }
         
         // 1. Discovery
-        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query, rerankerMaxInputDocuments);   
+        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
         if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
             return MockAnswers.getEmptyAnswer();
         }
         for (int index = 0; index < discoveryAnswer.results.size(); index++) {
             discoveryAnswer.results.get(index).document_id = discoveryAnswer.results.get(index).chunckid;
         }
+        discoveryAnswer = askDiscoveryService.ensureDocumentIdsExist(discoveryAnswer);
         
         // 2. ReRanker
         int inputReRankerAmountDocuments = discoveryAnswer.results.size();
