@@ -14,6 +14,7 @@ import sacrebleu as scb
 import logging
 import openpyxl
 import time
+from datetime import date
 
 # ******************************************
 # Global variables
@@ -88,14 +89,14 @@ def bleu_get_data(input_filename):
 def bleu_from_list_to_dict(header):
     indices = [i for i in range(0, len(header))]
     header = {k: v for k, v in zip(header, indices)}
-    print ( header )
+    # print ( header )
     return header
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "_" + output_error_log)
+logger = logging.getLogger(str(date.today()) + "_" + output_session_id + "_" + output_error_log)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "_" + output_error_log)
+file_handler = logging.FileHandler(get_output_path() + "/" + str(date.today()) + "_" + output_session_id + "_" + output_error_log)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
@@ -246,13 +247,16 @@ def main(args):
         
         # Temp list for creating output files
         golds = [[]]
+        
+        # Get date to be added to the file names
+        today = str(date.today())
 
         output_directory = get_output_path()
         print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
         print(f"- Input dir: {input_directory}")
-        workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
-        csv_output_filepath = output_directory + "/"  + output_session_id + "_" +  output_question_resp_anwser
+        workbook_name_file = output_directory + "/"  + output_session_id + "_" + today + "_" + output_question_resp_anwser_excel
+        csv_output_filepath = output_directory + "/"  + output_session_id + "_" + today + "_" +  output_question_resp_anwser
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
@@ -295,7 +299,7 @@ def main(args):
                                         # 1.4.1 Retry if the request didn't work
                                         if (verify != True):
                                                 print(f"--- Retry the request {i} for {number_of_retrys } times and wait for 3 sec ---")
-                                                retrys = number_of_retrys
+                                                retrys = int(number_of_retrys)
                                                 retrys_count = 1
                                                 
                                                 while (retrys_count != retrys):
@@ -306,7 +310,7 @@ def main(args):
                                                         if (verify == True):
                                                                 break
                                                         else:
-                                                                message = "Retry: " + str(retrys_count) + " for request " + str(i) + "didn't work"
+                                                                message = "Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
                                                                 print(message)
                                                                 logger.error(message)
 
@@ -345,6 +349,9 @@ def main(args):
         responses = [row[header['response']] for row in rows]
         golds = [[row[header['golden_anwser']]] for row in rows]
 
+        #print(f"Response {responses}")
+        #print(f"golds {golds}")
+
         metric = load_metric("sacrebleu")
         metric.add_batch(predictions=responses, references=golds)
         sacrebleu = metric.compute()["score"]
@@ -356,7 +363,8 @@ def main(args):
         print (f"******* outputs for session: {output_session_id} ********")
         print (f"CSV   output file : {csv_output_filepath}")
         print (f"Excel output file : {workbook_name_file}\n")
-        print (f"******* Bleu result based on {len(responses)} responses ********")
+        count = len(responses) - 1
+        print (f"******* Bleu result based on {count} responses ********")
         print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
 
 if __name__ == "__main__":

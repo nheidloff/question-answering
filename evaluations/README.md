@@ -1,4 +1,4 @@
-# evaluations
+# Evaluations
 
 ## Used main libraries
 
@@ -25,15 +25,10 @@ python3 -m pip install rouge_score
 pip3 freeze > requirements.txt
 ```
 
-* Use to install from the requirements file
-
-```sh
-pip install -r requirements.txt
-```
-
 ## Create an `.env` file
 
 ```sh
+cd YOUR_PATH/question-answering/evaluations
 cat ./env_template > .env
 ```
 
@@ -48,7 +43,7 @@ export input_excel_filename="input_excel.xlsx"
 export output_question_resp_anwser="output_question_resp_anwser.csv"
 export output_question_resp_anwser_excel="output_question_resp_anwser_excel.xlsx"
 export output_error_log="error.log"
-export output_session_id="1680027XXX"
+export output_session_id="$(date +%s)"
 export output_folder_name="outputs"
 export number_of_retrys="5"
 # Only needed when you run 
@@ -78,11 +73,11 @@ python3 evaluate.py
 
 * Output files
 
-    * **CSV:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
+    * **CSV:** It creates a file in the `outputs` folder `outputs/EX_RUN_1_2023-03-31_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
 
-    * **Excel:** It creates a file in the `outputs` folder `outputs/1680027XXX_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    * **Excel:** It creates a file in the `outputs` folder `outputs/EX_RUN_1_2023-03-31_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
-    * **Error Log:** It creates a file in the `outputs` folder `outputs/1680027XXX_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **Error Log:** It creates a file in the `outputs` folder `outputs/2023-03-31_EX_RUN_1_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
 ### 2. Execute as a local container
 
@@ -121,7 +116,7 @@ ifconfig | grep 192.
 Example output:
 
 You should see your local host IP address.
-In that situation it is the `192.168.178.36`.
+In our example below the value is the IP `192.168.178.36`.
 
 Insert the IP address in your `.env` file:
 
@@ -129,7 +124,7 @@ Insert the IP address in your `.env` file:
 # Only needed when you run 
 # question answering microservice and evaluate container
 # on the same local machine.
-export host_ip=""
+export host_ip="192.168.178.36"
 ```
 
 2. Execute the bash script in a new terminal session.

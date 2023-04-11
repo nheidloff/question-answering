@@ -6,17 +6,28 @@ export version="v0.0.1"
 export image_name="evaluation-local"
 export host_ip_addr=$host_ip
 
-mkdir $(pwd)/outputs
-mkdir $(pwd)/inputs
+echo "***** CREATE DIRs ******"
+mountpath_inputs="$(pwd)/inputs"
+mountpath_outputs="$(pwd)/outputs"
+
+echo "Path: $mountpath_outputs"
+echo "Path: $mountpath_inputs"
+
+mkdir $mountpath_outputs
+mkdir $mountpath_inputs
 
 echo "***** BUILD evaluation container ******"
 docker build -t $image_name:$version .
 
+echo "***** STOP and DELETE existing evaluation container ******"
+docker container stop -f  "evaluation-run"
+docker container rm -f "evaluation-run"
+
 echo "***** START evaluation container ******"
 docker run --name="evaluation-run" -it --rm \
                 --add-host host.docker.internal:"${host_ip_addr}" \
-                -v ${pwd}/outputs:/app/outputs \
-                -v ${pwd}/inputs:/app/inputs \
+                -v "${mountpath_outputs}":/app/outputs \
+                -v "${mountpath_inputs}":/app/inputs \
                 -e endpoint="$endpoint" \
                 -e api_url="$api_url" \
                 -e username="$username" \
