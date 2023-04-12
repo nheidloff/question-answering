@@ -7,6 +7,6 @@ public class Passages {
     }
     public String[] fields;
     public boolean enabled = true;
-    public int characters = 250;
-    public boolean find_answers = true;
+    public int characters = 1000;
+    public boolean find_answers = false;
 }
