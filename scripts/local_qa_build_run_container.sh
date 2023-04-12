@@ -1,7 +1,12 @@
 #!/bin/bash
 
+echo "Home path : $HOME_PATH"
+echo "Session ID: $SESSION_ID"
+cd $HOME_PATH
+
 # **************** Global variables
 source ./.env
+source $(pwd)/../evaluations/.env
 
 export version="v0.0.1"
 export image_name="question-answering-local"
@@ -13,6 +18,7 @@ tmp_home=$(pwd)
 cd ..
 project_path=$(pwd)
 cd $tmp_home
+export mountpath_metrics="${project_path}/metrics/${METRICS_FOLDER_NAME}"
 
 echo "****** BUILD *********"
 cd $(pwd)/../service
@@ -48,6 +54,6 @@ docker run -i --rm -p 8080:8080 --name $name \
   -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
   -e EXPERIMENT_METRICS_SESSION=${EXPERIMENT_METRICS_SESSION} \
   -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
-  -v "${project_path}"/metrics/myrun:/deployments/metrics \
+  -v "${mountpath_metrics}":/deployments/metrics \
   $image_name:$version
 cd $tmp_home

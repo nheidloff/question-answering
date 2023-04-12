@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Home path : $HOME_PATH"
+echo "Session ID: $SESSION_ID"
+cd $HOME_PATH/../evaluations
+
 # evaluation environment variables
 source ./.env
 
@@ -10,6 +14,14 @@ export host_ip_addr=$host_ip
 echo "***** CREATE DIRs ******"
 mountpath_inputs="$(pwd)/inputs"
 mountpath_outputs="$(pwd)/outputs"
+
+# temp set metrics problem with '../' in the question-answering service
+tmp_home=$(pwd)
+cd ..
+project_path=$(pwd)
+cd $tmp_home
+export mountpath_metrics="${project_path}/metrics/${input_folder_name_qa_service_metrics}"
+
 
 echo "Path: $mountpath_outputs"
 echo "Path: $mountpath_inputs"
@@ -29,6 +41,7 @@ docker run --name="evaluation-run" -it --rm \
                 --add-host host.docker.internal:"${host_ip_addr}" \
                 -v "${mountpath_outputs}":/app/outputs \
                 -v "${mountpath_inputs}":/app/inputs \
+                -v "${mountpath_metrics}":/app/metrics \
                 -e endpoint="$endpoint" \
                 -e api_url="$api_url" \
                 -e username="$username" \
@@ -42,4 +55,5 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_session_id="$output_session_id" \
                 -e output_folder_name="$output_folder_name" \
                 -e number_of_retrys="$number_of_retrys" \
+                -e container_run="$container_run" \
                 $image_name:$version

@@ -30,6 +30,7 @@ verify_answer=os.environ.get("verify_answer")
 input_excel_filename = os.environ.get("input_excel_filename")
 input_folder_name = os.environ.get("input_folder_name")
 input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_service_metrics")
+container_run = os.environ.get("container_run")
 
 # outputs
 output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
@@ -56,6 +57,7 @@ print(f"- Sesssion ID output prefix: {output_session_id}")
 print(f"- Output CSV: {output_question_resp_anwser}")
 print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
 print(f"- Error log name: {output_error_log}")
+print(f"- Container run: {container_run}")
 
 # ******************************************
 # get os path information
@@ -80,7 +82,7 @@ def get_input_qa_service_metrics_local_path():
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
         directory = os.getcwd()
-        directory = directory + "/metrics/"
+        directory = directory + "/metrics"
         return directory
 
 # ******************************************
@@ -290,10 +292,15 @@ def main(args):
         print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
         print(f"- Input dir: {input_directory}")
-        input_qa_directory = get_input_qa_service_metrics_local_path()
-        print(f"- Input qa dir (local): {input_qa_directory}")
-
-        qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
+        if (container_run == False):
+                input_qa_directory = get_input_qa_service_metrics_local_path()
+                print(f"- Input qa dir (local): {input_qa_directory}")
+                qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
+        else:
+                input_qa_directory = get_input_qa_service_metrics_container_path()
+                print(f"- Input qa dir (container): {input_qa_directory}")
+                qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
+   
         workbook_name_file = output_directory + "/"  + output_session_id + "_" + today + "_" + output_question_resp_anwser_excel
         csv_output_filepath = output_directory + "/"  + output_session_id + "_" + today + "_" +  output_question_resp_anwser
 
