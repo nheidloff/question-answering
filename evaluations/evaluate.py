@@ -247,10 +247,14 @@ def main(args):
         
         # Temp list for creating output files
         golds = [[]]
+
+        # End experiment, when not all requests can be processed!
+        end_experiment = False 
         
         # Get date to be added to the file names
         today = str(date.today())
 
+        # Set paths for input and output
         output_directory = get_output_path()
         print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
@@ -300,22 +304,45 @@ def main(args):
                                         if (verify != True):
                                                 print(f"--- Retry the request {i} for {number_of_retrys } times and wait for 3 sec ---")
                                                 retrys = int(number_of_retrys)
-                                                retrys_count = 1
+                                                retrys_count = 0
                                                 
                                                 while (retrys_count != retrys):
+                                                        
                                                         time.sleep(3.0)
                                                         print(f"Retry counter : {retrys_count} ---")
                                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
                                                         retrys_count = retrys_count + 1
+
                                                         if (verify == True):
                                                                 break
                                                         else:
-                                                                message = "Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
-                                                                print(message)
-                                                                logger.error(message)
+                                                                if (retrys_count == retrys):
+                                                                        message = "END EXPERIMENT! - Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
+                                                                        print(message)
+                                                                        logger.error(message)
+                                                                        end_experiment = True
+                                                                                                                        # 1.4.3 add the values to the output csv file
+                                                                        csv_line = [str(i),"FAILED","FAILED","FAILED"]
+                                                                        stripped_line = [cell.strip() for cell in csv_line]
+                                                                        csvfile_writer.writerow(stripped_line)
+                                                                        
+                                                                        # 1.4.4 add the values to the output temp excel file
+                                                                        # set value for cell B2=2
+                                                                        j = j + 1
+                                                                        workbook = openpyxl.load_workbook(workbook_name_file)
+                                                                        worksheet = workbook['experiment_data']
+                                                                        worksheet.cell(row=(j+1), column=1).value = "FAILED"
+                                                                        worksheet.cell(row=(j+1), column=2).value = "FAILED"
+                                                                        worksheet.cell(row=(j+1), column=3).value = "FAILED"
+                                                                        workbook.save(workbook_name_file)
+                                                                        break
+                                                                else: 
+                                                                        message = "Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
+                                                                        print(message)
+                                                                        logger.error(message)
 
                                         # 1.4.2 Request work and a anwser contains content
-                                        if ((verify == True) and (len(row[1]) != 0)):
+                                        if ((verify == True) and (len(row[1]) != 0) and ( end_experiment == False)):
                                                 # 1.4.3 add the values to the output csv file
                                                 csv_line = [str(i),question,answer_text,golden_answer]
                                                 stripped_line = [cell.strip() for cell in csv_line]
@@ -325,7 +352,7 @@ def main(args):
                                                 # set value for cell B2=2
                                                 j = j + 1
                                                 workbook = openpyxl.load_workbook(workbook_name_file)
-                                                worksheet = workbook['temp_data']
+                                                worksheet = workbook['experiment_data']
                                                 worksheet.cell(row=(j+1), column=1).value = question
                                                 worksheet.cell(row=(j+1), column=2).value = answer_text
                                                 worksheet.cell(row=(j+1), column=3).value = golden_answer
@@ -343,29 +370,39 @@ def main(args):
                         workbook.save(workbook_name_file)      
                         csvfile.close()                    
         
-        # 2. Create evalution blue result output         
-        header, rows = bleu_run(workbook_name_file)
-        header = bleu_from_list_to_dict(header)
-        responses = [row[header['response']] for row in rows]
-        golds = [[row[header['golden_anwser']]] for row in rows]
+        if (end_experiment == False):
 
-        #print(f"Response {responses}")
-        #print(f"golds {golds}")
+                  # 2. Create evalution blue result output         
+                  header, rows = bleu_run(workbook_name_file)
+                  header = bleu_from_list_to_dict(header)
+                  responses = [row[header['response']] for row in rows]
+                  golds = [[row[header['golden_anwser']]] for row in rows]
+                  
+                  # print(f"Response {responses}")
+                  # print(f"golds {golds}")
+                   
+                  metric = load_metric("sacrebleu")
+                  metric.add_batch(predictions=responses, references=golds)
+                  sacrebleu = metric.compute()["score"]
 
-        metric = load_metric("sacrebleu")
-        metric.add_batch(predictions=responses, references=golds)
-        sacrebleu = metric.compute()["score"]
-
-        metric = load_metric("rouge")
-        metric.add_batch(predictions=responses, references=golds)
-        rouge = metric.compute()["rougeL"]
+                  metric = load_metric("rouge")
+                  metric.add_batch(predictions=responses, references=golds)
+                  rouge = metric.compute()["rougeL"]
+                
+                  print (f"******* outputs for session: {output_session_id} ********")
+                  print (f"CSV   output file : {csv_output_filepath}")
+                  print (f"Excel output file : {workbook_name_file}\n")
+                  count = len(responses) - 1
+                  print (f"******* Bleu result based on {count} responses ********")
+                  print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
         
-        print (f"******* outputs for session: {output_session_id} ********")
-        print (f"CSV   output file : {csv_output_filepath}")
-        print (f"Excel output file : {workbook_name_file}\n")
-        count = len(responses) - 1
-        print (f"******* Bleu result based on {count} responses ********")
-        print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
+        else:
+                  print (f"******* Experiment failed *************")
+                  print (f"******* outputs for failed session: {output_session_id} ********")
+                  print (f"CSV   output file : {csv_output_filepath}")
+                  print (f"Excel output file : {workbook_name_file}\n")
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
