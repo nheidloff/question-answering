@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# evaluation environment variables
 source ./.env
 
 export version="v0.0.1"
@@ -20,7 +21,7 @@ echo "***** BUILD evaluation container ******"
 docker build -t $image_name:$version .
 
 echo "***** STOP and DELETE existing evaluation container ******"
-docker container stop -f  "evaluation-run"
+docker container stop -f "evaluation-run"
 docker container rm -f "evaluation-run"
 
 echo "***** START evaluation container ******"

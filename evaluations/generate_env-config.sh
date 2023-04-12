@@ -13,6 +13,7 @@ export verify_answer="${verify_answer}"
 # inputs
 export input_excel_filename="${input_excel_filename}"
 export input_folder_name="${input_folder_name}"
+export input_folder_name_qa_service_log="${input_folder_name_qa_service_log}"
 # outputs
 export output_question_resp_anwser_excel="${output_question_resp_anwser_excel}"
 export output_question_resp_anwser="${output_question_resp_anwser}"

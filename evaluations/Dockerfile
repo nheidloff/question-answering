@@ -22,6 +22,7 @@ WORKDIR /app
 # Create folders to map
 RUN mkdir outputs
 RUN mkdir inputs
+RUN mkdir metrics
 
 COPY evaluate.py /app
 COPY generate_env-config.sh /app

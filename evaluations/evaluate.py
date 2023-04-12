@@ -18,13 +18,20 @@ from datetime import date
 
 # ******************************************
 # Global variables
+
+# qa service
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
 username=os.environ.get("username")
 password=os.environ.get("password")
 verify_answer=os.environ.get("verify_answer")
+
+# inputs
 input_excel_filename = os.environ.get("input_excel_filename")
 input_folder_name = os.environ.get("input_folder_name")
+input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_service_metrics")
+
+# outputs
 output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
 output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
 output_error_log = os.environ.get("output_error_log")
@@ -42,7 +49,8 @@ print(f"- Username: {username}")
 print(f"- Password: {password}")
 print(f"- Verify answer: {verify_answer}\n")
 print(f"- Input Excel: {input_excel_filename}")
-print(f"- Input folder name: {input_folder_name}\n")
+print(f"- Input folder name: {input_folder_name}")
+print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
 print(f"- Output folder name: {output_folder_name}")
 print(f"- Sesssion ID output prefix: {output_session_id}")
 print(f"- Output CSV: {output_question_resp_anwser}")
@@ -61,6 +69,18 @@ def get_output_path():
         global output_folder_name
         directory = os.getcwd()
         directory = directory + "/" + output_folder_name
+        return directory
+
+def get_input_qa_service_metrics_local_path():
+        global input_folder_name_qa_service_metrics
+        directory = os.getcwd()
+        directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
+        return directory
+
+def get_input_qa_service_metrics_container_path():
+        global input_folder_name_qa_service_metrics
+        directory = os.getcwd()
+        directory = directory + "/metrics/"
         return directory
 
 # ******************************************
@@ -111,6 +131,12 @@ def create_output_workbook (workbook_name):
         worksheet['A1'] = 'question'
         worksheet['B1'] = 'answer'
         worksheet['C1'] = 'golden_anwser'
+        worksheet['D1'] = 'golden_passage_1'
+        worksheet['E1'] = 'golden_passage_2'
+        worksheet['F1'] = 'golden_passage_3'
+        worksheet['G1'] = 'answer_passage_1'
+        worksheet['H1'] = 'answer_passage_2'
+        worksheet['I1'] = 'answer_passage_3'
 
         # Add a header to the worksheet
         # header_text = 'Temp Response Values'
@@ -137,36 +163,40 @@ def load_input_excel(excel_input):
     new_rows = []
     #i = 0
     for row in rows:
-        golden_answer = row[8]
+        
         question      = row[1]
+        passage_1     = row[2]
+        passage_2     = row[4]
+        passage_3     = row[6]
+        golden_answer = row[8]
 
-        golden_answer = golden_answer.replace('\n', '')
-        question = question.replace('\n', '')
+        # golden_answer = golden_answer.replace('\n', '')
+        # question = question.replace('\n', '')
 
-        new_rows.append([question, golden_answer])
+        new_rows.append([question, golden_answer, passage_1, passage_2, passage_3 ])
 
         #print(f"-----[{i}]-----\n * Question: {question}\n * Golden answer: {golden_answer}")
         #i = i + 1
 
-    new_header = [ "question", "golden_answer"]
+    new_header = [ "question", "golden_answer", "golden_passage_1", "golden_passage_2", "golden_passage_3" ]
     
     return new_header, new_rows
 
 # ******************************************
 # load existing evaluate values from csv
-def load_existing_eval_values(csv_filepath):
+def load_qa_service_metrics(csv_filepath):
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
         print(f"{header}")
-        answers = []
-        golds = [[]]
-        for row in csvreader:              
-                answers.append(row[2])
-                golds[0].append(row[3])
+        qa_service_metrics = []
+        for row in csvreader: 
+                values = [ str(row[4]) , str(row[6]) , str(row[8]) ]
+                #print(f"Values:\n {values}")          
+                qa_service_metrics.append(values)
         file.close()
-        return answers, golds
+        return qa_service_metrics
 
 # ******************************************
 # Invoke the REST API endpoint 
@@ -215,11 +245,12 @@ def invoke_qa(question):
                                 
                                 if( len(answer_text_list)>1):
                                         for answer_part in answer_text_list:
-                                                answer_text_clean = answer_part.replace('\n', '')
+                                                #answer_text_clean = answer_part.replace('\n', '')
+                                                answer_text_clean = answer_part
                                                 answer_text = answer_text + ' ' + answer_text_clean
                                 else:
                                         answer_text = answer_text_list[0]
-                                        answer_text = answer_text.replace('\n', '')
+                                        #answer_text = answer_text.replace('\n', '')
 
                                 print(f"Question: {question}")
                                 print(f"Answer  : {answer_text}")
@@ -254,11 +285,15 @@ def main(args):
         # Get date to be added to the file names
         today = str(date.today())
 
-        # Set paths for input and output
+        # Set paths for input
         output_directory = get_output_path()
         print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
         print(f"- Input dir: {input_directory}")
+        input_qa_directory = get_input_qa_service_metrics_local_path()
+        print(f"- Input qa dir (local): {input_qa_directory}")
+
+        qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
         workbook_name_file = output_directory + "/"  + output_session_id + "_" + today + "_" + output_question_resp_anwser_excel
         csv_output_filepath = output_directory + "/"  + output_session_id + "_" + today + "_" +  output_question_resp_anwser
 
@@ -281,7 +316,7 @@ def main(args):
                         # 1.2. Prepare an output file for logging the execution results
                         csvfile = open(csv_output_filepath,'w',encoding='utf-8')
                         csvfile_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-                        csv_line = ['count','question','answer','golden_answer']
+                        csv_line = ['count','question','answer','golden_answer','golden_passage_1','golden_passage_2','golden_passage_3','answer_passage_1','answer_passage_2','answer_passage_1']
                         stripped_line = [cell.strip() for cell in csv_line]
                         csvfile_writer.writerow(stripped_line)
                         
@@ -297,6 +332,10 @@ def main(args):
                                 if (len(very_golden_answer) != 0):
                                         question = row[0]
                                         golden_answer = row[1]
+                                        golden_passage_1 = row[2]
+                                        golden_passage_2 = row[3]
+                                        golden_passage_3 = row[4]
+
                                         print(f"--- Request {i} ---")
                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
                                         
@@ -320,12 +359,13 @@ def main(args):
                                                                         print(message)
                                                                         logger.error(message)
                                                                         end_experiment = True
-                                                                                                                        # 1.4.3 add the values to the output csv file
-                                                                        csv_line = [str(i),"FAILED","FAILED","FAILED"]
+
+                                                                        # 1.4.3 add the error to the output csv file
+                                                                        csv_line = [str(i),"FAILED","FAILED","FAILED",]
                                                                         stripped_line = [cell.strip() for cell in csv_line]
                                                                         csvfile_writer.writerow(stripped_line)
                                                                         
-                                                                        # 1.4.4 add the values to the output temp excel file
+                                                                        # 1.4.4 add the error to the output temp excel file
                                                                         # set value for cell B2=2
                                                                         j = j + 1
                                                                         workbook = openpyxl.load_workbook(workbook_name_file)
@@ -350,11 +390,16 @@ def main(args):
                                                 # 1.4.4 add the values to the output temp excel file
                                                 # set value for cell B2=2
                                                 j = j + 1
+
                                                 workbook = openpyxl.load_workbook(workbook_name_file)
                                                 worksheet = workbook['experiment_data']
                                                 worksheet.cell(row=(j+1), column=1).value = question
                                                 worksheet.cell(row=(j+1), column=2).value = answer_text
                                                 worksheet.cell(row=(j+1), column=3).value = golden_answer
+                                                worksheet.cell(row=(j+1), column=4).value = golden_passage_1
+                                                worksheet.cell(row=(j+1), column=5).value = golden_passage_2
+                                                worksheet.cell(row=(j+1), column=6).value = golden_passage_3
+
                                                 workbook.save(workbook_name_file)
 
                                         else:
@@ -366,6 +411,7 @@ def main(args):
                                         print(f"Error: {message}")
                                         logger.error(message)
                                 i = i + 1
+                        
                         workbook.save(workbook_name_file)      
                         csvfile.close()                    
         
@@ -387,6 +433,23 @@ def main(args):
                   metric = load_metric("rouge")
                   metric.add_batch(predictions=responses, references=golds)
                   rouge = metric.compute()["rougeL"]
+
+                  # 3. add results from the qa service metrics
+
+                  metrics_results = load_qa_service_metrics(qa_metrics_run_file)
+                  print(f"metrics_results: {len(metrics_results)} \n")
+                  workbook = openpyxl.load_workbook(workbook_name_file)
+        
+                  j = 1
+                  for row in metrics_results:
+                        worksheet = workbook['experiment_data']
+                        worksheet.cell(row=(j+1), column=7).value = row[0]
+                        worksheet.cell(row=(j+1), column=8).value = row[1]
+                        worksheet.cell(row=(j+1), column=9).value = row[2]
+                        j = j + 1
+                  workbook.save(workbook_name_file)
+
+                  # 4. Show results
                 
                   print (f"******* outputs for session: {output_session_id} ********")
                   print (f"CSV   output file : {csv_output_filepath}")
