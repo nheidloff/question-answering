@@ -67,9 +67,11 @@ mkdir ./evaluations/inputs
 python3 evaluate.py
 ```
 
+* The `evaluate app` ends an experiment, with the retry count being reached.
+
 * Input files
 
-    * The python app uses the `inputs` folder as the source folder for the excel file with the data input. The input file name is based on `input_folder_name` and `input_excel_filename` environment variables.
+    * The Python app uses the `inputs` folder as the source folder for the Excel file with the data input. The input file name is based on `input_folder_name` and `input_excel_filename` environment variables.
 
 * Output files
 
