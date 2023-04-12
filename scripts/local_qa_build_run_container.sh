@@ -47,6 +47,7 @@ docker run -i --rm -p 8080:8080 --name $name \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
   -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
   -e EXPERIMENT_METRICS_SESSION=${EXPERIMENT_METRICS_SESSION} \
+  -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
   -v "${project_path}"/metrics/myrun:/deployments/metrics \
   $image_name:$version
 cd $tmp_home
