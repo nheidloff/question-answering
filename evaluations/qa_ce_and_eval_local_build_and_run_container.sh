@@ -38,5 +38,5 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_error_log="$output_error_log" \
                 -e output_session_id="$output_session_id" \
                 -e output_folder_name="$output_folder_name" \
-                -e export number_of_retrys="$export number_of_retrys" \
+                -e number_of_retrys="$export number_of_retrys" \
                 $image_name:$version
