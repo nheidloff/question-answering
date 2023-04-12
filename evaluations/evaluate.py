@@ -77,7 +77,7 @@ def bleu_get_data(input_filename):
 
     try:
         workbook = openpyxl.load_workbook(input_filename)
-        ws = workbook['temp_data']
+        ws = workbook['experiment_data']
     except:
         print(f"Error: Could not open {input_filename}\n")
     
@@ -105,8 +105,8 @@ logger.addHandler(file_handler)
 # Select the active worksheet
 def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
-        worksheet = workbook.create_sheet("temp_data")
-        worksheet.title = "temp_data"
+        worksheet = workbook.create_sheet("experiment_data")
+        worksheet.title = "experiment_data"
 
         worksheet['A1'] = 'question'
         worksheet['B1'] = 'answer'
