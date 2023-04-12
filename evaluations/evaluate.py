@@ -302,13 +302,12 @@ def main(args):
                                         
                                         # 1.4.1 Retry if the request didn't work
                                         if (verify != True):
-                                                print(f"--- Retry the request {i} for {number_of_retrys } times and wait for 3 sec ---")
+                                                print(f"--- Retry the request {i} for {number_of_retrys } times ---")
                                                 retrys = int(number_of_retrys)
                                                 retrys_count = 0
                                                 
                                                 while (retrys_count != retrys):
-                                                        
-                                                        time.sleep(3.0)
+                                                
                                                         print(f"Retry counter : {retrys_count} ---")
                                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
                                                         retrys_count = retrys_count + 1
