@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export SET_HOME_PATH=$(pwd)
-export SET_SESSION_ID="$(date +%s)"
+export SET_SESSION_ID=$(date +%s)
 export SET_M_DIR_NAME=myrun
 export SET_CONT_CONF=True
 
