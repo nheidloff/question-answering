@@ -8,7 +8,7 @@ echo "** Create enviroment file "
 echo "*********************"
 
 "/bin/sh" ./generate_env-config.sh > ./.env
-more .env
+cat .env
 
 echo "*********************"
 echo "** Start python application"

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+source $HOME_PATH/env_container_start.sh
+
+echo "******** QA - service ************"
+echo "- Home path :          $HOME_PATH"
+echo "- SESSION_ID:          $C_SESSION_ID"
+echo "- M_DIR_NAME:          $C_M_DIR_NAME"
+cd $HOME_PATH
+
 # **************** Global variables
 source ./.env
 
@@ -13,6 +21,8 @@ tmp_home=$(pwd)
 cd ..
 project_path=$(pwd)
 cd $tmp_home
+# export mountpath_metrics="${project_path}/metrics/${M_DIR_NAME}"
+export mountpath_metrics="${project_path}/metrics/myrun"
 
 echo "****** BUILD *********"
 cd $(pwd)/../service
@@ -46,8 +56,8 @@ docker run -i --rm -p 8080:8080 --name $name \
   -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
   -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
-  -e EXPERIMENT_METRICS_SESSION=${EXPERIMENT_METRICS_SESSION} \
+  -e EXPERIMENT_METRICS_SESSION=${C_SESSION_ID} \
   -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
-  -v "${project_path}"/metrics/myrun:/deployments/metrics \
+  -v "${mountpath_metrics}":/deployments/metrics \
   $image_name:$version
 cd $tmp_home

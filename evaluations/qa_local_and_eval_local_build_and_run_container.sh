@@ -1,5 +1,16 @@
 #!/bin/bash
 
+source $HOME_PATH/../scripts/env_container_start.sh
+
+echo "******** evaluate - app ************"
+echo "- Home path :          $HOME_PATH"
+echo "- Session ID:          $C_SESSION_ID"
+echo "- CONTAINER_RUN_CONF:  $C_CONT_CONF"
+echo "- M_DIR_NAME:          $C_M_DIR_NAME"
+
+cd $HOME_PATH/../evaluations
+
+# evaluation environment variables
 source ./.env
 
 export version="v0.0.1"
@@ -9,6 +20,13 @@ export host_ip_addr=$host_ip
 echo "***** CREATE DIRs ******"
 mountpath_inputs="$(pwd)/inputs"
 mountpath_outputs="$(pwd)/outputs"
+
+# temp set metrics problem with '../' in the question-answering service
+tmp_home=$(pwd)
+cd ..
+project_path=$(pwd)
+cd $tmp_home
+export mountpath_metrics="${project_path}/metrics/${input_folder_name_qa_service_metrics}"
 
 echo "Path: $mountpath_outputs"
 echo "Path: $mountpath_inputs"
@@ -20,7 +38,7 @@ echo "***** BUILD evaluation container ******"
 docker build -t $image_name:$version .
 
 echo "***** STOP and DELETE existing evaluation container ******"
-docker container stop -f  "evaluation-run"
+docker container stop -f "evaluation-run"
 docker container rm -f "evaluation-run"
 
 echo "***** START evaluation container ******"
@@ -28,6 +46,7 @@ docker run --name="evaluation-run" -it --rm \
                 --add-host host.docker.internal:"${host_ip_addr}" \
                 -v "${mountpath_outputs}":/app/outputs \
                 -v "${mountpath_inputs}":/app/inputs \
+                -v "${mountpath_metrics}":/app/metrics \
                 -e endpoint="$endpoint" \
                 -e api_url="$api_url" \
                 -e username="$username" \
@@ -38,7 +57,8 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_question_resp_anwser_excel="$output_question_resp_anwser_excel" \
                 -e output_question_resp_anwser="$output_question_resp_anwser" \
                 -e output_error_log="$output_error_log" \
-                -e output_session_id="$output_session_id" \
+                -e output_session_id="${C_SESSION_ID}" \
                 -e output_folder_name="$output_folder_name" \
                 -e number_of_retrys="$number_of_retrys" \
+                -e container_run="${container_run}" \
                 $image_name:$version
