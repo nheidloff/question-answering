@@ -22,7 +22,8 @@ tmp_home=$(pwd)
 cd ..
 project_path=$(pwd)
 cd $tmp_home
-export mountpath_metrics="${project_path}/metrics/${M_DIR_NAME}"
+# export mountpath_metrics="${project_path}/metrics/${M_DIR_NAME}"
+export mountpath_metrics="${project_path}/metrics/myrun"
 
 echo "****** BUILD *********"
 cd $(pwd)/../service

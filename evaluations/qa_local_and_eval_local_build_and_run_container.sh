@@ -6,6 +6,7 @@ echo "******** evaluate - app ************"
 echo "- Home path :          $HOME_PATH"
 echo "- Session ID:          $SESSION_ID"
 echo "- CONTAINER_RUN_CONF:  $CONT_CONF"
+echo "- M_DIR_NAME:          $M_DIR_NAME"
 
 cd $HOME_PATH/../evaluations
 
