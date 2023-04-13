@@ -1,7 +1,6 @@
 package com.ibm.question_answering;
 
 import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -40,23 +39,27 @@ public class QueryDiscoveryReRankerMaaS {
     @Inject
     Summarization summarization;
 
+    static final int RERANKER_MAX_INPUT_DOCUMENTS = 10;
     @ConfigProperty(name = "experiment.reranker-max-input-documents") 
     Optional<String> rerankerMaxInputDocumentsOptionalString;
     
+    static final int LLM_MAX_INPUT_DOCUMENTS = 5;
     @ConfigProperty(name = "experiment.llm-max-input-documents") 
     Optional<String> llmMaxInputDocumentsOptionalString;
+
+    final static String ERROR_DISCOVERY_UNEXPECTED = com.ibm.question_answering.discovery.ExceptionMapper.ERROR_DISCOVERY_PREFIX + "Unexpected";
 
     @Inject
     Metrics metrics;
 
     public Answer query(String query, boolean proxy, boolean summaries) {
-        int rerankerMaxInputDocuments = 10;
+        int rerankerMaxInputDocuments = RERANKER_MAX_INPUT_DOCUMENTS;
         if (rerankerMaxInputDocumentsOptionalString.isPresent()) {
             try {
                 rerankerMaxInputDocuments = Integer.parseInt(rerankerMaxInputDocumentsOptionalString.get());
             } catch (Exception e) {}
         }
-        int llmMaxInputDocuments = 5;
+        int llmMaxInputDocuments = LLM_MAX_INPUT_DOCUMENTS;
         if (llmMaxInputDocumentsOptionalString.isPresent()) {
             try {
                 llmMaxInputDocuments = Integer.parseInt(llmMaxInputDocumentsOptionalString.get());
@@ -65,9 +68,11 @@ public class QueryDiscoveryReRankerMaaS {
         
         // 1. Discovery
         com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
-        if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
-            return MockAnswers.getEmptyAnswer();
+        if (discoveryAnswer == null) {
+            System.err.println(ERROR_DISCOVERY_UNEXPECTED);
+            throw new RuntimeException(ERROR_DISCOVERY_UNEXPECTED);
         }
+        // If documents have been split, use chunkids as document_ids
         for (int index = 0; index < discoveryAnswer.results.size(); index++) {
             discoveryAnswer.results.get(index).document_id = discoveryAnswer.results.get(index).chunckid;
         }

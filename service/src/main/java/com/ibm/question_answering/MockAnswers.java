@@ -26,6 +26,12 @@ public class MockAnswers {
         return new Answer(false, 1, results);
     }
 
+    public static Answer getErrorAnswer() {
+        ArrayList<Result> results = new ArrayList<Result>();
+        results.add(getErrorResult());
+        return new Answer(false, 1, results);
+    }
+
     public static Result getResultDocument1() {
         UUID randomUUID = UUID.randomUUID();  
         DocumentPassage[] documentPassages = new DocumentPassage[1];
@@ -73,6 +79,17 @@ public class MockAnswers {
         text[0] = "";
         return new Result(randomUUID.toString(), 
             "", 
+            text, 
+            "",
+            null);
+    }
+
+    public static Result getErrorResult() {
+        UUID randomUUID = UUID.randomUUID(); 
+        String text[] = new String[1];
+        text[0] = "";
+        return new Result(randomUUID.toString(), 
+            "Error", 
             text, 
             "",
             null);
