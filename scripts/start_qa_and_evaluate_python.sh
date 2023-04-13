@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export SET_HOME_PATH=$(pwd)
+export HOME_PATH=$(pwd)
 export SET_SESSION_ID=$(date +%s)
 export SET_M_DIR_NAME=myrun
 export SET_CONT_CONF=True
 
-"/bin/sh" ./generate_env_container_start.sh > $SET_HOME_PATH/.env_container_start
+"/bin/sh" ./generate_env_container_start.sh > $SET_HOME_PATH/env_container_start.sh
 
 echo "************************************"
 echo "    Configuration"

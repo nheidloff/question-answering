@@ -1,12 +1,12 @@
 #!/bin/bash
 
-source ../scripts/.env_container_start
+source $HOME_PATH/../scripts/env_container_start.sh
 
 echo "******** evaluate - app ************"
 echo "- Home path :          $HOME_PATH"
-echo "- Session ID:          $SESSION_ID"
-echo "- CONTAINER_RUN_CONF:  $CONT_CONF"
-echo "- M_DIR_NAME:          $M_DIR_NAME"
+echo "- Session ID:          $C_SESSION_ID"
+echo "- CONTAINER_RUN_CONF:  $C_CONT_CONF"
+echo "- M_DIR_NAME:          $C_M_DIR_NAME"
 
 cd $HOME_PATH/../evaluations
 
@@ -57,7 +57,7 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_question_resp_anwser_excel="$output_question_resp_anwser_excel" \
                 -e output_question_resp_anwser="$output_question_resp_anwser" \
                 -e output_error_log="$output_error_log" \
-                -e output_session_id="$output_session_id" \
+                -e output_session_id="${C_SESSION_ID}" \
                 -e output_folder_name="$output_folder_name" \
                 -e number_of_retrys="$number_of_retrys" \
                 -e container_run="${container_run}" \

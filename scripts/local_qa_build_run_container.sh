@@ -1,16 +1,15 @@
 #!/bin/bash
 
-source ./.env_container_start
+source $HOME_PATH/env_container_start.sh
 
 echo "******** QA - service ************"
 echo "- Home path :          $HOME_PATH"
-echo "- SESSION_ID:          $SESSION_ID"
-echo "- M_DIR_NAME:          $M_DIR_NAME"
+echo "- SESSION_ID:          $C_SESSION_ID"
+echo "- M_DIR_NAME:          $C_M_DIR_NAME"
 cd $HOME_PATH
 
 # **************** Global variables
 source ./.env
-
 
 export version="v0.0.1"
 export image_name="question-answering-local"
@@ -57,7 +56,7 @@ docker run -i --rm -p 8080:8080 --name $name \
   -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
   -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
-  -e EXPERIMENT_METRICS_SESSION=${EXPERIMENT_METRICS_SESSION} \
+  -e EXPERIMENT_METRICS_SESSION=${C_SESSION_ID} \
   -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
   -v "${mountpath_metrics}":/deployments/metrics \
   $image_name:$version

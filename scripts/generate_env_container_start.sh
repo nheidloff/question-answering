@@ -1,7 +1,9 @@
 #!/bin/bash
 cat <<EOF
-export M_DIR_NAME=${SET_M_DIR_NAME}
-export HOME_PATH=${SET_HOME_PATH}
-export SESSION_ID=${SET_SESSION_ID}
-export CONT_CONF=${SET_CONT_CONF}
+#!/bin/bash
+# start with container
+export C_M_DIR_NAME=${SET_M_DIR_NAME}
+export C_HOME_PATH=${HOME_PATH}
+export C_SESSION_ID=${SET_SESSION_ID}
+export C_CONT_CONF=${SET_CONT_CONF}
 EOF
