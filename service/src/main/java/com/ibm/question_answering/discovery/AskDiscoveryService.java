@@ -14,30 +14,30 @@ public class AskDiscoveryService {
     final String DISCOVERY_COLLECTION_ID_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "DISCOVERY_COLLECTION_ID", defaultValue = DISCOVERY_COLLECTION_ID_NOT_SET) 
     private String collectionId;
-    final static String ERROR_COLLECTION_ID_NOT_SET = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_COLLECTION_ID not defined";
+    final static String ERROR_COLLECTION_ID_NOT_SET = DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_COLLECTION_ID not defined";
 
     final String DISCOVERY_URL_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "DISCOVERY_URL", defaultValue = DISCOVERY_URL_NOT_SET) 
     private String collectionUrl;
-    final static String ERROR_DISCOVERY_URL_NOT_SET = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_URL not defined";
+    final static String ERROR_DISCOVERY_URL_NOT_SET = DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_URL not defined";
 
     final String DISCOVERY_API_KEY_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "DISCOVERY_API_KEY", defaultValue = DISCOVERY_API_KEY_NOT_SET) 
     private String apiKey;
-    final static String ERROR_DISCOVERY_API_KEY_NOT_SET = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_API_KEY not defined";
+    final static String ERROR_DISCOVERY_API_KEY_NOT_SET = DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_API_KEY not defined";
 
     final String DISCOVERY_INSTANCE_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "DISCOVERY_INSTANCE", defaultValue = DISCOVERY_INSTANCE_NOT_SET) 
     private String instance;
-    final static String ERROR_DISCOVERY_INSTANCE_NOT_SET = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_INSTANCE not defined";
+    final static String ERROR_DISCOVERY_INSTANCE_NOT_SET = DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_INSTANCE not defined";
 
     final String DISCOVERY_PROJECT_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "DISCOVERY_PROJECT", defaultValue = DISCOVERY_PROJECT_NOT_SET) 
     private String project;
-    final static String ERROR_DISCOVERY_PROJECT_NOT_SET = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_PROJECT not defined";
+    final static String ERROR_DISCOVERY_PROJECT_NOT_SET = DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + "DISCOVERY_PROJECT not defined";
   
     final static int DISCOVERY_MAX_OUTPUT_DOCUMENTS = 5;
-    @ConfigProperty(name = "experiment.discovery-max-output-documents") 
+    @ConfigProperty(name = "EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS") 
     Optional<String> maxDocumentsOptionalString;
     
     @Inject

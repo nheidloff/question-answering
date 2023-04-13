@@ -5,13 +5,14 @@ import javax.ws.rs.ext.Provider;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 @Provider
-public class ExceptionMapper implements ResponseExceptionMapper<RuntimeException> {
+public class DiscoveryExceptionMapper implements ResponseExceptionMapper<RuntimeException> {
 
     public final static String ERROR_DISCOVERY_PREFIX = "Watson Discovery error: ";
-    final static String ERROR_DISCOVERY_500 = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 500";
-    final static String ERROR_DISCOVERY_405 = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 405";
-    final static String ERROR_DISCOVERY_401 = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 401";
-    final static String ERROR_DISCOVERY_OTHER = ExceptionMapper.ERROR_DISCOVERY_PREFIX + "Other";
+    public final static String ERROR_DISCOVERY_500 = ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 500";
+    public final static String ERROR_DISCOVERY_405 = ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 405";
+    public final static String ERROR_DISCOVERY_401 = ERROR_DISCOVERY_PREFIX + "The remote service responded with HTTP 401";
+    public final static String ERROR_DISCOVERY_OTHER = ERROR_DISCOVERY_PREFIX + "Other";
+    public final static String ERROR_DISCOVERY_UNEXPECTED = ERROR_DISCOVERY_PREFIX + "Unexpected";
 
 	@Override
     public RuntimeException toThrowable(Response response) {        

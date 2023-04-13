@@ -39,26 +39,14 @@ public class QueryDiscoveryReRankerMaaS {
     @Inject
     Summarization summarization;
 
-    static final int RERANKER_MAX_INPUT_DOCUMENTS = 10;
-    @ConfigProperty(name = "experiment.reranker-max-input-documents") 
-    Optional<String> rerankerMaxInputDocumentsOptionalString;
-    
     static final int LLM_MAX_INPUT_DOCUMENTS = 5;
     @ConfigProperty(name = "experiment.llm-max-input-documents") 
     Optional<String> llmMaxInputDocumentsOptionalString;
-
-    final static String ERROR_DISCOVERY_UNEXPECTED = com.ibm.question_answering.discovery.ExceptionMapper.ERROR_DISCOVERY_PREFIX + "Unexpected";
 
     @Inject
     Metrics metrics;
 
     public Answer query(String query, boolean proxy, boolean summaries) {
-        int rerankerMaxInputDocuments = RERANKER_MAX_INPUT_DOCUMENTS;
-        if (rerankerMaxInputDocumentsOptionalString.isPresent()) {
-            try {
-                rerankerMaxInputDocuments = Integer.parseInt(rerankerMaxInputDocumentsOptionalString.get());
-            } catch (Exception e) {}
-        }
         int llmMaxInputDocuments = LLM_MAX_INPUT_DOCUMENTS;
         if (llmMaxInputDocumentsOptionalString.isPresent()) {
             try {
@@ -69,16 +57,12 @@ public class QueryDiscoveryReRankerMaaS {
         // 1. Discovery
         com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
         if (discoveryAnswer == null) {
-            System.err.println(ERROR_DISCOVERY_UNEXPECTED);
-            throw new RuntimeException(ERROR_DISCOVERY_UNEXPECTED);
+            System.err.println(com.ibm.question_answering.discovery.DiscoveryExceptionMapper.ERROR_DISCOVERY_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.discovery.DiscoveryExceptionMapper.ERROR_DISCOVERY_UNEXPECTED);
         }        
         
         // 2. ReRanker
         int inputReRankerAmountDocuments = discoveryAnswer.results.size();
-        if (inputReRankerAmountDocuments > rerankerMaxInputDocuments) {
-            inputReRankerAmountDocuments = rerankerMaxInputDocuments;
-        }
-        metrics.setRRAmountInputDocuments(inputReRankerAmountDocuments, rerankerMaxInputDocuments);
         DocumentScore[] documentsAndScoresInput = new DocumentScore[inputReRankerAmountDocuments];
         for (int index = 0; index < inputReRankerAmountDocuments; index++) {
             Document document = new Document();
@@ -89,11 +73,13 @@ public class QueryDiscoveryReRankerMaaS {
         }
         DocumentScore[][] documentsAndScoresArray = askReRankerService.executeAndReturnRawAnswer(query, documentsAndScoresInput);
         if ((documentsAndScoresArray == null) || (documentsAndScoresArray.length < 1)) {
-            return MockAnswers.getEmptyAnswer();
+            System.err.println(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
         }
         DocumentScore[] documentsAndScores = documentsAndScoresArray[0];
         if ((documentsAndScores == null) || (documentsAndScores.length < 1)) {
-            return MockAnswers.getEmptyAnswer();
+            System.err.println(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
         }
 
         // 3. MaaS

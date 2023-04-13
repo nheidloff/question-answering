@@ -34,9 +34,6 @@ public class QueryDiscoveryMaaS {
     @Inject
     QuestionAnswering questionAnswering;
 
-    @ConfigProperty(name = "experiment.reranker-max-input-documents") 
-    Optional<String> rerankerMaxInputDocumentsOptionalString;
-    
     @ConfigProperty(name = "experiment.llm-max-input-documents") 
     Optional<String> llmMaxInputDocumentsOptionalString;
 
