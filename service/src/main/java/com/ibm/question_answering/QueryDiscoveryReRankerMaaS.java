@@ -71,12 +71,7 @@ public class QueryDiscoveryReRankerMaaS {
         if (discoveryAnswer == null) {
             System.err.println(ERROR_DISCOVERY_UNEXPECTED);
             throw new RuntimeException(ERROR_DISCOVERY_UNEXPECTED);
-        }
-        // If documents have been split, use chunkids as document_ids
-        for (int index = 0; index < discoveryAnswer.results.size(); index++) {
-            discoveryAnswer.results.get(index).document_id = discoveryAnswer.results.get(index).chunckid;
-        }
-        discoveryAnswer = askDiscoveryService.ensureDocumentIdsExist(discoveryAnswer);
+        }        
         
         // 2. ReRanker
         int inputReRankerAmountDocuments = discoveryAnswer.results.size();

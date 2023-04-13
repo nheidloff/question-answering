@@ -10,15 +10,13 @@ import javax.ws.rs.core.MultivaluedMap;
 @ApplicationScoped
 public class CustomHeaderFactory implements ClientHeadersFactory {
 
-    final String DISCOVERY_API_KEY_NOT_SET = "NOT_SET";    
-
-    @ConfigProperty(name = "DISCOVERY_API_KEY", defaultValue = DISCOVERY_API_KEY_NOT_SET) 
-    private String discoveryApiKey;
+    @ConfigProperty(name = "DISCOVERY_API_KEY", defaultValue = "") 
+    private String apiKey;
 
     @Override
     public MultivaluedMap<String, String> update(MultivaluedMap<String, String> incomingHeaders, MultivaluedMap<String, String> clientOutgoingHeaders) {
         MultivaluedMap<String, String> result = new MultivaluedHashMap<>();
-        String toBeEncoded = "apikey:" + discoveryApiKey;
+        String toBeEncoded = "apikey:" + apiKey;
         result.add("Authorization", "Basic " + Base64.getEncoder().encodeToString(toBeEncoded.getBytes()));
         return result;
     }

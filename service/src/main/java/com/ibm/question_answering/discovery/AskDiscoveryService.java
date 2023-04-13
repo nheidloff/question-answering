@@ -83,11 +83,17 @@ public class AskDiscoveryService {
     }
 
     // There are two options:
-    // 1. Full documents are returned
-    // 2. Split smaller chunks are returned
+    // 1. Full documents are returned from collection
+    // 2. Split smaller chunks are returned from collection
     // If there are no document ids, use the urls as document ids
     // If there are no chunk ids, use the document ids (= urls)
     public Answer ensureDocumentIdsExist(Answer answer) {
+        // 2
+        for (int index = 0; index < answer.results.size(); index++) {
+            answer.results.get(index).document_id = answer.results.get(index).chunckid;
+        }
+
+        // 1
         for (int index = 0; index < answer.results.size(); index++) {
             if (answer.results.get(index).document_id == null) {
                 answer.results.get(index).document_id = answer.results.get(index).url;
