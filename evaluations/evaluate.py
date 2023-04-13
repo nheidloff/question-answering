@@ -76,7 +76,10 @@ def get_output_path():
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
         directory = os.getcwd()
-        directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
+        if input_folder_name_qa_service_metrics != "":
+                directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
+        else:
+                directory = directory + "/../metrics"
         return directory
 
 def get_input_qa_service_metrics_container_path():
