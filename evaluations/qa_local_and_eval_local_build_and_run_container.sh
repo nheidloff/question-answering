@@ -1,7 +1,12 @@
 #!/bin/bash
 
-echo "Home path : $HOME_PATH"
-echo "Session ID: $SESSION_ID"
+source ../scripts/.env_container_start
+
+echo "******** evaluate - app ************"
+echo "- Home path :          $HOME_PATH"
+echo "- Session ID:          $SESSION_ID"
+echo "- CONTAINER_RUN_CONF:  $CONT_CONF"
+
 cd $HOME_PATH/../evaluations
 
 # evaluation environment variables
@@ -21,7 +26,6 @@ cd ..
 project_path=$(pwd)
 cd $tmp_home
 export mountpath_metrics="${project_path}/metrics/${input_folder_name_qa_service_metrics}"
-
 
 echo "Path: $mountpath_outputs"
 echo "Path: $mountpath_inputs"
@@ -55,5 +59,5 @@ docker run --name="evaluation-run" -it --rm \
                 -e output_session_id="$output_session_id" \
                 -e output_folder_name="$output_folder_name" \
                 -e number_of_retrys="$number_of_retrys" \
-                -e container_run="$container_run" \
+                -e container_run="${container_run}" \
                 $image_name:$version

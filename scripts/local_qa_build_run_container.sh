@@ -1,12 +1,16 @@
 #!/bin/bash
 
-echo "Home path : $HOME_PATH"
-echo "Session ID: $SESSION_ID"
+source ./.env_container_start
+
+echo "******** QA - service ************"
+echo "- Home path :          $HOME_PATH"
+echo "- SESSION_ID:          $SESSION_ID"
+echo "- M_DIR_NAME:          $M_DIR_NAME"
 cd $HOME_PATH
 
 # **************** Global variables
 source ./.env
-source $(pwd)/../evaluations/.env
+
 
 export version="v0.0.1"
 export image_name="question-answering-local"
@@ -18,7 +22,7 @@ tmp_home=$(pwd)
 cd ..
 project_path=$(pwd)
 cd $tmp_home
-export mountpath_metrics="${project_path}/metrics/${METRICS_FOLDER_NAME}"
+export mountpath_metrics="${project_path}/metrics/${M_DIR_NAME}"
 
 echo "****** BUILD *********"
 cd $(pwd)/../service

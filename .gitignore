@@ -63,3 +63,4 @@ nb-configuration.xml
 .env
 
 readnik.md
+scripts/.env_container_start

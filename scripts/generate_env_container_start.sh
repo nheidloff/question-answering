@@ -1,0 +1,7 @@
+#!/bin/bash
+cat <<EOF
+export M_DIR_NAME=${SET_M_DIR_NAME}
+export HOME_PATH=${SET_HOME_PATH}
+export SESSION_ID=${SET_SESSION_ID}
+export CONT_CONF=${SET_CONT_CONF}
+EOF

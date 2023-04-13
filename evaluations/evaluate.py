@@ -41,7 +41,7 @@ output_folder_name = os.environ.get("output_folder_name")
 number_of_retrys = os.environ.get("number_of_retrys")
 
 print("*************************")
-print("Environment configurations of 'evalute':")
+print("Environment configurations of 'evaluate':")
 print("")
 print(f"- Endpoint: {endpoint}")
 print(f"- API URL: {api_url}")
@@ -185,8 +185,9 @@ def load_input_excel(excel_input):
     return new_header, new_rows
 
 # ******************************************
-# load existing evaluate values from csv
+# load qa service metrics from csv file
 def load_qa_service_metrics(csv_filepath):
+        print(f"QA -service experiment file: {csv_filepath}")
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
