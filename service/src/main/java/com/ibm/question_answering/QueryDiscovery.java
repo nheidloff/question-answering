@@ -2,6 +2,7 @@ package com.ibm.question_answering;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import com.ibm.question_answering.discovery.AskDiscoveryService;
 
 @ApplicationScoped

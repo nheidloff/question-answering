@@ -4,6 +4,7 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import com.ibm.question_answering.Answer;
 import com.ibm.question_answering.Metrics;
 

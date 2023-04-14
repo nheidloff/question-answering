@@ -1,5 +1,6 @@
 readnik.md 
-
+.env
+service/.env
 data/product-doc
 
 metrics/*

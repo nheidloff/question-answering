@@ -185,7 +185,7 @@ public class AnswerResource {
     public Answer queryPrimeAndMaaSProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         utilities.checkAuthorization(apikey);
         Answer output;
-        output = queryPrimeAndMaaS.query(utilities.getQuery(data), true, false);
+        output = queryPrimeAndMaaS.query(utilities.getQuery(data));
         output = utilities.removeRedundantDocuments(output);
         return output;
     }
@@ -201,7 +201,7 @@ public class AnswerResource {
     public Answer queryPrimeQAAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         utilities.checkAuthorization(apikey);
         Answer output;
-        output = queryPrimeAndMaaS.query(utilities.getQuery(data), false, false);
+        output = queryPrimeAndMaaS.query(utilities.getQuery(data));
         output = utilities.removeRedundantDocuments(output);
         return output;                
     }
@@ -217,7 +217,7 @@ public class AnswerResource {
     public Answer queryPrimeQAAndMaaSSummaries(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         utilities.checkAuthorization(apikey);
         Answer output;
-        output = queryPrimeAndMaaS.query(utilities.getQuery(data), true, true);
+        output = queryPrimeAndMaaS.query(utilities.getQuery(data));
         output = utilities.removeRedundantDocuments(output);
         return output;                        
     }

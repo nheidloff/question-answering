@@ -20,13 +20,13 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Metrics {
 
-    @ConfigProperty(name = "experiment.metrics-session") 
+    @ConfigProperty(name = "EXPERIMENT_METRICS_SESSION") 
     Optional<String> sessionOptionalString;
 
     String session = null;
     boolean enabled = false;
 
-    @ConfigProperty(name = "experiment.metrics-directory") 
+    @ConfigProperty(name = "EXPERIMENT_METRICS_DIRECTORY") 
     Optional<String> directoryOptionalString;
 
     public Metrics() {

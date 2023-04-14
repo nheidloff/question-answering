@@ -2,6 +2,9 @@ package com.ibm.question_answering;
 
 import java.util.ArrayList;
 
+import com.ibm.question_answering.Result;
+import com.ibm.question_answering.RetrievalDetails;
+
 public class Answer {
 
     public Answer(boolean highConfidence, int amount, ArrayList<Result> results) {

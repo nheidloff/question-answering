@@ -3,6 +3,7 @@ package com.ibm.question_answering.discovery;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -10,6 +11,7 @@ import javax.ws.rs.Path;
 @RegisterProvider(DiscoveryExceptionMapper.class)
 public class DiscoveryServiceResource {
 
+    @Inject
     @RestClient
     DiscoveryService discoverService;
 
