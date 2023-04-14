@@ -7,6 +7,12 @@
 ## Setup environment
 
 ```sh
+pip install -r requirements.txt
+```
+
+or 
+
+```sh
 python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp csv sacrebleu python-dotenv pyinstaller evaluate openpyxl absl nltk rouge_score
 ```
 
