@@ -76,11 +76,13 @@ def get_output_path():
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
         directory = os.getcwd()
+        
         if input_folder_name_qa_service_metrics != "":
-                directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
+                new_directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
         else:
-                directory = directory + "/../metrics"
-        return directory
+                new_directory = directory + "/../metrics"
+                
+        return new_directory
 
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
@@ -304,7 +306,8 @@ def main(args):
         print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
         print(f"- Input dir: {input_directory}")
-        if (container_run == False):
+        
+        if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
                 print(f"- Input qa dir (local): {input_qa_directory}")
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
