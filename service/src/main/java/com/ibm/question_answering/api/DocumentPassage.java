@@ -7,7 +7,7 @@ public class DocumentPassage {
 
     public DocumentPassage(String passageText, String field, PassageAnswer[] passageAnswers) {
         this.passage_text = passageText;
-        this.passageAnswers = passageAnswers;
+        this.answers = passageAnswers;
         this.field = field;
         if (field == null) {
             this.field = FIELD_TEXT;
@@ -16,5 +16,5 @@ public class DocumentPassage {
 
     public String passage_text;
     public String field;
-    public PassageAnswer[] passageAnswers;
+    public PassageAnswer[] answers;
 }
