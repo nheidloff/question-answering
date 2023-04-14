@@ -8,7 +8,7 @@ At this point three steps are taken to generate answers:
 2. Re-ranking
 3. Answer generation
 
-Two large `Large Language Models´ are used:
+Two large `Large Language Models` are used:
 
 1. Re-ranker which is typically an encoder-based transformer
 2. Answer generator which is typically a decoder-based transformer
@@ -52,57 +52,35 @@ Further [endpoints](https://github.com/nheidloff/question-answering/blob/main/se
 <kbd><img src="screenshots/qa-architecture-flow1.png" /></kbd>
 
 
-## Running the Service
+## Run the Service
 
-The service can be run locally via Docker or via Java and Maven. There is also a deployed version on IBM Code Engine.
+The service can be run locally via Docker or via Java and Maven. 
 
-The following environment variables are used for the configuration. Dependent on the endpoint you intend to invoke, not all variables are necessary.
-
-```
-export QA_API_KEY=0123456789
-export DISCOVERY_API_KEY=xxx
-export DISCOVERY_URL=https://api.us-east.discovery.watson.cloud.ibm.com/instances/
-export DISCOVERY_INSTANCE=405ac31f-5cd3-420f-9128-f1e286a1c575
-export DISCOVERY_PROJECT=baf8ef5b-7a97-4d32-a4a4-d95b4522ba2b
-export DISCOVERY_COLLECTION_ID=7801e618-8411-2538-0000-0186cbc7aed4
-export PRIME_QA_URL=http://141.125.109.94:50059/ask
-export RERANKER_URL=http://141.125.109.94:50052/RerankRequest
-export MAAS_URL=xxx
-export MAAS_API_KEY=xxx
-export PROXY_URL=xxx
-export PROXY_API_KEY=xxx
-```
-
-The following variables are optional:
+Environment variables are used for the configuration. 
 
 ```
-export EXPERIMENT_METRICS_SESSION=$(date +%s)
-export EXPERIMENT_METRICS_DIRECTORY=$(pwd)/../metrics
-export EXPERIMENT_LLM_NAME=google/ul2
-export EXPERIMENT_LLM_MIN_NEW_TOKENS=5
-export EXPERIMENT_LLM_MAX_NEW_TOKENS=15
-export EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS=5
-export EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=10
-export EXPERIMENT_RERANKER_MODEL="/store/checkpoints/drdecr/DrDecr.dnn"
-export EXPERIMENT_RERANKER_ID=ColBERTReranker
-export EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=30
+cd servive
+cp .env_template .env
+code .env
 ```
 
-
-**Access on Code Engine**
+Via Java 17 and Maven 3.9:
 
 ```
-export QA_API_KEY=xxx;
-curl -v -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{\"query\": \"text:When and for how much did IBM acquire Red Hat?\"}" "https://mock-api.zuhvp4cwkui.us-east.codeengine.appdomain.cloud/query-mock-confident" | jq '.'
+cd servive
+mvn packages
+source .env
+mvn quarkus:dev
 ```
 
-**Run locally via Docker**
+Locally via Docker:
 
 The following commands allow using /query-mock-confident and /query-primeqa. For the other endpoints additional environment variables need to be passed in.
 
 ```
 cd service
 docker build -f src/main/docker/Dockerfile.jvm -t question-answering:latest .
+source .env
 docker run -i --rm -p 8080:8080 \
   -e QA_API_KEY=${QA_API_KEY} \
   -e DISCOVERY_API_KEY=${DISCOVERY_API_KEY} \
@@ -124,27 +102,22 @@ docker run -i --rm -p 8080:8080 \
   -e EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS} \
   -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
-  -v $(pwd)/metrics:/deployments/metrics \
+  -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS={EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
+  -v $(pwd)/../metrics:/deployments/metrics \
   question-answering:latest
 ```
 
-**Run locally via Java 17 and Maven**
+Remotely on Code Engine:
 
-The following commands allow using /query-mock-confident and /query-primeqa. For the other endpoints additional environment variables need to be set.
-
-```shell script
-cd service
-export QA_API_KEY=0123456789
-export PRIME_QA_URL=http://169.63.96.53:50059/ask
-export DISCOVERY_COLLECTION_ID=7801e618-8411-2538-0000-0186cbc7aed4
-mvn package
-mvn compile quarkus:dev
+```
+export QA_API_KEY=xxx;
+curl -v -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{\"query\": \"text:When and for how much did IBM acquire Red Hat?\"}" "https://mock-api.xxx.us-east.codeengine.appdomain.cloud/query-mock-confident" | jq '.'
 ```
 
 
 ## Sample REST API Invocations
 
-Sample query that returns one answer with high confidence plus relevant documents:
+Sample query that returns one answer plus relevant documents:
 
 ```
 curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query-mock-confident" | jq '.'
@@ -171,17 +144,7 @@ curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json"
         "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
       ],
       "link": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
-      "document_passages": [
-        {
-          "passage_text": "<em>IBM</em> <em>acquires</em> <em>Red</em> <em>Hat</em>",
-          "passageAnswers": [
-            {
-              "answer_text": "IBM acquires Red Hat",
-              "confidence": 0.07588528
-            }
-          ]
-        }
-      ]
+      "document_passages": null
     },
     {
       "document_id": "fdc7a154-497b-4115-bb71-b3d20fe0c822",
@@ -190,16 +153,7 @@ curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json"
         "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
       ],
       "link": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
-      "document_passages": [
-        {
-          "passage_text": "<em>IBM</em> (NYSE<em>:</em><em>IBM</em>) and <em>Red</em> <em>Hat</em> announced today that they have closed the transaction under which <em>IBM</em> <em>acquired</em> all of the issued and outstanding common shares of <em>Red</em> <em>Hat</em> for $190.00 per share in cash, representing a total equity value of approximately $34 billion.",
-          "passageAnswers": [
-            {
-              "answer_text": "$190.00 per share in cash",
-              "confidence": 0.6790031
-            }
-          ]
-        }
+      "document_passages": null
       ]
     }
   ]
