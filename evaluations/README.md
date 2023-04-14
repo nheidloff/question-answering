@@ -7,22 +7,7 @@
 ## Setup environment
 
 ```sh
-python3 -m pip install requests
-python3 -m pip install pandas
-python3 -m pip install datasets
-python3 -m pip install huggingface_hub 
-python3 -m pip install fsspec 
-python3 -m pip install aiohttp
-python3 -m pip install csv
-python3 -m pip install sacrebleu
-python3 -m pip install python-dotenv
-python3 -m pip install pyinstaller
-python3 -m pip install evaluate
-python3 -m pip install openpyxl
-python3 -m pip install absl
-python3 -m pip install nltk
-python3 -m pip install rouge_score
-pip3 freeze > requirements.txt
+python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp csv sacrebleu python-dotenv pyinstaller evaluate openpyxl absl nltk rouge_score
 ```
 
 ## Create an `.env` file
@@ -33,13 +18,6 @@ cat ./env_template > .env
 ```
 
 [Link to the ./env_template file.](/evaluations/.env_template)
-
-## Create `/evaluations/outputs` and `/evaluations/inputs` folder
-
-```sh
-mkdir ./evaluations/outputs
-mkdir ./evaluations/inputs
-```
 
 ## Run application
 
@@ -57,11 +35,11 @@ python3 evaluate.py
 
 * Output files
 
-    * **CSV:** It creates a file in the `outputs` folder `outputs/EX_RUN_1_2023-03-31_output_question_resp_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
+    * **CSV:** It creates a file in the `outputs` folder `outputs/SESSION_ID_2023-03-31_output_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
 
-    * **Excel:** It creates a file in the `outputs` folder `outputs/EX_RUN_1_2023-03-31_output_question_resp_anwser_excel.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    * **Excel:** It creates a file in the `outputs` folder `outputs/SESSION_ID_2023-03-31_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
-    * **Error Log:** It creates a file in the `outputs` folder `outputs/2023-03-31_EX_RUN_1_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **Error Log:** It creates a file in the `outputs` folder `outputs/2023-03-31_SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
 ### 2. Execute as a local container
 
@@ -109,6 +87,7 @@ Insert the IP address in your `.env` file:
 # question answering microservice and evaluate container
 # on the same local machine.
 export host_ip="192.168.178.36"
+export container_run=True
 ```
 
 2. Execute the bash script in a new terminal session.
