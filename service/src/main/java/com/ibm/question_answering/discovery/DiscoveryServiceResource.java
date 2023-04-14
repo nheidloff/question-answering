@@ -17,7 +17,7 @@ public class DiscoveryServiceResource {
 
     @POST
     @Path("/instances")
-    public com.ibm.question_answering.Answer ask(Input input) {
+    public com.ibm.question_answering.api.Answer ask(Input input) {
         return discoverService.ask(input);
     }
 }

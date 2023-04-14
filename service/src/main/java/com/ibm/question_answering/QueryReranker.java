@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.ibm.question_answering.api.Answer;
+import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.reranker.AskReRankerService;
 import com.ibm.question_answering.reranker.Document;
 import com.ibm.question_answering.reranker.DocumentScore;

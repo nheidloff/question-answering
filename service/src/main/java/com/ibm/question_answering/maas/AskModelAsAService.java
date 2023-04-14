@@ -6,8 +6,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.ibm.question_answering.Metrics;
-import com.ibm.question_answering.Result;
+import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.primeqa.AnswerDocument;
+import com.ibm.question_answering.primeqa.AskPrimeQA;
 import com.ibm.question_answering.prompts.QuestionAnswering;
 import com.ibm.question_answering.proxy.ProxyExceptionMapper;
 import com.ibm.question_answering.proxy.ProxyServiceResource;
@@ -19,6 +21,9 @@ public class AskModelAsAService {
     @Inject
     Metrics metrics;
 
+    @Inject
+    AskPrimeQA askPrimeQA;
+    
     @Inject
     QuestionAnswering questionAnswering;
     
@@ -64,7 +69,17 @@ public class AskModelAsAService {
     @ConfigProperty(name = "EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS") 
     Optional<String> llmMaxInputDocumentsOptionalString;
 
-    public com.ibm.question_answering.Answer execute(String query, AnswerDocument[] answerDocuments) {        
+    final static int MAX_RESULTS = 5;
+    @ConfigProperty(name = "MAX_RESULTS") 
+    Optional<String> maxResultsOptionalString;
+    int maxResults = MAX_RESULTS;
+
+    public com.ibm.question_answering.api.Answer execute(String query, AnswerDocument[] answerDocuments) {      
+        if (maxResultsOptionalString.isPresent()) {
+            try {
+                maxResults = Integer.parseInt(maxResultsOptionalString.get());
+            } catch (Exception e) {}
+        }  
         int llmMaxInputDocuments = MAAS_LLM_MAX_INPUT_DOCUMENTS;
         if (llmMaxInputDocumentsOptionalString.isPresent()) {
             try {
@@ -78,10 +93,12 @@ public class AskModelAsAService {
             System.arraycopy(answerDocumentsOrg, 0, answerDocuments, 0, llmMaxInputDocuments);
         }
         String prompt = questionAnswering.getPrompt(query, answerDocuments);
-        return execute(prompt);
+        com.ibm.question_answering.api.Answer output = execute(prompt);
+        output = cleanUpAnswer(output, answerDocuments);
+        return output;
     }
 
-    public com.ibm.question_answering.Answer execute(String prompt) {
+    public com.ibm.question_answering.api.Answer execute(String prompt) {
         if (!proxyApiKey.equalsIgnoreCase(PROXY_API_KEY_NOT_SET)) {
             useProxy = true;
             if (proxyUrl.equalsIgnoreCase(PROXY_URL_NOT_SET)) {
@@ -119,8 +136,8 @@ public class AskModelAsAService {
         parameters.max_new_tokens = llmMaxNewTokens;
         parameters.temperature = 0;
         metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);
-        com.ibm.question_answering.Answer output;
-        output = new com.ibm.question_answering.Answer(true, 0, null);
+        com.ibm.question_answering.api.Answer output;
+        output = new com.ibm.question_answering.api.Answer(true, 0, null);
         String[] inputs = new String[1];
         inputs[0] = prompt;
 
@@ -158,6 +175,50 @@ public class AskModelAsAService {
             output = answer.substring(0, lastIndexOfDot + 1);
             output = output.trim();
         }
+        return output;
+    }
+
+    public com.ibm.question_answering.api.Answer cleanUpAnswer(com.ibm.question_answering.api.Answer output, AnswerDocument[] answerDocuments) {
+        if (answerDocuments != null) {
+            output.matching_results = answerDocuments.length;
+            ArrayList<Result> results = new ArrayList<Result>();
+            results.add(output.results.get(0));
+            for (int index = 0; index < answerDocuments.length; index++) {
+                results.add(askPrimeQA.getAnswerDocument(answerDocuments[index]));
+            }
+            output.results = results;
+        }
+
+        int results = output.results.size();
+        if (maxResults + 1 < results) {
+            for (int index = results - 1; index > maxResults; index--) {
+                output.results.remove(index);
+            }
+        }
+        for (int index = 0; index < output.results.size(); index++) {
+            output.results.get(index).document_passages = null;
+            /* 
+            if (output.results.get(index).document_passages != null) {
+                output.results.get(index).document_passages[0].passageAnswers = null;
+                int countPassages = output.results.get(index).document_passages.length;
+                if (countPassages > 1) {
+                    DocumentPassage[] newPassages = new DocumentPassage[1];
+                    newPassages[0] = output.results.get(index).document_passages[0];
+                    output.results.get(index).document_passages = newPassages;
+                    
+                } 
+            }
+            */
+        }
+
+        /*
+        String answerAsText = output.results.get(0).text.text[0];
+        answerAsText = removeEverythingAfterLastDot(answerAsText);
+        String[] text = new String[1];
+        text[0] = answerAsText;
+        output.results.get(0).text.text = text;
+        */
+
         return output;
     }
 }

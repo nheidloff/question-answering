@@ -19,5 +19,5 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 public interface DiscoveryService {
     
     @POST
-    com.ibm.question_answering.Answer ask(Input input);
+    com.ibm.question_answering.api.Answer ask(Input input);
 }

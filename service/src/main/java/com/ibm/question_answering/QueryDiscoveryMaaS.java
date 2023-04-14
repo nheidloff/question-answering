@@ -2,7 +2,8 @@ package com.ibm.question_answering;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
+import com.ibm.question_answering.api.Answer;
+import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.discovery.AskDiscoveryService;
 import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.maas.AskModelAsAService;
@@ -32,10 +33,10 @@ public class QueryDiscoveryMaaS {
     @Inject
     Metrics metrics;
 
-    public Answer query(String query, boolean proxy, boolean summaries) {
+    public Answer query(String query) {
         
         // 1. Discovery
-        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
+        com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query);   
         if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
             return MockAnswers.getEmptyAnswer();
         }
@@ -61,7 +62,7 @@ public class QueryDiscoveryMaaS {
         return output;
     }
 
-    public DocumentScore[] convert(com.ibm.question_answering.Answer discoveryAnswer) {
+    public DocumentScore[] convert(com.ibm.question_answering.api.Answer discoveryAnswer) {
         DocumentScore[] output = new DocumentScore[0];
         if (discoveryAnswer != null) {
             if (discoveryAnswer.results != null) {

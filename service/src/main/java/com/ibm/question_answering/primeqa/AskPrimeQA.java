@@ -5,9 +5,9 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import com.ibm.question_answering.DocumentPassage;
-import com.ibm.question_answering.PassageAnswer;
-import com.ibm.question_answering.Result;
+import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.PassageAnswer;
+import com.ibm.question_answering.api.Result;
 
 @ApplicationScoped
 public class AskPrimeQA {
@@ -21,10 +21,10 @@ public class AskPrimeQA {
     @ConfigProperty(name = "DISCOVERY_COLLECTION_ID", defaultValue = DISCOVERY_COLLECTION_ID_NOT_SET) 
     public String collectionId;
 
-    public com.ibm.question_answering.Answer execute(String query) {       
+    public com.ibm.question_answering.api.Answer execute(String query) {       
         AnswerDocument[] response = primeQAResource.ask(createInput(query));
 
-        com.ibm.question_answering.Answer output = new com.ibm.question_answering.Answer(false, 0, null);
+        com.ibm.question_answering.api.Answer output = new com.ibm.question_answering.api.Answer(false, 0, null);
         if (response != null) {
             output.matching_results = response.length;
             ArrayList<Result> results = new ArrayList<Result>();

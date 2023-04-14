@@ -3,6 +3,11 @@ package com.ibm.question_answering;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.ibm.question_answering.api.Answer;
+import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.PassageAnswer;
+import com.ibm.question_answering.api.Result;
+
 public class MockAnswers {
     
     public static Answer getConfidentAnswer() {

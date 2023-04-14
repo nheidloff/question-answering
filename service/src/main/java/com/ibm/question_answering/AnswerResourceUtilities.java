@@ -6,6 +6,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.NotAuthorizedException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import com.ibm.question_answering.api.Answer;
+import com.ibm.question_answering.api.RetrievalDetails;
+
 @ApplicationScoped
 public class AnswerResourceUtilities {
 
@@ -64,15 +67,15 @@ public class AnswerResourceUtilities {
         int inputResulsSize = input.results.size();
         if (input != null) {
             if (inputResulsSize > 0) {
-                String[] urls = new String[inputResulsSize];
+                String[] documentIds = new String[inputResulsSize];
                 for (int index = 0; index < inputResulsSize; index++) {
-                    urls[index] = input.results.get(index).url;
+                    documentIds[index] = input.results.get(index).document_id;
                 }
                 for (int index = inputResulsSize - 1; index > 0; index--) {
                     String url = input.results.get(index).url;
                     boolean isRedundant = false;
                     for (int i = index - 1; i >= 0; i--) {
-                        if (url.equals(urls[i])) isRedundant = true;
+                        if (url.equals(documentIds[i])) isRedundant = true;
                     }
                     if (isRedundant == true) {
                         output.results.remove(index);

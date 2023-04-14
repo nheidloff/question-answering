@@ -4,9 +4,8 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import com.ibm.question_answering.Answer;
 import com.ibm.question_answering.Metrics;
+import com.ibm.question_answering.api.Answer;
 
 @ApplicationScoped
 public class AskDiscoveryService {
@@ -47,7 +46,7 @@ public class AskDiscoveryService {
     @Inject
     Metrics metrics;
   
-    public com.ibm.question_answering.Answer ask(String query) {
+    public com.ibm.question_answering.api.Answer ask(String query) {
         if (collectionId.equalsIgnoreCase(DISCOVERY_COLLECTION_ID_NOT_SET)) {
             System.err.println(ERROR_COLLECTION_ID_NOT_SET);
             throw new RuntimeException(ERROR_COLLECTION_ID_NOT_SET);
@@ -77,7 +76,7 @@ public class AskDiscoveryService {
 
         metrics.discoveryStarted(maxDocs);
         Input input = new Input(collectionId, query, maxDocs);
-        com.ibm.question_answering.Answer output = discoveryResource.ask(input);
+        com.ibm.question_answering.api.Answer output = discoveryResource.ask(input);
         output = ensureDocumentIdsExist(output);
         metrics.discoveryStopped(output);
         return output;

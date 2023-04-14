@@ -1,9 +1,6 @@
-package com.ibm.question_answering;
+package com.ibm.question_answering.api;
 
 import java.util.ArrayList;
-
-import com.ibm.question_answering.Result;
-import com.ibm.question_answering.RetrievalDetails;
 
 public class Answer {
 

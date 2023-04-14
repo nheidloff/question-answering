@@ -1,11 +1,11 @@
 package com.ibm.question_answering.discovery;
 
-import com.ibm.question_answering.DocumentPassage;
-import com.ibm.question_answering.Result;
+import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.Result;
 
 public class RelevantOutput {
 
-    public static String getDiscoveryResultAsText(com.ibm.question_answering.Answer discoveryAnswer, int index) {
+    public static String getDiscoveryResultAsText(com.ibm.question_answering.api.Answer discoveryAnswer, int index) {
         String output = "";
         if (discoveryAnswer != null) {
             Result discoveryResult = discoveryAnswer.results.get(index);
