@@ -1,23 +1,30 @@
 # Question Answering Service based on IBM Software
 
-This repo contains a simple implementation of a `Question Answering` microservice which supports conversational search scenarios by leveraging `Large Language Models` and open source projects like `PrimeQA`.
+This repo contains a simple implementation of a `Question Answering` microservice which supports generative conversational search scenarios by leveraging `Foundation Models`, IBM software and open source.
 
-At this point two steps are used to generate answers:
+At this point three steps are taken to generate answers:
 
-1. Full-text searches on knowledge bases, e.g. Watson Discovery, via PrimeQA
-2. Generation of answers via `Prompt Engineering` by passing in context via FLAN-UL2
+1. Full text searches
+2. Re-ranking
+3. Answer generation
+
+Two large `Large Language Models´ are used:
+
+1. Re-ranker which is typically an encoder-based transformer
+2. Answer generator which is typically a decoder-based transformer
 
 Involved technologies:
 
-* IBM Watson Assistant
 * IBM Watson Discovery
-* PrimeQA hosted on IBM Cloud
-* IBM Code Engine
+* ColBERT Reranker DrDecr in PrimeQA hosted on IBM Cloud
+* FLAN-T5 hosted via some MaaS (Model as a Service) provider
+* Optional: IBM Watson Assistant
+* Optional: IBM Code Engine
 
 
 ## Screenshots of Sample Scenario
 
-Sample documents have been uploaded to Watson Discovery and integrated in PrimeQA. The results of PrimeQA are passed as input to a prompt executed via FLAN-UL2 (20B).
+Sample documents have been uploaded to Watson Discovery and integrated in PrimeQA. The results of PrimeQA are passed as input to a prompt executed via a FLAN fine-tuned model.
 
 The answer to the question "When and for how much did IBM acquire Red Hat?" is generated from two different documents.
 
@@ -30,31 +37,19 @@ The answer to the question "When and for how much did IBM acquire Red Hat?" is g
 
 There are several endpoints to test and compare results. Main flows:
 
-1. /query-discovery-reranker-maas: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (with proxy, without summaries, with metrics)
-2. /query-discovery-maas: Returns answer from Discovery and MaaS (with proxy, without summaries, with metrics)
-3. /query-primeqa-maas: Returns answer from PrimeQA (connected to Discovery) and MaaS (with proxy, without summaries)
+1. /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer
+2. /query-discovery-maas: Returns answer from Discovery and MaaS
+3. /query-primeqa-maas: Returns answer from PrimeQA (connected to Discovery) and MaaS
 
-Further endpoints can be used for testing:
+Further [endpoints](https://github.com/nheidloff/question-answering/blob/main/service/src/main/java/com/ibm/question_answering/AnswerResource.java) can be used for testing.
 
-* /query: Same as /query-discovery-reranker-maas
-* /query-discovery-reranker-maas-no-proxy: Reads documents from Discovery, re-ranks results and uses MaaS to return answer (without proxy, without summaries, with metrics)
-* /query-discovery-maas-no-proxy: Returns answer from Discovery and MaaS (no proxy, without summaries, with metrics)
-* /query-primeqa-maas-no-proxy: Returns answer from PrimeQA (connected to Discovery) and MaaS (without proxy, without summaries)
-* /query-discovery: Returns answer from Watson Discovery
-* /query-reranker: Returns answer from the reranker on PrimeQA with mock documents (model: drdecr)
-* /query-primeqa: Returns answer from PrimeQA (retriever: Watson Discovery; reader: PrimeQA/nq_tydi_sq1-reader-xlmr_large)
-* /query-maas: Returns answer from MaaS (aka BAM; model: FLAN-UL2)
-* /query-primeqa-maas-summaries: Returns answer from PrimeQA and MaaS (with proxy, with summaries)
-* /query-mock-confident: Returns hardcoded data for a confident answer
-* /query-mock-not-confident: Returns hardcoded data for a non confident answer
-
-*Flow 1: /query-primeqa-maaas: Returns answer from PrimeQA (connected to Discovery) and MaaS*
-
-<kbd><img src="screenshots/qa-architecture-flow1.png" /></kbd>
-
-*Flow 2: /query-discovery-reranker-maas: Reads documents from Discovery, re-ranks results and uses MaaS to return answer*
+*Flow 1: /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer*
 
 <kbd><img src="screenshots/qa-architecture-flow2.png" /></kbd>
+
+*Flow 2: /query-primeqa-maaas: Returns answer from PrimeQA (connected to Discovery) and MaaS*
+
+<kbd><img src="screenshots/qa-architecture-flow1.png" /></kbd>
 
 
 ## Running the Service
@@ -437,11 +432,13 @@ Sample how the API of this service can be integrated in Watson Assistant:
 
 ## Resources
 
-* [Question Answering Service](https://github.com/nheidloff/question-answering)
+
 * [Generative AI for Question Answering Scenarios](https://heidloff.net/article/question-answering-transformers/)
 * [Generative AI Sample Code for Question Answering](https://heidloff.net/article/sample-question-answering/)
+* [Introduction to Neural Information Retrieval](https://heidloff.net/article/introduction-neural-information-retrieval/)
+* [Optimizing Generative AI for Question Answering](https://heidloff.net/article/optimizing-generative-ai-for-question-answering/)
 * [Integrating generative AI in Watson Assistant](https://heidloff.net/article/integrating-generative-ai-in-watson-assistant/)
-* [The Setup of Bring Your Own Search (BYOS) for a Question Answering Service in Watson Assistant](https://suedbroecker.net/2023/03/20/the-setup-of-bring-your-own-search-byos-for-the-question-answering-service-in-watson-assistant/)
+* [Setup of Bring Your Own Search in Watson Assistant](https://github.com/nheidloff/question-answering/tree/main/assistant)
 * [Using PrimeQA For NLP Question Answering](https://www.deleeuw.me.uk/posts/Using-PrimeQA-For-NLP-Question-Answering/)
 * [Finding concise answers to questions in enterprise documents](https://medium.com/ibm-data-ai/finding-concise-answers-to-questions-in-enterprise-documents-53a865898dbd)
 * [Bring your own search to IBM Watson Assistant](https://medium.com/ibm-watson/bring-your-own-search-to-ibm-watson-assistant-587e77410c98)
