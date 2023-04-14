@@ -17,6 +17,10 @@ evaluations/test_output.csv
 evaluations/Book1.xlsx
 evaluations/outputs/*
 evaluations/inputs/*
+evaluations/outputs/*
+!evaluations/outputs/YOUR_OUTPUT.txt
+evaluations/inputs/*
+!evaluations/inputs/YOUR_INPUT.txt
 
 #Maven
 target/
