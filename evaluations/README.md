@@ -32,25 +32,7 @@ cd YOUR_PATH/question-answering/evaluations
 cat ./env_template > .env
 ```
 
-```sh
-export endpoint="/YOUR_VALUE"
-export api_url="YOUR_VALUE"
-export username='apikey'
-export password='YOUR_VALUE'
-export verify_answer="Answer"
-export input_folder_name="inputs"
-export input_excel_filename="input_excel.xlsx"
-export output_question_resp_anwser="output_question_resp_anwser.csv"
-export output_question_resp_anwser_excel="output_question_resp_anwser_excel.xlsx"
-export output_error_log="error.log"
-export output_session_id="$(date +%s)"
-export output_folder_name="outputs"
-export number_of_retrys="5"
-# Only needed when you run 
-# question answering microservice and evaluate container
-# on the same local machine.
-export host_ip=""
-```
+[Link to the ./env_template file.](/evaluations/.env_template)
 
 ## Create `/evaluations/outputs` and `/evaluations/inputs` folder
 
