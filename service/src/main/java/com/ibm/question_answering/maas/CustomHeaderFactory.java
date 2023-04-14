@@ -10,7 +10,6 @@ import javax.ws.rs.core.MultivaluedMap;
 public class CustomHeaderFactory implements ClientHeadersFactory {
 
     final String MAAS_API_KEY_NOT_SET = "NOT_SET";    
-
     @ConfigProperty(name = "MAAS_API_KEY", defaultValue = MAAS_API_KEY_NOT_SET) 
     private String apikey;
 

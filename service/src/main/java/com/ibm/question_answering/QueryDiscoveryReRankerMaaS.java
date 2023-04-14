@@ -1,17 +1,14 @@
 package com.ibm.question_answering;
 
-import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import com.ibm.question_answering.api.Answer;
 import com.ibm.question_answering.discovery.AskDiscoveryService;
 import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.maas.AskModelAsAService;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.prompts.QuestionAnswering;
 import com.ibm.question_answering.prompts.Summarization;
-import com.ibm.question_answering.proxy.AskProxyService;
 import com.ibm.question_answering.reranker.AskReRankerService;
 import com.ibm.question_answering.reranker.Document;
 import com.ibm.question_answering.reranker.DocumentScore;
@@ -29,9 +26,6 @@ public class QueryDiscoveryReRankerMaaS {
     AskModelAsAService askMaaS;
 
     @Inject
-    AskProxyService askProxy;
-
-    @Inject
     QueryPrimeAndMaaS queryPrimeAndMaaS;
 
     @Inject
@@ -40,45 +34,20 @@ public class QueryDiscoveryReRankerMaaS {
     @Inject
     Summarization summarization;
 
-    @ConfigProperty(name = "experiment.reranker-max-input-documents") 
-    Optional<String> rerankerMaxInputDocumentsOptionalString;
-    
-    @ConfigProperty(name = "experiment.llm-max-input-documents") 
-    Optional<String> llmMaxInputDocumentsOptionalString;
-
     @Inject
     Metrics metrics;
 
-    public Answer query(String query, boolean proxy, boolean summaries) {
-        int rerankerMaxInputDocuments = 10;
-        if (rerankerMaxInputDocumentsOptionalString.isPresent()) {
-            try {
-                rerankerMaxInputDocuments = Integer.parseInt(rerankerMaxInputDocumentsOptionalString.get());
-            } catch (Exception e) {}
-        }
-        int llmMaxInputDocuments = 5;
-        if (llmMaxInputDocumentsOptionalString.isPresent()) {
-            try {
-                llmMaxInputDocuments = Integer.parseInt(llmMaxInputDocumentsOptionalString.get());
-            } catch (Exception e) {}
-        }
+    public Answer query(String query) {        
         
         // 1. Discovery
-        com.ibm.question_answering.Answer discoveryAnswer = askDiscoveryService.ask(query);   
-        if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
-            return MockAnswers.getEmptyAnswer();
-        }
-        for (int index = 0; index < discoveryAnswer.results.size(); index++) {
-            discoveryAnswer.results.get(index).document_id = discoveryAnswer.results.get(index).chunckid;
-        }
-        discoveryAnswer = askDiscoveryService.ensureDocumentIdsExist(discoveryAnswer);
+        com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query);   
+        if (discoveryAnswer == null) {
+            System.err.println(com.ibm.question_answering.discovery.DiscoveryExceptionMapper.ERROR_DISCOVERY_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.discovery.DiscoveryExceptionMapper.ERROR_DISCOVERY_UNEXPECTED);
+        }        
         
         // 2. ReRanker
         int inputReRankerAmountDocuments = discoveryAnswer.results.size();
-        if (inputReRankerAmountDocuments > rerankerMaxInputDocuments) {
-            inputReRankerAmountDocuments = rerankerMaxInputDocuments;
-        }
-        metrics.setRRAmountInputDocuments(inputReRankerAmountDocuments, rerankerMaxInputDocuments);
         DocumentScore[] documentsAndScoresInput = new DocumentScore[inputReRankerAmountDocuments];
         for (int index = 0; index < inputReRankerAmountDocuments; index++) {
             Document document = new Document();
@@ -89,32 +58,27 @@ public class QueryDiscoveryReRankerMaaS {
         }
         DocumentScore[][] documentsAndScoresArray = askReRankerService.executeAndReturnRawAnswer(query, documentsAndScoresInput);
         if ((documentsAndScoresArray == null) || (documentsAndScoresArray.length < 1)) {
-            return MockAnswers.getEmptyAnswer();
+            System.err.println(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
         }
         DocumentScore[] documentsAndScores = documentsAndScoresArray[0];
         if ((documentsAndScores == null) || (documentsAndScores.length < 1)) {
-            return MockAnswers.getEmptyAnswer();
+            System.err.println(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
+            throw new RuntimeException(com.ibm.question_answering.reranker.ReRankerExceptionMapper.ERROR_RERANKER_UNEXPECTED);
         }
 
-        // 3. MaaS
-        metrics.setMaaSMaxAmountDocuments(llmMaxInputDocuments);
-        AnswerDocument[] answerDocuments = convertToAnswerDocuments(documentsAndScores, discoveryAnswer, llmMaxInputDocuments);
+        // 3. MaaS        
+        AnswerDocument[] answerDocuments = convertToAnswerDocuments(documentsAndScores, discoveryAnswer, documentsAndScores.length);
         if ((answerDocuments == null) || (answerDocuments.length < 1)) {
             return MockAnswers.getEmptyAnswer();
         }
-
-        Answer output = queryPrimeAndMaaS.queryMaaS(answerDocuments, query, proxy, summaries);
-        String answerAsText = output.results.get(0).text.text[0];
-        //answerAsText = removeEverythingAfterLastDot(answerAsText);
-        String[] text = new String[1];
-        text[0] = answerAsText;
-        output.results.get(0).text.text = text;
+        Answer output = queryPrimeAndMaaS.queryMaaS(answerDocuments, query);
         metrics.maaSStopped(output);
 
         return output;
     }
 
-    public AnswerDocument[] convertToAnswerDocuments(DocumentScore[] documentsAndScores, com.ibm.question_answering.Answer discoveryAnswer, int amountDocumentsLimit) {
+    public AnswerDocument[] convertToAnswerDocuments(DocumentScore[] documentsAndScores, com.ibm.question_answering.api.Answer discoveryAnswer, int amountDocumentsLimit) {
         AnswerDocument[] output = null;
         if (documentsAndScores != null) {
             int amount = documentsAndScores.length;
@@ -140,7 +104,7 @@ public class QueryDiscoveryReRankerMaaS {
         return output;
     }
 
-    public String getDocumentUrl(String documentId, com.ibm.question_answering.Answer discoveryAnswer) {
+    public String getDocumentUrl(String documentId, com.ibm.question_answering.api.Answer discoveryAnswer) {
         String output = "";
         for (int index = 0; index < discoveryAnswer.results.size(); index++) {
             if (discoveryAnswer.results.get(index).document_id.equals(documentId)) {

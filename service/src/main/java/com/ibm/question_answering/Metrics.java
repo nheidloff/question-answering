@@ -20,13 +20,13 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Metrics {
 
-    @ConfigProperty(name = "experiment.metrics-session") 
+    @ConfigProperty(name = "EXPERIMENT_METRICS_SESSION") 
     Optional<String> sessionOptionalString;
 
     String session = null;
     boolean enabled = false;
 
-    @ConfigProperty(name = "experiment.metrics-directory") 
+    @ConfigProperty(name = "EXPERIMENT_METRICS_DIRECTORY") 
     Optional<String> directoryOptionalString;
 
     public Metrics() {
@@ -292,7 +292,7 @@ public class Metrics {
         this.discoveryMaxDocuments = String.valueOf(maxDocuments);
     }
 
-    public void discoveryStopped(com.ibm.question_answering.Answer answer) {
+    public void discoveryStopped(com.ibm.question_answering.api.Answer answer) {
         this.tsDiscoveryEnd = getTimestamp();
         if (answer != null) {
             this.sizeDiscoveryResults = String.valueOf(answer.matching_results);
@@ -326,7 +326,7 @@ public class Metrics {
         this.prompt = prompt;
     }
 
-    public void maaSStopped(com.ibm.question_answering.Answer result) {
+    public void maaSStopped(com.ibm.question_answering.api.Answer result) {
         this.tsMaaSEnd = getTimestamp();
         if (result != null) {
             if ((result.results != null) && (result.results.size() > 0) && (result.results.get(0).text.text.length > 0)) {

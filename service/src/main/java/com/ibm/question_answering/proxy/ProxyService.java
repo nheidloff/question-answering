@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("")
@@ -14,6 +15,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "proxy")
 @RegisterClientHeaders(CustomHeaderFactory.class)
 @ApplicationScoped
+@RegisterProvider(ProxyExceptionMapper.class)
 public interface ProxyService {
     
     @POST

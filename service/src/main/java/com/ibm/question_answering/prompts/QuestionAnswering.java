@@ -40,7 +40,7 @@ Agent:""";
         if (primeQADocuments != null) {
             for (int index = 0; index < amountDocuments; index++) {
                 context = context + 
-                    primeQADocuments[index].document.title + "\n" + 
+                    //primeQADocuments[index].document.title + ". " + 
                     primeQADocuments[index].document.text; 
                 if (index < amountDocuments - 1) {
                     context = context + "\n\n";

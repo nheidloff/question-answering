@@ -1,4 +1,4 @@
-package com.ibm.question_answering;
+package com.ibm.question_answering.api;
 
 public class ResultMetaData {
     public String collection_id;

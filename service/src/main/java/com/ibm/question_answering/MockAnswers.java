@@ -3,6 +3,11 @@ package com.ibm.question_answering;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.ibm.question_answering.api.Answer;
+import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.PassageAnswer;
+import com.ibm.question_answering.api.Result;
+
 public class MockAnswers {
     
     public static Answer getConfidentAnswer() {
@@ -23,6 +28,12 @@ public class MockAnswers {
     public static Answer getEmptyAnswer() {
         ArrayList<Result> results = new ArrayList<Result>();
         results.add(getResultEmpty());
+        return new Answer(false, 1, results);
+    }
+
+    public static Answer getErrorAnswer() {
+        ArrayList<Result> results = new ArrayList<Result>();
+        results.add(getErrorResult());
         return new Answer(false, 1, results);
     }
 
@@ -73,6 +84,17 @@ public class MockAnswers {
         text[0] = "";
         return new Result(randomUUID.toString(), 
             "", 
+            text, 
+            "",
+            null);
+    }
+
+    public static Result getErrorResult() {
+        UUID randomUUID = UUID.randomUUID(); 
+        String text[] = new String[1];
+        text[0] = "";
+        return new Result(randomUUID.toString(), 
+            "Error", 
             text, 
             "",
             null);

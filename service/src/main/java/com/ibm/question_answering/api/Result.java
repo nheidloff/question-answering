@@ -1,4 +1,4 @@
-package com.ibm.question_answering;
+package com.ibm.question_answering.api;
 
 import com.ibm.question_answering.discovery.Text;
 

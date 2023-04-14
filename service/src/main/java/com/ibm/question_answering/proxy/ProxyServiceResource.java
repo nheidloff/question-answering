@@ -1,13 +1,17 @@
 package com.ibm.question_answering.proxy;
 
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @ApplicationScoped
+@RegisterProvider(ProxyExceptionMapper.class)
 public class ProxyServiceResource {
 
+    @Inject
     @RestClient
     ProxyService proxyService;
 
