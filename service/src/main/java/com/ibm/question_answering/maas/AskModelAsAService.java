@@ -154,10 +154,19 @@ public class AskModelAsAService {
         
         if (response != null) {
             if (response.results.length > 0) {
+                String generatedText = response.results[0].generated_text;
+
+                // special case
+                String EVIDENCE_MARKER = "; evidence:";
+                String RESPONSE_MARKER = "response: ";
+                if (generatedText.contains(EVIDENCE_MARKER)) {
+                    generatedText = generatedText.substring(RESPONSE_MARKER.length(), generatedText.indexOf(EVIDENCE_MARKER));
+                }
+
                 output.matching_results = 1;
                 ArrayList<Result> results = new ArrayList<Result>();
                 String text[] = new String[1];
-                text[0] = response.results[0].generated_text;
+                text[0] = generatedText;
                 results.add(new Result(Result.TITLE_ONE_ANSWER, 
                     Result.TITLE_ONE_ANSWER,
                     text,
