@@ -43,7 +43,8 @@ public class Metrics {
         "RERANKER_MODEL",
         "RERANKER_ID",
         "URL",
-        "DISCOVERY_MAX_OUTPUT_DOCUMENTS"
+        "DISCOVERY_MAX_OUTPUT_DOCUMENTS",
+        "PROMPT_TEMPLATE"
     };
 
     final String[] headersRuns = {
@@ -133,6 +134,7 @@ public class Metrics {
     String sizeReRankerInputs;
     String sizeReRankerResults;
     String discoveryMaxDocuments;
+    String promptTemplate;
 
     final String fileNameMetadata = "Metadata.csv";
     final String fileNameRuns = "Runs.csv";
@@ -250,6 +252,7 @@ public class Metrics {
                 data.add(this.rrId);
                 data.add(this.url);
                 data.add(this.discoveryMaxDocuments);
+                data.add(this.promptTemplate);
 
                 csvPrinterMetadata.printRecord(data);
                 csvPrinterMetadata.flush();
@@ -347,6 +350,10 @@ public class Metrics {
     private String getTimestamp() {
         long time = new java.util.Date().getTime();
         return String.valueOf(time);
+    }
+
+    public void setPromptTemplate(String promptTemplate) {
+        this.promptTemplate = promptTemplate.replaceAll(System.getProperty("line.separator"), "\\\\n");
     }
 
     void writeLastRunReadable() {
