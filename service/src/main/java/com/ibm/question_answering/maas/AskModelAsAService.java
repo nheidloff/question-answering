@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.ibm.question_answering.Metrics;
 import com.ibm.question_answering.api.DocumentPassage;
+import com.ibm.question_answering.api.PassageAnswer;
 import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.primeqa.AskPrimeQA;
@@ -196,19 +197,20 @@ public class AskModelAsAService {
             }
         }
         for (int index = 0; index < output.results.size(); index++) {
-            output.results.get(index).document_passages = null;
-            /* 
             if (output.results.get(index).document_passages != null) {
-                output.results.get(index).document_passages[0].passageAnswers = null;
                 int countPassages = output.results.get(index).document_passages.length;
-                if (countPassages > 1) {
-                    DocumentPassage[] newPassages = new DocumentPassage[1];
-                    newPassages[0] = output.results.get(index).document_passages[0];
-                    output.results.get(index).document_passages = newPassages;
-                    
+                if (countPassages > 0) {
+                    String textRead = output.results.get(index).document_passages[0].passage_text;
+                    DocumentPassage[] documentPassages = new DocumentPassage[1];
+                    PassageAnswer[] passageAnswers = new PassageAnswer[1];
+                    passageAnswers[0] = new PassageAnswer(textRead, 0);
+                    passageAnswers[0].field = PassageAnswer.FIELD_SUMMARY;
+                    documentPassages[0] = new DocumentPassage("<em>IBM</em> <em>acquires</em> <em>Red</em> <em>Hat</em>", DocumentPassage.FIELD_TEXT, passageAnswers);
+                    String text[] = new String[1];
+                    text[0] = textRead;
+                    output.results.get(index).document_passages = documentPassages;                    
                 } 
             }
-            */
         }
 
         /*

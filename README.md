@@ -43,20 +43,16 @@ There are several endpoints to test and compare results. Main flows:
 
 Further [endpoints](https://github.com/nheidloff/question-answering/blob/main/service/src/main/java/com/ibm/question_answering/AnswerResource.java) can be used for testing.
 
-*Flow 1: /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer*
+Flow 1: /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer
 
 <kbd><img src="screenshots/qa-architecture-flow2.png" /></kbd>
-
-*Flow 2: /query-primeqa-maaas: Returns answer from PrimeQA (connected to Discovery) and MaaS*
-
-<kbd><img src="screenshots/qa-architecture-flow1.png" /></kbd>
 
 
 ## Run the Service
 
 The service can be run locally via Docker or via Java and Maven. 
 
-Environment variables are used for the configuration. 
+Environment variables are used for the [configuration](https://github.com/nheidloff/question-answering/blob/main/service/.env_template). 
 
 ```
 cd servive
@@ -64,12 +60,20 @@ cp .env_template .env
 code .env
 ```
 
+After invoking REST APIs the results are also stored in the 'metrics' directory:
+
+* [Last-Run.md](metrics/sample/Last-Run.md)
+* [1679920979-Runs.csv](metrics/sample/1679920979-Runs.csv)
+* [1679920979-Metadata.csv](metrics/sample/1679920979-Metadata.csv)
+
 Via Java 17 and Maven 3.9:
 
 ```
 cd servive
 mvn packages
 source .env
+echo $EXPERIMENT_METRICS_SESSION
+echo $QA_API_KEY
 mvn quarkus:dev
 ```
 
@@ -81,6 +85,8 @@ The following commands allow using /query-mock-confident and /query-primeqa. For
 cd service
 docker build -f src/main/docker/Dockerfile.jvm -t question-answering:latest .
 source .env
+echo $EXPERIMENT_METRICS_SESSION
+echo $QA_API_KEY
 docker run -i --rm -p 8080:8080 \
   -e QA_API_KEY=${QA_API_KEY} \
   -e DISCOVERY_API_KEY=${DISCOVERY_API_KEY} \
@@ -103,6 +109,9 @@ docker run -i --rm -p 8080:8080 \
   -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
   -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
   -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS={EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
+  -e EXPERIMENT_DISCOVERY_CHARACTERS={EXPERIMENT_DISCOVERY_CHARACTERS} \
+  -e EXPERIMENT_DISCOVERY_FIND_ANSWERS={EXPERIMENT_DISCOVERY_FIND_ANSWERS} \
+  -e EXPERIMENT_LLM_PROMPT={EXPERIMENT_LLM_PROMPT} \
   -v $(pwd)/../metrics:/deployments/metrics \
   question-answering:latest
 ```
@@ -113,6 +122,33 @@ Remotely on Code Engine:
 export QA_API_KEY=xxx;
 curl -v -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{\"query\": \"text:When and for how much did IBM acquire Red Hat?\"}" "https://mock-api.xxx.us-east.codeengine.appdomain.cloud/query-mock-confident" | jq '.'
 ```
+
+## Run Experiments
+
+Experiments can be run locally via Python. 
+
+Environment variables are used for the [configuration](https://github.com/nheidloff/question-answering/blob/main/evaluations/.env_template). 
+
+Define $QA_API_KEY and $EXPERIMENT_METRICS_SESSION from previous step. Define the name and the location of your ground truth file 'input_excel_filename'.
+
+```
+cd evaluations
+cp .env_template .env
+code .env
+```
+
+Via Python 3.9:
+
+```
+cd evaluations
+python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp csv sacrebleu python-dotenv pyinstaller evaluate openpyxl absl nltk rouge_score
+source .env
+python3 evaluate.py
+```
+
+The evaluate script invokes all questions from the ground truth document.
+
+As result of an experiment the 'Bleu' and 'Rouge' values are displayed. Additionally a spreadsheet with information from the ground truth file as well as the results is created in 'evaluations/outputs/'.
 
 
 ## Sample REST API Invocations
@@ -160,158 +196,22 @@ curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json"
 }
 ```
 
-Sample query that returns relevant documents if confidence is too low:
 
-```
-curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query-mock-not-confident" | jq '.'
-
-{
-  "matching_results": 2,
-  "retrievalDetails": {
-    "document_retrieval_strategy": "untrained"
-  },
-  "results": [
-    {
-      "document_id": "8ef31fcb-b556-4769-b091-d72677f4ca89",
-      "title": "IBM acquires Red Hat",
-      "text": [
-        "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
-      ],
-      "link": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
-      "document_passages": [
-        {
-          "passage_text": "<em>IBM</em> <em>acquires</em> <em>Red</em> <em>Hat</em>",
-          "passageAnswers": [
-            {
-              "answer_text": "IBM acquires Red Hat",
-              "confidence": 0.07588528
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "document_id": "90b93be2-0e74-4200-b750-200a63881f00",
-      "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
-      "text": [
-        "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
-      ],
-      "link": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
-      "document_passages": [
-        {
-          "passage_text": "<em>IBM</em> (NYSE<em>:</em><em>IBM</em>) and <em>Red</em> <em>Hat</em> announced today that they have closed the transaction under which <em>IBM</em> <em>acquired</em> all of the issued and outstanding common shares of <em>Red</em> <em>Hat</em> for $190.00 per share in cash, representing a total equity value of approximately $34 billion.",
-          "passageAnswers": [
-            {
-              "answer_text": "$190.00 per share in cash",
-              "confidence": 0.6790031
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-
-## Open API
+## API
 
 Open the Open API UI: http://localhost:8080/q/swagger-ui/.
 
 <kbd><img src="screenshots/OpenAI-UI.png" /></kbd>
 
-<kbd><img src="screenshots/OpenAI-UI2.png" /></kbd>
-
 Download the Open API definition from http://localhost:8080/q/openapi or [openapi.yaml](data/openapi.yaml).
-
-
-## Data
-
-```
-{
-    "id": "0001",
-    "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
-    "link": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
-    "text": "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
-}
-
-{
-    "id": "0002",
-    "title": "IBM acquires Red Hat",
-    "link": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
-    "text": "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
-}
-```
-
-
-## Sample Prompt
-
-Answer the question based on the context below.
-
-Context: It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat.
-
-IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds.
-
-Question: When and for how much did IBM acquire Red Hat? Summarize the answer.
-
-Answer: 
-
--> October 2018 for $190.00 per share in cash, representing a total equity value of approximately $34 billion
-
-
-## PrimeQA
-
-Setup of PrimeQA is documented in the blog [Using PrimeQA For NLP Question Answering](https://www.deleeuw.me.uk/posts/Using-PrimeQA-For-NLP-Question-Answering/).
-
-Open the [dashboard at :82/qa](http://141.125.109.94:82/qa) or [OpenAPI at :50052/docs](http://141.125.109.94:50052/docs).
-
-```
-curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query-primeqa" | jq '.'
-```
-
-
-## Watson Discovery Query Sample
 
 The Question Answering service has the same interface as the query endpoint of [Watson Discovery](https://cloud.ibm.com/apidocs/discovery-data#query). Watson Discovery sample for a natural language query:
 
 ```
-curl -X POST -u "apikey:xxx" --header "Content-Type: application/json" --data "{\"collection_ids\": [\"xxx\"], \"natural_language_query\": \"text:When and for how much did IBM acquire Red Hat?\", \"passages\": {\"enabled\": true, \"fields\": [\"title\", \"text\"], \"find_answers\": true, \"max_answers_per_passage\": 1}}" "https://api.us-east.discovery.watson.cloud.ibm.com/instances/xxx/v2/projects/xxx/query?version=2020-08-30"
+curl -X POST -u "apikey:xxx" --header "Content-Type: application/json" --data "{\"collection_ids\": [\"xxx\"], \"natural_language_query\": \"text:When and for how much did IBM acquire Red Hat?\", \"passages\": {\"enabled\": true, \"fields\": [\"title\", \"text\"]}}" "https://api.us-east.discovery.watson.cloud.ibm.com/instances/xxx/v2/projects/xxx/query?version=2020-08-30"
 ```
 
 [Output](data/discovery/output.json):
-
-```
-{
-    "matching_results": 2,
-    "retrieval_details": {
-        "document_retrieval_strategy": "untrained"
-    },
-    "results": [
-        {
-            "document_id": "2ea6e0c222f6d3fbe005ac22bf5fb12d",
-            "result_metadata": {
-                "collection_id": "7801e618-8411-2538-0000-0186cbc7aed4",
-                "document_retrieval_source": "search",
-                "confidence": 0.15055
-            },
-            ...
-            "text": [
-                "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion...."
-            ],
-            "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
-            "url": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
-            "document_passages": [
-                {
-                    "passage_text": "<em>IBM</em> (NYSE<em>:</em><em>IBM</em>) and <em>Red</em> <em>Hat</em> announced today that they have closed the transaction under which <em>IBM</em> <em>acquired</em> all of the issued and outstanding common shares of <em>Red</em> <em>Hat</em> for $190.00 per share in cash, representing a total equity value of approximately $34 billion.",
-                    ...
-                    "answers": [
-                        {
-                            "answer_text": "$190.00 per share in cash",
-                            ...
-                            "confidence": 0.6790031
-                        }
-...
-```
 
 The Watson Discovery API has been 'extended' in two ways.
 
@@ -339,33 +239,60 @@ Rather than returning 'untrained' the document retrieval strategy is 'llm'. The 
 
 **2. Document Summaries**
 
-To return summaries for each document, document_passages are used. To mark these passages as something special (summaries), 'field' is set to 'summary'.
+To return summaries for each document, document_passages are used. To mark these passages as something special (summaries), 'field' is set to 'summary'. There is one passage (= summary) per result, except of the first result with the answer.
 
 ```
 "document_passages": [
   {
-    "passage_text": "$190.00 per share in cash",
+    "passage_text": "IBM and Red Hat are defining the future of hybrid cloud computing.",
     "field": "text",
-    "passageAnswers": [
-      {
-        "answer_text": "$190.00 per share in cash",
-        "confidence": 0.699999988079071
-      },
-      {
-        "passage_text": "IBM and Red Hat are defining the future of hybrid cloud computing.",
-        "field": "summary",
-        "passageAnswers": null
-      }
+    "answers": [
+        {
+            "answer_text": "IBM and Red Hat are defining the future of hybrid cloud computing.",
+            "field": "summary"
+        }
     ]
   }
 ]
 ```
 
 
+## Watson Assistant
+
+Sample how the API of this service can be integrated in Watson Assistant:
+
+<kbd><img src="screenshots/Assistant.png" /></kbd>
+
+
+## Sample Prompt
+
+Answer the question based on the context below.
+
+Context: It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat.
+
+IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion. The acquisition redefines the cloud market for business. Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries. Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds.
+
+Question: When and for how much did IBM acquire Red Hat? Summarize the answer.
+
+Answer: 
+
+-> October 2018 for $190.00 per share in cash, representing a total equity value of approximately $34 billion
+
+
+## PrimeQA
+
+Setup of PrimeQA is documented in the blog [Using PrimeQA For NLP Question Answering](https://www.deleeuw.me.uk/posts/Using-PrimeQA-For-NLP-Question-Answering/).
+
+Open the [dashboard at :82/qa](http://xxx:82/qa) or [OpenAPI at :50052/docs](http://xxx:50052/docs).
+
+```
+curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query-primeqa" | jq '.'
+```
+
+
 ## Push Image to IBM Container Registry
 
 ```
-
 docker build -f src/main/docker/Dockerfile.jvm -t question-answering .
 ibmcloud login --sso
 ibmcloud target -g xxx
@@ -377,15 +304,7 @@ docker push ${REGISTRY}/${NAMESPACE}/question-answering:latest
 ```
 
 
-## Watson Assistant
-
-Sample how the API of this service can be integrated in Watson Assistant:
-
-<kbd><img src="screenshots/Assistant.png" /></kbd>
-
-
 ## Resources
-
 
 * [Generative AI for Question Answering Scenarios](https://heidloff.net/article/question-answering-transformers/)
 * [Generative AI Sample Code for Question Answering](https://heidloff.net/article/sample-question-answering/)

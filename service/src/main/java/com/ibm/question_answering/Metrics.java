@@ -43,7 +43,10 @@ public class Metrics {
         "RERANKER_MODEL",
         "RERANKER_ID",
         "URL",
-        "DISCOVERY_MAX_OUTPUT_DOCUMENTS"
+        "DISCOVERY_MAX_OUTPUT_DOCUMENTS",
+        "PROMPT_TEMPLATE",
+        "DISCOVERY_CHARACTERS",
+        "DISCOVERY_FIND_ANSWERS"
     };
 
     final String[] headersRuns = {
@@ -101,7 +104,8 @@ public class Metrics {
         "TIMESTAMP_MAAS_END",
         "SIZE_DISCOVERY_RESULTS",
         "SIZE_RERANKER_INPUTS",
-        "SIZE_RERANKER_RESULTS"
+        "SIZE_RERANKER_RESULTS",
+        "PROMPT"
     };
 
     String endpoint;
@@ -133,6 +137,9 @@ public class Metrics {
     String sizeReRankerInputs;
     String sizeReRankerResults;
     String discoveryMaxDocuments;
+    String promptTemplate;
+    String discoveryCharacters;
+    String discoveryFindAnswers;
 
     final String fileNameMetadata = "Metadata.csv";
     final String fileNameRuns = "Runs.csv";
@@ -216,7 +223,8 @@ public class Metrics {
                 data.add(this.tsMaaSEnd);
                 data.add(this.sizeDiscoveryResults);
                 data.add(this.sizeReRankerInputs);
-                data.add(this.sizeReRankerResults);
+                data.add(this.sizeReRankerResults);                
+                data.add(prompt.replaceAll(System.getProperty("line.separator"), "\\\\n"));
                 csvPrinterRuns.printRecord(data);
     
                 csvPrinterRuns.flush();
@@ -250,6 +258,9 @@ public class Metrics {
                 data.add(this.rrId);
                 data.add(this.url);
                 data.add(this.discoveryMaxDocuments);
+                data.add(this.promptTemplate);
+                data.add(this.discoveryCharacters);
+                data.add(this.discoveryFindAnswers);
 
                 csvPrinterMetadata.printRecord(data);
                 csvPrinterMetadata.flush();
@@ -349,6 +360,15 @@ public class Metrics {
         return String.valueOf(time);
     }
 
+    public void setPromptTemplate(String promptTemplate) {
+        this.promptTemplate = promptTemplate.replaceAll(System.getProperty("line.separator"), "\\\\n");
+    }
+
+    public void setDiscoveryCharactersAndFindAnswers(int characters, boolean findAnswers) {
+        this.discoveryCharacters = Integer.toString(characters);
+        this.discoveryFindAnswers = String.valueOf(findAnswers);  
+    }
+
     void writeLastRunReadable() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(directoryAndfileNameLastRun));
@@ -371,6 +391,10 @@ public class Metrics {
             writer.write("*Results (returned):* " + this.sizeDiscoverySentResults + "\n");
             writer.write("\n");
             writer.write("*Results (max):* " + this.discoveryMaxDocuments + "\n");
+            writer.write("\n");            
+            writer.write("*Characters per Passage:* " + this.discoveryCharacters + "\n");
+            writer.write("\n");            
+            writer.write("*Find Answers:* " + this.discoveryFindAnswers + "\n");
             writer.write("\n");            
             writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
             writer.write("\n");

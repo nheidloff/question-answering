@@ -1,10 +1,22 @@
 package com.ibm.question_answering.prompts;
 
+import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import com.ibm.question_answering.Metrics;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 
 @ApplicationScoped
 public class QuestionAnswering {
+
+    @ConfigProperty(name = "EXPERIMENT_LLM_PROMPT") 
+    Optional<String> promptOptionalString;
+
+    @Inject
+    Metrics metrics;
 
     public final static String CONTEXT = "<<CONTEXT>>";
     public final static String QUESTION = "<<QUESTION>>";
@@ -29,6 +41,16 @@ Agent:""";
 
     public String getPrompt(String query, String context) {
         String output = template;
+        String promptVar = "";
+        if (promptOptionalString.isPresent()) {
+            promptVar = promptOptionalString.get();
+        }
+        if (!promptVar.equalsIgnoreCase("")) {
+            output = promptVar;
+            output = output.replaceAll("\\\\n", System.getProperty("line.separator"));
+        }
+        metrics.setPromptTemplate(output);
+        
         output = output.replace(CONTEXT, context);
         output = output.replace(QUESTION, query);
         return output;
@@ -43,7 +65,7 @@ Agent:""";
                     //primeQADocuments[index].document.title + ". " + 
                     primeQADocuments[index].document.text; 
                 if (index < amountDocuments - 1) {
-                    context = context + "\n\n";
+                    context = context + System.getProperty("line.separator") + System.getProperty("line.separator");
                 }
             }
         }
