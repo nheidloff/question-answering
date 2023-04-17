@@ -76,6 +76,7 @@ public class AskDiscoveryService {
 
         metrics.discoveryStarted(maxDocs);
         Input input = new Input(collectionId, query, maxDocs);
+        metrics.setDiscoveryCharactersAndFindAnswers(input.passages.characters, input.passages.find_answers);
         com.ibm.question_answering.api.Answer output = discoveryResource.ask(input);
         output = ensureDocumentIdsExist(output);
         metrics.discoveryStopped(output);
