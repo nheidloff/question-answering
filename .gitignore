@@ -3,8 +3,11 @@ readnik.md
 service/.env
 data/product-doc
 
-metrics/*
-!metrics/sample/
+metrics/input/*
+metrics/output/*
+!metrics/output/Last-Run-Sample.md
+metrics/input/*
+!metrics/input/your-ground-truth.xlsx
 
 evaluations/error.log
 evaluations/env

@@ -104,7 +104,8 @@ public class Metrics {
         "TIMESTAMP_MAAS_END",
         "SIZE_DISCOVERY_RESULTS",
         "SIZE_RERANKER_INPUTS",
-        "SIZE_RERANKER_RESULTS"
+        "SIZE_RERANKER_RESULTS",
+        "PROMPT"
     };
 
     String endpoint;
@@ -222,7 +223,8 @@ public class Metrics {
                 data.add(this.tsMaaSEnd);
                 data.add(this.sizeDiscoveryResults);
                 data.add(this.sizeReRankerInputs);
-                data.add(this.sizeReRankerResults);
+                data.add(this.sizeReRankerResults);                
+                data.add(prompt.replaceAll(System.getProperty("line.separator"), "\\\\n"));
                 csvPrinterRuns.printRecord(data);
     
                 csvPrinterRuns.flush();
