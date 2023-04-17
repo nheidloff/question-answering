@@ -22,9 +22,8 @@ WORKDIR /app
 # Create folders to map
 RUN mkdir outputs
 RUN mkdir inputs
-RUN mkdir metrics
 
-COPY evaluate.py /app
+COPY exp-runner.py /app
 COPY generate_env-config.sh /app
 COPY docker_entrypoint.sh /app
 

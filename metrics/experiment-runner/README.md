@@ -8,6 +8,7 @@
 
 ```sh
 pip install -r requirements.txt
+pip install --upgrade --force-reinstall -r requirements.txt
 ```
 
 or 
@@ -30,22 +31,21 @@ cat ./env_template > .env
 ### 1. Execute as command line application
 
 ```sh
-python3 evaluate.py
+python3 exp-runner.py
 ```
 
-* The `evaluate app` ends an experiment, with the retry count being reached.
+* The `experiment runner app` ends an experiment, with the retry count being reached.
 
 * Input files
 
-    * The Python app uses the `inputs` folder as the source folder for the Excel file with the data input. The input file name is based on `input_folder_name` and `input_excel_filename` environment variables.
+    * The Python app uses the `input` folder as the source folder for the Excel file with the data input. The input file name is based on `input_folder_name` and `input_excel_filename` environment variables.
 
 * Output files
 
-    * **CSV:** It creates a file in the `outputs` folder `outputs/SESSION_ID_2023-03-31_output_anwser.csv`. The output file name is based on `output_session_id` and `output_question_resp_anwser` environment variables. 
 
-    * **Excel:** It creates a file in the `outputs` folder `outputs/SESSION_ID_2023-03-31_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    * **Excel:** It creates a file in the `outputs` folder `output/SESSION_ID_2023-03-31_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
-    * **Error Log:** It creates a file in the `outputs` folder `outputs/2023-03-31_SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **Error Log:** It creates a file in the `output` folder `output/2023-03-31_SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
 ### 2. Execute as a local container
 

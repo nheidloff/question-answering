@@ -1,48 +1,39 @@
 #!/bin/bash
 
-source $HOME_PATH/../scripts/env_container_start.sh
+source ~/.env_profile
 
-echo "******** evaluate - app ************"
-echo "- Home path :          $HOME_PATH"
-echo "- Session ID:          $C_SESSION_ID"
-echo "- CONTAINER_RUN_CONF:  $C_CONT_CONF"
-echo "- M_DIR_NAME:          $C_M_DIR_NAME"
+echo "*************************"
+echo "HOME_PATH: ${GLOBAL_HOME_PATH}"
+echo "*************************"
 
-cd $HOME_PATH/../evaluations
+cd $GLOBAL_HOME_PATH/../metrics/experiment-runner
 
-# evaluation environment variables
+# experiment-runner environment variables
 source ./.env
 
 export version="v0.0.1"
-export image_name="evaluation-local"
+export image_name="experiment-runner-local"
 export host_ip_addr=$host_ip
-
-echo "***** CREATE DIRs ******"
-mountpath_inputs="$(pwd)/inputs"
-mountpath_outputs="$(pwd)/outputs"
 
 # temp set metrics problem with '../' in the question-answering service
 tmp_home=$(pwd)
 cd ..
 project_path=$(pwd)
 cd $tmp_home
-export mountpath_metrics="${project_path}/metrics/${input_folder_name_qa_service_metrics}"
+export mountpath_metrics="${project_path}/${input_folder_name_qa_service_metrics}"
 
 echo "Path: $mountpath_outputs"
 echo "Path: $mountpath_inputs"
 
-mkdir $mountpath_outputs
-mkdir $mountpath_inputs
-
-echo "***** BUILD evaluation container ******"
+echo "***** BUILD experiment-runner container ******"
 docker build -t $image_name:$version .
 
-echo "***** STOP and DELETE existing evaluation container ******"
-docker container stop -f "evaluation-run"
-docker container rm -f "evaluation-run"
+echo "***** STOP and DELETE existing experiment-runner container ******"
+docker container stop -f "experiment-runner-run"
+docker container rm -f "experiment-runner-run"
 
-echo "***** START evaluation container ******"
-docker run --name="evaluation-run" -it --rm \
+echo "***** START experiment-runner container ******"
+docker run --name="experiment-runner-run" -it --rm \
                 --add-host host.docker.internal:"${host_ip_addr}" \
                 -v "${mountpath_outputs}":/app/outputs \
                 -v "${mountpath_inputs}":/app/inputs \
@@ -55,10 +46,9 @@ docker run --name="evaluation-run" -it --rm \
                 -e input_excel_filename="$input_excel_filename" \
                 -e input_folder_name="$input_folder_name" \
                 -e output_question_resp_anwser_excel="$output_question_resp_anwser_excel" \
-                -e output_question_resp_anwser="$output_question_resp_anwser" \
                 -e output_error_log="$output_error_log" \
                 -e output_session_id="${C_SESSION_ID}" \
                 -e output_folder_name="$output_folder_name" \
-                -e number_of_retrys="$number_of_retrys" \
+                -e number_of_retries="$number_of_retries" \
                 -e container_run="${container_run}" \
                 $image_name:$version
