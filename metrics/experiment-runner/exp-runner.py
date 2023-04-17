@@ -9,11 +9,9 @@ import csv
 from dotenv import load_dotenv
 load_dotenv()
 from datasets import load_metric
-import evaluate as eval
-import sacrebleu as scb
+import sacrebleu
 import logging
 import openpyxl
-import time
 from datetime import date
 
 # ******************************************
@@ -26,26 +24,26 @@ username=os.environ.get("username")
 password=os.environ.get("password")
 verify_answer=os.environ.get("verify_answer")
 
-# inputs
+# input
 input_excel_filename = os.environ.get("input_excel_filename")
 input_folder_name = os.environ.get("input_folder_name")
 input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_service_metrics")
 container_run = os.environ.get("container_run")
 
-# outputs
+# output
 output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
 output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
 output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
-number_of_retrys = os.environ.get("number_of_retrys")
+number_of_retries = os.environ.get("number_of_retries")
 
 print("*************************")
-print("Environment configurations of 'evaluate':")
+print("Experiment-runner configuration:")
 print("")
 print(f"- Endpoint: {endpoint}")
 print(f"- API URL: {api_url}")
-print(f"- Retrys: {number_of_retrys}")
+print(f"- retries: {number_of_retries}")
 print(f"- Username: {username}")
 print(f"- Password: {password}")
 print(f"- Verify answer: {verify_answer}\n")
@@ -54,7 +52,6 @@ print(f"- Input folder name: {input_folder_name}")
 print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
 print(f"- Output folder name: {output_folder_name}")
 print(f"- Sesssion ID output prefix: {output_session_id}")
-print(f"- Output CSV: {output_question_resp_anwser}")
 print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
 print(f"- Error log name: {output_error_log}")
 print(f"- Container run: {container_run}")
@@ -64,13 +61,13 @@ print(f"- Container run: {container_run}")
 def get_input_path():
         global input_folder_name
         directory = os.getcwd()
-        directory = directory + "/" + input_folder_name
+        directory = directory + "/../" + input_folder_name
         return directory
 
 def get_output_path():
         global output_folder_name
         directory = os.getcwd()
-        directory = directory + "/" + output_folder_name
+        directory = directory + "/../" + output_folder_name
         return directory
 
 def get_input_qa_service_metrics_local_path():
@@ -78,16 +75,16 @@ def get_input_qa_service_metrics_local_path():
         directory = os.getcwd()
         
         if input_folder_name_qa_service_metrics != "":
-                new_directory = directory + "/../metrics/" + input_folder_name_qa_service_metrics
+                new_directory = directory + "/../output/" + input_folder_name_qa_service_metrics
         else:
-                new_directory = directory + "/../metrics"
+                new_directory = directory + "/../output"
                 
         return new_directory
 
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
         directory = os.getcwd()
-        directory = directory + "/metrics"
+        directory = directory + "/../output"
         return directory
 
 # ******************************************
@@ -121,15 +118,15 @@ def bleu_from_list_to_dict(header):
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(str(date.today()) + "_" + output_session_id + "_" + output_error_log)
+logger = logging.getLogger(output_session_id + "_" + output_error_log)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + str(date.today()) + "_" + output_session_id + "_" + output_error_log)
+file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "_" + output_error_log)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# Select the active worksheet
+# Create a "experiment_data" worksheet
 def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
@@ -155,10 +152,6 @@ def create_output_workbook (workbook_name):
         worksheet['M1'] = 'answer_passage_2_id'
         worksheet['N1'] = 'answer_passage_3'
         worksheet['O1'] = 'answer_passage_3_id'
-
-        # Add a header to the worksheet
-        # header_text = 'Temp Response Values'
-        # worksheet.header_footer.oddHeader.text = header_text
 
         # Save the workbook as a new Excel file
         workbook.save(workbook_name)
@@ -316,8 +309,7 @@ def main(args):
                 print(f"- Input qa dir (container): {input_qa_directory}")
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
    
-        workbook_name_file = output_directory + "/"  + output_session_id + "_" + today + "_" + output_question_resp_anwser_excel
-        csv_output_filepath = output_directory + "/"  + output_session_id + "_" + today + "_" +  output_question_resp_anwser
+        workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
@@ -334,18 +326,11 @@ def main(args):
                         print(f"- First question: {question}")
                         golden_answer = row[1]
                         print(f"- First golden answer: {golden_answer}")
-                        
-                        # 1.2. Prepare an output file for logging the execution results
-                        csvfile = open(csv_output_filepath,'w',encoding='utf-8')
-                        csvfile_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-                        csv_line = ['count','question','answer','golden_answer','passage_1','passage_1_id','passage_2','passage_2_id','passage_3','passage_3_id','answer_passage_1','answer_passage_1_id','answer_passage_2','answer_passage_2_id','answer_passage_3','answer_passage_3_id']
-                        stripped_line = [cell.strip() for cell in csv_line]
-                        csvfile_writer.writerow(stripped_line)
-                        
-                        # 1.3. Prepare an output excel for logging the execution results
+                               
+                        # 1.2. Prepare an output excel for logging the execution results
                         workbook = create_output_workbook(workbook_name_file)
 
-                        # 1.4. invoke endpoint with questions and write the test results
+                        # 1.3. invoke endpoint with questions and write the test results
                         i = 0
                         j = 0
                         print(f"******* invoke REST API ********\n")
@@ -366,31 +351,26 @@ def main(args):
                                         
                                         # 1.4.1 Retry if the request didn't work
                                         if (verify != True):
-                                                print(f"--- Retry the request {i} for {number_of_retrys } times ---")
-                                                retrys = int(number_of_retrys)
-                                                retrys_count = 0
+                                                print(f"--- Retry the request {i} for {number_of_retries } times ---")
+                                                retries = int(number_of_retries)
+                                                retries_count = 0
                                                 
-                                                while (retrys_count != retrys):
+                                                while (retries_count != retries):
                                                 
-                                                        print(f"Retry counter : {retrys_count} ---")
+                                                        print(f"Retry counter : {retries_count} ---")
                                                         answer_text, answer_text_len, answer_list, verify = invoke_qa(question)
-                                                        retrys_count = retrys_count + 1
+                                                        retries_count = retries_count + 1
 
                                                         if (verify == True):
                                                                 break
                                                         else:
-                                                                if (retrys_count == retrys):
-                                                                        message = "END EXPERIMENT! - Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
+                                                                if (retries_count == retries):
+                                                                        message = "END EXPERIMENT! - Retry: " + str(retries_count) + " for request " + str(i) + " didn't work!"
                                                                         print(message)
                                                                         logger.error(message)
                                                                         end_experiment = True
-
-                                                                        # 1.4.3 add the error to the output csv file
-                                                                        csv_line = [str(i),"FAILED","FAILED","FAILED",]
-                                                                        stripped_line = [cell.strip() for cell in csv_line]
-                                                                        csvfile_writer.writerow(stripped_line)
                                                                         
-                                                                        # 1.4.4 add the error to the output temp excel file
+                                                                        # 1.4.2 add the error to the output temp excel file
                                                                         # set value for cell B2=2
                                                                         j = j + 1
                                                                         workbook = openpyxl.load_workbook(workbook_name_file)
@@ -401,17 +381,12 @@ def main(args):
                                                                         workbook.save(workbook_name_file)
                                                                         break
                                                                 else: 
-                                                                        message = "Retry: " + str(retrys_count) + " for request " + str(i) + " didn't work!"
+                                                                        message = "Retry: " + str(retries_count) + " for request " + str(i) + " didn't work!"
                                                                         print(message)
                                                                         logger.error(message)
 
-                                        # 1.4.2 Request work and a anwser contains content
+                                        # 1.4.3 Request work and a anwser contains content
                                         if ((verify == True) and (len(row[1]) != 0) and ( end_experiment == False)):
-                                                # 1.4.3 add the values to the output csv file
-                                                csv_line = [str(i),question,answer_text,golden_answer,passage_1,str(passage_1_id),passage_2,str(passage_2_id),passage_3,str(passage_3_id)]
-                                                #stripped_line = [cell.strip() for cell in csv_line]
-                                                #csvfile_writer.writerow(stripped_line)
-                                                csvfile_writer.writerow(csv_line)
 
                                                 # 1.4.4 add the values to the output temp excel file
                                                 # set value for cell B2=2
@@ -441,19 +416,15 @@ def main(args):
                                         logger.error(message)
                                 i = i + 1
                         
-                        workbook.save(workbook_name_file)      
-                        csvfile.close()                    
+                        workbook.save(workbook_name_file)                       
         
         if (end_experiment == False):
 
-                  # 2. Create evalution blue result output         
+                  # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
                   header = bleu_from_list_to_dict(header)
                   responses = [row[header['response']] for row in rows]
                   golds = [[row[header['golden_anwser']]] for row in rows]
-                  
-                  # print(f"Response {responses}")
-                  # print(f"golds {golds}")
                    
                   metric = load_metric("sacrebleu")
                   metric.add_batch(predictions=responses, references=golds)
@@ -484,7 +455,6 @@ def main(args):
                   # 4. Show results
                 
                   print (f"******* outputs for session: {output_session_id} ********")
-                  print (f"CSV   output file : {csv_output_filepath}")
                   print (f"Excel output file : {workbook_name_file}\n")
                   count = len(responses) - 1
                   print (f"******* Bleu result based on {count} responses ********")
@@ -493,10 +463,7 @@ def main(args):
         else:
                   print (f"******* Experiment failed *************")
                   print (f"******* outputs for failed session: {output_session_id} ********")
-                  print (f"CSV   output file : {csv_output_filepath}")
                   print (f"Excel output file : {workbook_name_file}\n")
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

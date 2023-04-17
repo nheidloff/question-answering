@@ -7,7 +7,6 @@ aiohttp
 sacrebleu 
 python-dotenv 
 pyinstaller 
-evaluate 
 openpyxl 
 absl 
 nltk 
