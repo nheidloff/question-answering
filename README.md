@@ -43,10 +43,6 @@ There are several endpoints to test and compare results. Main flows:
 
 Further [endpoints](https://github.com/nheidloff/question-answering/blob/main/service/src/main/java/com/ibm/question_answering/AnswerResource.java) can be used for testing.
 
-Flow 1: /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer
-
-<kbd><img src="screenshots/qa-architecture-flow2.png" /></kbd>
-
 
 ## Run the Service
 
@@ -119,9 +115,16 @@ docker run -i --rm -p 8080:8080 \
 Remotely on Code Engine:
 
 ```
-export QA_API_KEY=xxx;
-curl -v -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{\"query\": \"text:When and for how much did IBM acquire Red Hat?\"}" "https://mock-api.xxx.us-east.codeengine.appdomain.cloud/query-mock-confident" | jq '.'
+QA_API_KEY=xxx
+QUERY="xxx"
+curl -X POST \
+    -u "apikey:$QA_API_KEY" \
+    --header "Content-Type: application/json" \
+    --data "{\"query\": \"text:$QUERY\"}" \
+    "https://xxx.xxx.us-east.codeengine.appdomain.cloud/query" \
+    | jq '.'
 ```
+
 
 ## Run Experiments
 
@@ -156,7 +159,15 @@ As result of an experiment the 'Bleu' and 'Rouge' values are displayed. Addition
 Sample query that returns one answer plus relevant documents:
 
 ```
-curl -v -X POST -u "apikey:0123456789" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query-mock-confident" | jq '.'
+cd service
+source .env
+QUERY="xxx"
+curl -X POST \
+    -u "apikey:$QA_API_KEY" \
+    --header "Content-Type: application/json" \
+    --data "{\"query\": \"text:$QUERY\"}" \
+    "http://localhost:8080/query-mock-confident" \
+    | jq '.'
 
 {
   "matching_results": 2,
