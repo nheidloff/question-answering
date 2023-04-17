@@ -43,10 +43,6 @@ There are several endpoints to test and compare results. Main flows:
 
 Further [endpoints](https://github.com/nheidloff/question-answering/blob/main/service/src/main/java/com/ibm/question_answering/AnswerResource.java) can be used for testing.
 
-Flow 1: /query: Reads documents from Discovery, re-ranks results and uses MaaS to return answer
-
-<kbd><img src="screenshots/qa-architecture-flow2.png" /></kbd>
-
 
 ## Run the Service
 
