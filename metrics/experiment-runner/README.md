@@ -42,38 +42,13 @@ python3 exp-runner.py
 
 * Output files
 
-
     * **Excel:** It creates a file in the `outputs` folder `output/SESSION_ID_2023-03-31_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
     * **Error Log:** It creates a file in the `output` folder `output/2023-03-31_SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
 ### 2. Execute as a local container
 
-#### 2.1 Build and run as a local container and the `question answering service` **doesn't run** on the same machine local machine as a container
-
-```sh
-sh qa_ce_and_eval_local_build_and_run_container.sh
-```
-
-* Example output:
-
-```sh
-...
-******* invoke REST API ********
-
---- Request0 ---
-Status  : 200
-Question: My question?
-Answer  : The answer.
---- Request1 ---
-Status  : 200
-Question: My question?
-Answer  : The answer.
---- Request2 ---
-...
-```
-
-#### 2.2 Build and run as a local container and the `question answering service` **does run** on the same machine local machine as a container
+#### 2.1 Build and run as a local container and the `QA pipeline service` **does run** on the same machine local machine as a container
 
 1. In this situation you need to get the local host IP address and save it, to use the address later 
 
@@ -99,7 +74,7 @@ export container_run=True
 2. Execute the bash script in a new terminal session.
 
 ```sh
-sh qa_local_and_eval_local_build_and_run_container.sh
+sh start_exp_runner_container.sh
 ```
 
 
