@@ -135,7 +135,7 @@ Environment variables are used for the [configuration](https://github.com/nheidl
 Define $QA_API_KEY and $EXPERIMENT_METRICS_SESSION from previous step. Define the name and the location of your ground truth file 'input_excel_filename'.
 
 ```
-cd evaluations
+cd metrics/experiment-runner
 cp .env_template .env
 code .env
 ```
@@ -143,15 +143,15 @@ code .env
 Via Python 3.9:
 
 ```
-cd evaluations
+cd metrics/experiment-runner
 python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp csv sacrebleu python-dotenv pyinstaller evaluate openpyxl absl nltk rouge_score
 source .env
-python3 evaluate.py
+python3 exp-runner.py
 ```
 
-The evaluate script invokes all questions from the ground truth document.
+The script invokes all questions from the ground truth document.
 
-As result of an experiment the 'Bleu' and 'Rouge' values are displayed. Additionally a spreadsheet with information from the ground truth file as well as the results is created in 'evaluations/outputs/'.
+As result of an experiment the 'Bleu' and 'Rouge' values are displayed. Additionally a spreadsheet with information from the ground truth file as well as the results is created in 'metrics/output/'.
 
 
 ## Sample REST API Invocations

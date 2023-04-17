@@ -1,0 +1,76 @@
+[
+  {
+    "title": "IBM Helps Ecosystem Partners Accelerate AI Adoption by Making it Easier to Embed and Scale AI Across Their Business",
+    "url": "https://newsroom.ibm.com/2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "chunkid": "0.2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "text": [
+      "ARMONK, N.Y., Oct. 25, 2022 /PRNewswire/ -- IBM (NYSE: IBM) today announced an expansion to its embeddable AI software portfolio with the release of three new libraries designed to help IBM Ecosystem partners, clients and developers more easily, quickly and cost-effectively build their own AI-powered solutions and bring them to market.",
+      "The expanded portfolio provides access to the same AI libraries that power popular IBM Watson products.",
+      "It is designed to help lower the barrier for AI adoption by helping partners and clients address the skills shortage and development costs required to build machine learning and AI models from scratch."
+    ]
+  },
+  {
+    "title": "IBM Helps Ecosystem Partners Accelerate AI Adoption by Making it Easier to Embed and Scale AI Across Their Business",
+    "url": "https://newsroom.ibm.com/2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "chunkid": "1.2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "text": [
+      "Generally available today, the AI libraries were developed in IBM Research and designed to provide Independent Software Vendors (ISVs) across industries an easily scalable way to build natural language processing, speech to text, and text to speech capabilities into applications across any hybrid, multi cloud environment."
+    ]
+  },
+  {
+    "title": "IBM Helps Ecosystem Partners Accelerate AI Adoption by Making it Easier to Embed and Scale AI Across Their Business",
+    "url": "https://newsroom.ibm.com/2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "chunkid": "2.2022-10-25-IBM-Helps-Ecosystem-Partners-Accelerate-AI-Adoption-by-Making-it-Easier-to-Embed-and-Scale-AI-Across-Their-Business",
+    "text": [
+      "Developer and IT teams also have the flexibility to embed the new Watson libraries of choice into their applications to help create customized and compelling products without data science expertise.",
+      "With the three new software libraries, developers can easily access AI capabilities and choose the specific functionality, such as natural language processing, that they want to embed in different parts of an application.",
+      "The libraries include innovations developed by IBM Research as well as open source technology and are designed to reduce the time and resources required for a developer to add powerful AI to an application."
+    ]
+  },
+  {
+    "title": "Running and Deploying IBM Watson NLP Containers",
+    "url": "https://heidloff.net/article/running-and-deploying-ibm-watson-nlp-containers/",
+    "chunkid": "0.article/running-and-deploying-ibm-watson-nlp-containers/",
+    "text": [
+      "IBM Watson NLP (Natural Language Understanding) and Watson Speech containers can be run locally, on-premises or Kubernetes and OpenShift clusters."
+    ]
+  },
+  {
+    "title": "Running and Deploying IBM Watson NLP Containers",
+    "url": "https://heidloff.net/article/running-and-deploying-ibm-watson-nlp-containers/",
+    "chunkid": "1.article/running-and-deploying-ibm-watson-nlp-containers/",
+    "text": [
+      "Via REST and gRCP APIs AI can easily be embedded in applications. This post describes different options how to run and deploy Watson NLP.",
+      "To set some context, check out the landing page IBM Watson NLP Library for Embed. The Watson NLP containers can be run on different container platforms, they provide REST and gRCP interfaces, they can be extended with custom models and they can easily be embedded in solutions.",
+      "While this offering is new, the underlaying functionality has been used and optimized for a long time in IBM offerings like the IBM Watson Assistant and NLU (Natural Language Understanding) SaaS services and IBM Cloud Pak for Data.",
+      "Via kubectl or oc Kubernetes resources can be deployed. The Watson NLP pod contains the NLP runtime container and potentially multiple init containers. Each init container contains either predefined or custom models."
+    ]
+  },
+  {
+    "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
+    "url": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+    "chunkid": "0.en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+    "text": [
+      "IBM (NYSE:IBM) and Red Hat announced today that they have closed the transaction under which IBM acquired all of the issued and outstanding common shares of Red Hat for $190.00 per share in cash, representing a total equity value of approximately $34 billion.",
+      "The acquisition redefines the cloud market for business."
+    ]
+  },
+  {
+    "title": "IBM Closes Landmark Acquisition of Red Hat; Defines Open, Hybrid Cloud Future",
+    "url": "https://www.redhat.com/en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+    "chunkid": "1.en/about/press-releases/ibm-closes-landmark-acquisition-red-hat-34-billion-defines-open-hybrid-cloud-future",
+    "text": [
+      "Red Hat’s open hybrid cloud technologies are now paired with the unmatched scale and depth of IBM’s innovation and industry expertise, and sales leadership in more than 175 countries.",
+      "Together, IBM and Red Hat will accelerate innovation by offering a next-generation hybrid multicloud platform. ",
+      "Based on open source technologies, such as Linux and Kubernetes, the platform will allow businesses to securely deploy, run and manage data and applications on-premises and on private and multiple public clouds."
+    ]
+  },
+  {
+    "title": "IBM acquires Red Hat",
+    "url": "https://www.ibm.com/support/pages/ibm-acquires-red-hat",
+    "chunkid": "0.support/pages/ibm-acquires-red-hat",
+    "text": [
+      "It's official - IBM has acquired Red Hat! The deal was announced in October 2018. IBM Closes Landmark Acquisition of Red Hat."
+    ]
+  }
+]

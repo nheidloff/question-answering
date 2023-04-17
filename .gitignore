@@ -8,6 +8,7 @@ metrics/output/*
 !metrics/output/Last-Run-Sample.md
 metrics/input/*
 !metrics/input/your-ground-truth.xlsx
+!metrics/input/demo-ground-truth.xlsx
 
 evaluations/error.log
 evaluations/env
