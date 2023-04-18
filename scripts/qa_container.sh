@@ -29,17 +29,19 @@ cd $HOME_PATH
 # 6. set metrics output docker mountpoint
 cd $HOME_PATH/../metrics/output
 export OUTPUT_MOUNTPOINT="$(pwd)"
+echo $OUTPUT_MOUNTPOINT
 cd $HOME_PATH
 
 # 7. set metrics input docker mountpoint
 cd $HOME_PATH/../metrics/input
 export INPUT_MOUNTPOINT="$(pwd)"
+echo $INPUT_MOUNTPOINT
 cd $HOME_PATH
 
 docker compose version
 docker compose -f ./docker_compose.yaml build
 docker compose -f ./docker_compose.yaml up # --detach
 
-#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $1;}')
-#docker docker exec -it $CONTAINER /bin/bash 
+#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $7;}')
+#docker exec -it experiment_runner sh
 #docker compose -f ./docker_compose.yaml stop

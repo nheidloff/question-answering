@@ -48,7 +48,7 @@ services:
       - 8084:8080
     environment:
       - endpoint=$endpoint
-      - api_url=$api_url
+      - api_url=http://qa_service:8080
       - username=$username
       - password=$password
       - verify_answer=$verify_answer
@@ -60,6 +60,7 @@ services:
       - output_session_id=$SESSION_ID
       - output_folder_name=outputs 
       - number_of_retries=$number_of_retries
+      - container_run=True
     volumes:
       - ${OUTPUT_MOUNTPOINT}:/app/outputs:rw
       - ${INPUT_MOUNTPOINT}:/app/inputs:rw

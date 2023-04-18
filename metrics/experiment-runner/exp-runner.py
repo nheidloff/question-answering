@@ -60,14 +60,24 @@ print(f"- Container run: {container_run}")
 # get os path information
 def get_input_path():
         global input_folder_name
-        directory = os.getcwd()
-        directory = directory + "/../" + input_folder_name
+        global container_run
+        if (container_run == "False"):
+                directory = os.getcwd()
+                directory = directory + "/../" + input_folder_name
+        else:
+                directory = os.getcwd()
+                directory = directory + "/" + input_folder_name
         return directory
 
 def get_output_path():
         global output_folder_name
-        directory = os.getcwd()
-        directory = directory + "/../" + output_folder_name
+        global container_run
+        if (container_run == "False"):
+                directory = os.getcwd()
+                directory = directory + "/../" + output_folder_name
+        else:
+                directory = os.getcwd()
+                directory = directory + "/" + output_folder_name
         return directory
 
 def get_input_qa_service_metrics_local_path():
