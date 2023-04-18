@@ -1,0 +1,77 @@
+version: "2.15.1"
+services:
+  question-answering:
+    build: 
+      context: ${QA_SERVICE_DOCKER_CONTEXT}
+      dockerfile: ${QA_SERVICE_DOCKER_CONTEXT}/src/main/docker/Dockerfile.jvm
+    image: qa_service:v1.0.0
+    container_name: qa_service
+    ports:
+      - 8080:8080
+    environment:
+      - QA_API_KEY=${QA_API_KEY}
+      - DISCOVERY_API_KEY=${DISCOVERY_API_KEY}
+      - DISCOVERY_URL=${DISCOVERY_URL}
+      - DISCOVERY_INSTANCE=${DISCOVERY_INSTANCE}
+      - DISCOVERY_PROJECT=${DISCOVERY_PROJECT}
+      - DISCOVERY_COLLECTION_ID=${DISCOVERY_COLLECTION_ID}
+      - PRIME_QA_URL=${PRIME_QA_URL}
+      - RERANKER_URL=${RERANKER_URL}
+      - MAAS_URL=${MAAS_URL}
+      - MAAS_API_KEY=${MAAS_API_KEY}
+      - PROXY_URL=${PROXY_URL}
+      - PROXY_API_KEY=${PROXY_API_KEY}
+      - EXPERIMENT_METRICS_SESSION${SESSION_ID}
+      - EXPERIMENT_LLM_NAME=${EXPERIMENT_LLM_NAME}
+      - EXPERIMENT_LLM_MIN_NEW_TOKENS=${EXPERIMENT_LLM_MIN_NEW_TOKENS}
+      - EXPERIMENT_LLM_MAX_NEW_TOKENS=${EXPERIMENT_LLM_MAX_NEW_TOKENS}
+      - EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS=${EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS}
+      - EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS}
+      - EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL}
+      - EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID}
+      - EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS={EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS}
+      - EXPERIMENT_DISCOVERY_CHARACTERS={EXPERIMENT_DISCOVERY_CHARACTERS}
+      - EXPERIMENT_DISCOVERY_FIND_ANSWERS={EXPERIMENT_DISCOVERY_FIND_ANSWERS}
+      - EXPERIMENT_LLM_PROMPT={EXPERIMENT_LLM_PROMPT}
+    volumes:
+      - ${OUTPUT_MOUNTPOINT}:/deployments/metrics:rw 
+  experiment-runner:
+    build: 
+      context: ${EXPERIMENT_RUNNER_DOCKER_CONTEXT}
+      dockerfile: ${EXPERIMENT_RUNNER_DOCKER_CONTEXT}/Dockerfile
+    depends_on:
+      - question-answering
+      - maas-mock
+    image: experiment_runner:v1.0.0
+    container_name: experiment_runner
+    ports:
+      - 8084:8080
+    environment:
+      - endpoint=$endpoint
+      - api_url=$api_url
+      - username=$username
+      - password=$password
+      - verify_answer=$verify_answer
+      - input_excel_filename=$input_excel_filename
+      - input_folder_name=inputs
+      - output_question_resp_anwser_excel=$output_question_resp_anwser_excel
+      - output_question_resp_anwser=$output_question_resp_anwser
+      - output_error_log=$output_error_log
+      - output_session_id=$SESSION_ID
+      - output_folder_name=outputs 
+      - number_of_retries=$number_of_retries
+    volumes:
+      - ${OUTPUT_MOUNTPOINT}:/app/outputs:rw
+      - ${INPUT_MOUNTPOINT}:/app/inputs:rw
+      - ${OUTPUT_MOUNTPOINT}:/app/metrics:rw
+  maas-mock:
+    build: 
+      context: ${MAAS_MOCK_DOCKER_CONTEXT}
+      dockerfile: ${MAAS_MOCK_DOCKER_CONTEXT}/src/main/docker/Dockerfile.jvm
+    image: maas_mock:v1.0.0
+    depends_on:
+      - question-answering
+    container_name: maas_mock
+    ports:
+      - 8082:8080
+   
