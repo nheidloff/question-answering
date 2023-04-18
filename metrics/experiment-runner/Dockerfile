@@ -15,6 +15,9 @@ RUN python -m pip install evaluate
 RUN python -m pip install openpyxl
 RUN python -m pip install nltk
 RUN python -m pip install rouge_score
+RUN python -m pip install subprocess
+RUN python -m pip install Flask
+RUN python -m pip install flask_restful
 
 # Set directory
 WORKDIR /app
@@ -24,7 +27,10 @@ RUN mkdir outputs
 RUN mkdir inputs
 
 COPY exp-runner.py /app
+COPY server.py /app
 COPY generate_env-config.sh /app
 COPY docker_entrypoint.sh /app
+COPY start.sh /app
 
+EXPOSE 8080
 CMD ["/bin/sh","docker_entrypoint.sh"]

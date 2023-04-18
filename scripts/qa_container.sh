@@ -1,60 +1,45 @@
 #!/bin/bash
 
-source ~/.env_profile
+# 1. set needed common environment
+export HOME_PATH=$(pwd)
+export SESSION_ID=$(date +%s)
+echo "Home path:    $HOME_PATH"
+echo "Session ID:   $SESSION_ID"
+"/bin/sh" "${HOME_PATH}"/generate_env_profile.sh > ~/.env_profile
 
-echo "*************************"
-echo "HOME_PATH: ${GLOBAL_HOME_PATH}"
-echo "*************************"
+# 2. load application environment configurations
+source $(pwd)/../service/.env
+source $(pwd)/../metrics/experiment-runner/.env
 
-# **************** Global variables
-source ./.env
+# 3. set qa service docker context
+cd $HOME_PATH/../service
+export QA_SERVICE_DOCKER_CONTEXT="$(pwd)"
+cd $HOME_PATH
 
-export version="v0.0.1"
-export image_name="question-answering-local"
-export dockerfile_path="$(pwd)/../service/src/main/docker/Dockerfile.jvm"
-export name=question-answering-service
+# 4. set experiment-runner docker context
+cd $HOME_PATH/../metrics/experiment-runner
+export EXPERIMENT_RUNNER_DOCKER_CONTEXT="$(pwd)"
+cd $HOME_PATH
 
-# temp set metrics problem with '../' in the question-answering service
-tmp_home=$(pwd)
-cd ..
-project_path=$(pwd)
-cd $tmp_home
-export mountpath_metrics="${project_path}/metrics/output"
+# 5. set maas-mock docker context
+cd $HOME_PATH/../maas-mock
+export MAAS_MOCK_DOCKER_CONTEXT="$(pwd)"
+cd $HOME_PATH
 
-echo "****** BUILD *********"
-cd $(pwd)/../service
-docker build -f $dockerfile_path -t $image_name:$version .
-cd $tmp_home
+# 6. set metrics output docker mountpoint
+cd $HOME_PATH/../metrics/output
+export OUTPUT_MOUNTPOINT="$(pwd)"
+cd $HOME_PATH
 
-echo "***** STOP and DELETE existing '$name' container ******"
-docker container stop -f "$name"
-docker container rm -f "$name"
+# 7. set metrics input docker mountpoint
+cd $HOME_PATH/../metrics/input
+export INPUT_MOUNTPOINT="$(pwd)"
+cd $HOME_PATH
 
-echo "****** RUN '$name' container *********"
-cd $(pwd)/../service
-docker run -i --rm -p 8080:8080 --name $name \
-  -e QA_API_KEY=${QA_API_KEY} \
-  -e DISCOVERY_API_KEY=${DISCOVERY_API_KEY} \
-  -e DISCOVERY_URL=${DISCOVERY_URL} \
-  -e DISCOVERY_INSTANCE=${DISCOVERY_INSTANCE} \
-  -e DISCOVERY_PROJECT=${DISCOVERY_PROJECT} \
-  -e DISCOVERY_COLLECTION_ID=${DISCOVERY_COLLECTION_ID} \
-  -e PRIME_QA_URL=${PRIME_QA_URL} \
-  -e RERANKER_URL=${RERANKER_URL} \
-  -e MAAS_URL=${MAAS_URL} \
-  -e MAAS_API_KEY=${MAAS_API_KEY} \
-  -e PROXY_URL=${PROXY_URL} \
-  -e PROXY_API_KEY=${PROXY_API_KEY} \
-  -e EXPERIMENT_LLM_NAME=${EXPERIMENT_LLM_NAME} \
-  -e EXPERIMENT_LLM_MIN_NEW_TOKENS=${EXPERIMENT_LLM_MIN_NEW_TOKENS} \
-  -e EXPERIMENT_LLM_MAX_NEW_TOKENS=${EXPERIMENT_LLM_MAX_NEW_TOKENS} \
-  -e EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS=${EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS} \
-  -e EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS} \
-  -e EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
-  -e EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
-  -e EXPERIMENT_METRICS_RUN=${EXPERIMENT_METRICS_RUN} \
-  -e EXPERIMENT_METRICS_SESSION=${C_SESSION_ID} \
-  -e EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
-  -v "${mountpath_metrics}":/deployments/metrics \
-  $image_name:$version
-cd $tmp_home
+docker compose version
+docker compose -f ./docker_compose.yaml build
+docker compose -f ./docker_compose.yaml up # --detach
+
+#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $1;}')
+#docker docker exec -it $CONTAINER /bin/bash 
+#docker compose -f ./docker_compose.yaml stop

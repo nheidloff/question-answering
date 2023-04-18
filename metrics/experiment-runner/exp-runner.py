@@ -198,10 +198,10 @@ def load_qa_service_metrics(csv_filepath):
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
-        #print(f"{header}")
+        print(f"{header}")
         qa_service_metrics = []
         for row in csvreader: 
-                values = [ str(row[4]) , str(row[5]) , str(row[6]) , str(row[7]) , str(row[8]), str(row[9]) ]
+                values = [ str(row[24]) , str(row[25]) , str(row[26]) , str(row[27]) , str(row[28]), str(row[29]) ]
                 #print(f"Values:\n {values}")          
                 qa_service_metrics.append(values)
         file.close()

@@ -11,7 +11,7 @@ echo "*********************"
 cat .env
 
 echo "*********************"
-echo "** Start python application"
+echo "** Start python server"
 echo "*********************"
 
-python evaluate.py
+python server.py
