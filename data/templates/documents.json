@@ -1,0 +1,21 @@
+[
+  {
+    "title": "title0",
+    "url": "https://mydomain.com/unique-string0",
+    "text": [
+      "text0",
+      "text1",
+      "text2",
+      "text3",
+      "text4"
+    ]
+  },
+  {
+    "title": "title1",
+    "url": "https://mydomain.com/unique-string1",
+    "text": [
+      "text5",
+      "text6"
+    ]
+  }
+]

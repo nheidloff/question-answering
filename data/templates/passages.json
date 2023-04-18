@@ -1,0 +1,37 @@
+[
+  {
+    "title": "title0",
+    "url": "https://mydomain.com/unique-string0",
+    "chunckid": "0.unique-string0",
+    "text": [
+      "text0",
+      "text1",
+      "text2 - roughly 100 tokens = 75 words",
+      "text3 - example: get next 60 words from document and end passage after the next sentence"
+    ]
+  },
+  {
+    "title": "title0",
+    "url": "https://mydomain.com/unique-string0",
+    "chunckid": "1.unique-string0",
+    "text": [
+      "text4"
+    ]
+  },
+  {
+    "title": "title1",
+    "url": "https://mydomain.com/unique-string1",
+    "chunckid": "0.unique-string1",
+    "text": [
+      "text5"
+    ]
+  },
+  {
+    "title": "title1",
+    "url": "https://mydomain.com/unique-string1",
+    "chunckid": "1.unique-string1",
+    "text": [
+      "text6"
+    ]
+  }
+]
