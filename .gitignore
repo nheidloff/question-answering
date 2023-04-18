@@ -5,7 +5,10 @@ data/product-doc
 
 metrics/input/*
 metrics/output/*
-!metrics/output/Last-Run-Sample.md
+!metrics/output/demo-Last-Run.md
+!metrics/output/demo_output.xlsx
+!metrics/output/demo-Metadata.csv
+!metrics/output/demo-Runs.csv
 metrics/input/*
 !metrics/input/your-ground-truth.xlsx
 !metrics/input/demo-ground-truth.xlsx
