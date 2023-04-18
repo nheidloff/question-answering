@@ -130,12 +130,16 @@ logger.addHandler(file_handler)
 def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
+        worksheet_blue = workbook.create_sheet("experiment_bleu_result")
         if 'Sheet1' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet1'])
         if 'Sheet' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet'])
         
         worksheet.title = "experiment_data"
+        worksheet_blue.title = "experiment_bleu_result"
+        worksheet_blue['A1'] = 'bleu'
+        worksheet_blue['B1'] = 'RougeL'
 
         worksheet['A1'] = 'question'
         worksheet['B1'] = 'answer'
@@ -199,10 +203,29 @@ def load_qa_service_metrics(csv_filepath):
         header = []
         header = next(csvreader)
         print(f"{header}")
+
+        # Reranker extract
+        i = 0
+        for column in header:
+                # print(f"Column: {column} : {i}")
+                if str(column) == "RESULT_RERANKER_PASSAGE1":
+                        ranker_p_1 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE2":
+                        ranker_p_2 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE3":
+                        ranker_p_3 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE1_ID":
+                        ranker_p_1_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE2_ID":
+                        ranker_p_2_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE3_ID":
+                        ranker_p_3_id = i
+                i = i + 1                         
+
         qa_service_metrics = []
         for row in csvreader: 
-                values = [ str(row[24]) , str(row[25]) , str(row[26]) , str(row[27]) , str(row[28]), str(row[29]) ]
-                #print(f"Values:\n {values}")          
+                values = [ str(row[ranker_p_1]) , str(row[ranker_p_1_id]) , str(row[ranker_p_2]) , str(row[ranker_p_2_id]) , str(row[ranker_p_3]), str(row[ranker_p_3_id]) ]
+                # print(f"Values:\n {values}")          
                 qa_service_metrics.append(values)
         file.close()
         return qa_service_metrics
@@ -450,6 +473,11 @@ def main(args):
                         worksheet.cell(row=(j+1), column=14).value = row[4]
                         worksheet.cell(row=(j+1), column=15).value = row[5]
                         j = j + 1
+                  
+                  worksheet = workbook['experiment_bleu_result']
+                  worksheet.cell(row=(2), column=1).value = str(sacrebleu)
+                  worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
+
                   workbook.save(workbook_name_file)
 
                   # 4. Show results
