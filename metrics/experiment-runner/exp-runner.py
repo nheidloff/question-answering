@@ -31,7 +31,6 @@ input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_serv
 container_run = os.environ.get("container_run")
 
 # output
-output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
 output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
 output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
@@ -82,25 +81,27 @@ def get_output_path():
 
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
+        global output_folder_name
         directory = os.getcwd()
         
         if input_folder_name_qa_service_metrics != "":
-                new_directory = directory + "/../output/" + input_folder_name_qa_service_metrics
+                new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
         else:
-                new_directory = directory + "/../output"
+                new_directory = directory + "/" + output_folder_name
                 
         return new_directory
 
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
+        global output_folder_name
         global container_run
         
         if (container_run == "False"):
                 directory = os.getcwd()
-                directory = directory + "/../output"
+                new_directory = directory + "/../" + output_folder_name
         else:
                 directory = os.getcwd()
-                new_directory = directory + "/output"
+                new_directory = directory + "/" + output_folder_name
         
         return new_directory
 

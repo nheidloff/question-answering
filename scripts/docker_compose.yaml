@@ -5,7 +5,7 @@ services:
       context: ${QA_SERVICE_DOCKER_CONTEXT}
       dockerfile: ${QA_SERVICE_DOCKER_CONTEXT}/src/main/docker/Dockerfile.jvm
     image: qa_service:v1.0.0
-    container_name: qa_service
+    container_name: qaservice
     ports:
       - 8080:8080
     environment:
@@ -43,12 +43,12 @@ services:
       - question-answering
       - maas-mock
     image: experiment_runner:v1.0.0
-    container_name: experiment_runner
+    container_name: experimentrunner
     ports:
       - 8084:8084
     environment:
       - endpoint=$endpoint
-      - api_url=http://qa_service:8080
+      - api_url=http://qaservice:8080
       - username=$username
       - password=$password
       - verify_answer=$verify_answer
@@ -72,7 +72,7 @@ services:
     image: maas_mock:v1.0.0
     depends_on:
       - question-answering
-    container_name: maas_mock
+    container_name: maasmock
     ports:
       - 8082:8082
    
