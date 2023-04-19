@@ -45,10 +45,6 @@ public class QueryReRankerMaaS {
         // 1. Read documents from file    
         List<com.ibm.question_answering.file.Document> documents = documentsReader.read();
         DocumentScore[] reRankerInput = documentsReader.getReRankerInput(documents);
-        System.out.println(documents.get(0).text[3]);
-        for (int index = 0; index < 10; index++) {
-            System.out.println(reRankerInput[index].document.text);
-        }
         if ((reRankerInput == null) || (reRankerInput.length == 0)) {
             System.err.println("Couldn't read file");
             throw new RuntimeException("Couldn't read file");

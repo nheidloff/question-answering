@@ -15,6 +15,7 @@ metrics/input/*
 
 service/src/main/resources/test-small.json
 service/src/main/resources/test.json
+service/src/main/resources/test-medium.json
 
 evaluations/error.log
 evaluations/env
