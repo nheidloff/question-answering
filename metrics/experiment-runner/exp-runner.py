@@ -135,9 +135,9 @@ def bleu_from_list_to_dict(header):
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "_" + output_error_log)
+logger = logging.getLogger(output_session_id + "-" + output_error_log)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "_" + output_error_log)
+file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
@@ -349,7 +349,7 @@ def main(args):
                 print(f"- Input qa dir (container): {input_qa_directory}")
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
    
-        workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
+        workbook_name_file = output_directory + "/"  + output_session_id + "-" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
