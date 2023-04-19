@@ -10,17 +10,19 @@ app = Flask(__name__)
 api = Api(app)
 
 class Start(Resource):
-    def start():
+    def get():
         # print(subprocess.check_output(['ls', '-l']))
-        return json.dumps({"container":"start"})
+        return_value = "Can't start anything!"
+        return return_value
 
 class Alive(Resource):
-    def alive():
+    def get():
         # print(subprocess.check_output(['ls', '-l']))
-        return json.dumps({"container":"alive"})
+        return_value = "Yes, I am alive!"
+        return return_value
 
 api.add_resource(Alive, '/')
 api.add_resource(Start, '/start')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8084)

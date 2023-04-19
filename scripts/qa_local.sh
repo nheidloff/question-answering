@@ -32,6 +32,7 @@ if [[ "${GLOBAL_SESSION_ID}" == "${verify}" ]]; then
     echo "**************************"
     echo "Start QA- Service"
     echo "**************************"
+    mvn package
     mvn quarkus:dev
 else
     echo "Session ID: ${GLOBAL_SESSION_ID}"
@@ -39,6 +40,7 @@ else
     echo "**************************"
     echo "Start QA- Service"
     echo "**************************"
+    mvn package
     mvn quarkus:dev
 fi
 

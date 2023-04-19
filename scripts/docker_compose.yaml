@@ -5,7 +5,7 @@ services:
       context: ${QA_SERVICE_DOCKER_CONTEXT}
       dockerfile: ${QA_SERVICE_DOCKER_CONTEXT}/src/main/docker/Dockerfile.jvm
     image: qa_service:v1.0.0
-    container_name: qa_service
+    container_name: qaservice
     ports:
       - 8080:8080
     environment:
@@ -26,13 +26,13 @@ services:
       - EXPERIMENT_LLM_MIN_NEW_TOKENS=${EXPERIMENT_LLM_MIN_NEW_TOKENS}
       - EXPERIMENT_LLM_MAX_NEW_TOKENS=${EXPERIMENT_LLM_MAX_NEW_TOKENS}
       - EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS=${EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS}
+      - EXPERIMENT_LLM_PROMPT=${EXPERIMENT_LLM_PROMPT}
       - EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS}
       - EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL}
       - EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID}
-      - EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS={EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS}
-      - EXPERIMENT_DISCOVERY_CHARACTERS={EXPERIMENT_DISCOVERY_CHARACTERS}
-      - EXPERIMENT_DISCOVERY_FIND_ANSWERS={EXPERIMENT_DISCOVERY_FIND_ANSWERS}
-      - EXPERIMENT_LLM_PROMPT={EXPERIMENT_LLM_PROMPT}
+      - EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS}
+      - EXPERIMENT_DISCOVERY_CHARACTERS=${EXPERIMENT_DISCOVERY_CHARACTERS}
+      - EXPERIMENT_DISCOVERY_FIND_ANSWERS=${EXPERIMENT_DISCOVERY_FIND_ANSWERS}
     volumes:
       - ${OUTPUT_MOUNTPOINT}:/deployments/metrics:rw 
   experiment-runner:
@@ -43,12 +43,12 @@ services:
       - question-answering
       - maas-mock
     image: experiment_runner:v1.0.0
-    container_name: experiment_runner
+    container_name: experimentrunner
     ports:
-      - 8084:8080
+      - 8084:8084
     environment:
       - endpoint=$endpoint
-      - api_url=$api_url
+      - api_url=http://qaservice:8080
       - username=$username
       - password=$password
       - verify_answer=$verify_answer
@@ -60,6 +60,7 @@ services:
       - output_session_id=$SESSION_ID
       - output_folder_name=outputs 
       - number_of_retries=$number_of_retries
+      - container_run=True
     volumes:
       - ${OUTPUT_MOUNTPOINT}:/app/outputs:rw
       - ${INPUT_MOUNTPOINT}:/app/inputs:rw
@@ -71,7 +72,7 @@ services:
     image: maas_mock:v1.0.0
     depends_on:
       - question-answering
-    container_name: maas_mock
+    container_name: maasmock
     ports:
-      - 8082:8080
+      - 8082:8082
    

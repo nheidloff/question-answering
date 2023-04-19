@@ -31,7 +31,6 @@ input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_serv
 container_run = os.environ.get("container_run")
 
 # output
-output_question_resp_anwser = os.environ.get("output_question_resp_anwser")
 output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
 output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
@@ -60,32 +59,51 @@ print(f"- Container run: {container_run}")
 # get os path information
 def get_input_path():
         global input_folder_name
-        directory = os.getcwd()
-        directory = directory + "/../" + input_folder_name
+        global container_run
+        if (container_run == "False"):
+                directory = os.getcwd()
+                directory = directory + "/../" + input_folder_name
+        else:
+                directory = os.getcwd()
+                directory = directory + "/" + input_folder_name
         return directory
 
 def get_output_path():
         global output_folder_name
-        directory = os.getcwd()
-        directory = directory + "/../" + output_folder_name
+        global container_run
+        if (container_run == "False"):
+                directory = os.getcwd()
+                directory = directory + "/../" + output_folder_name
+        else:
+                directory = os.getcwd()
+                directory = directory + "/" + output_folder_name
         return directory
 
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
+        global output_folder_name
         directory = os.getcwd()
         
         if input_folder_name_qa_service_metrics != "":
-                new_directory = directory + "/../output/" + input_folder_name_qa_service_metrics
+                new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
         else:
-                new_directory = directory + "/../output"
+                new_directory = directory + "/" + output_folder_name
                 
         return new_directory
 
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
-        directory = os.getcwd()
-        directory = directory + "/../output"
-        return directory
+        global output_folder_name
+        global container_run
+        
+        if (container_run == "False"):
+                directory = os.getcwd()
+                new_directory = directory + "/../" + output_folder_name
+        else:
+                directory = os.getcwd()
+                new_directory = directory + "/" + output_folder_name
+        
+        return new_directory
 
 # ******************************************
 # Bleu prepare eval data functions 
@@ -118,9 +136,9 @@ def bleu_from_list_to_dict(header):
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "_" + output_error_log)
+logger = logging.getLogger(output_session_id + "-" + output_error_log)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "_" + output_error_log)
+file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 file_handler.setFormatter(formatter)
@@ -130,12 +148,16 @@ logger.addHandler(file_handler)
 def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
+        worksheet_blue = workbook.create_sheet("experiment_bleu_result")
         if 'Sheet1' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet1'])
         if 'Sheet' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet'])
         
         worksheet.title = "experiment_data"
+        worksheet_blue.title = "experiment_bleu_result"
+        worksheet_blue['A1'] = 'bleu'
+        worksheet_blue['B1'] = 'RougeL'
 
         worksheet['A1'] = 'question'
         worksheet['B1'] = 'answer'
@@ -199,10 +221,29 @@ def load_qa_service_metrics(csv_filepath):
         header = []
         header = next(csvreader)
         print(f"{header}")
+
+        # Reranker extract
+        i = 0
+        for column in header:
+                # print(f"Column: {column} : {i}")
+                if str(column) == "RESULT_RERANKER_PASSAGE1":
+                        ranker_p_1 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE2":
+                        ranker_p_2 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE3":
+                        ranker_p_3 = i
+                if str(column) == "RESULT_RERANKER_PASSAGE1_ID":
+                        ranker_p_1_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE2_ID":
+                        ranker_p_2_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE3_ID":
+                        ranker_p_3_id = i
+                i = i + 1                         
+
         qa_service_metrics = []
         for row in csvreader: 
-                values = [ str(row[24]) , str(row[25]) , str(row[26]) , str(row[27]) , str(row[28]), str(row[29]) ]
-                #print(f"Values:\n {values}")          
+                values = [ str(row[ranker_p_1]) , str(row[ranker_p_1_id]) , str(row[ranker_p_2]) , str(row[ranker_p_2_id]) , str(row[ranker_p_3]), str(row[ranker_p_3_id]) ]
+                # print(f"Values:\n {values}")          
                 qa_service_metrics.append(values)
         file.close()
         return qa_service_metrics
@@ -309,7 +350,7 @@ def main(args):
                 print(f"- Input qa dir (container): {input_qa_directory}")
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
    
-        workbook_name_file = output_directory + "/"  + output_session_id + "_" + output_question_resp_anwser_excel
+        workbook_name_file = output_directory + "/"  + output_session_id + "-" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == False):
@@ -336,6 +377,9 @@ def main(args):
                         print(f"******* invoke REST API ********\n")
                         for row in rows:
                                 very_golden_answer = row[1]
+                                if (end_experiment == True):
+                                        break
+                                
                                 if (len(very_golden_answer) != 0):
                                         question      = row[0]
                                         golden_answer = row[1]
@@ -450,6 +494,11 @@ def main(args):
                         worksheet.cell(row=(j+1), column=14).value = row[4]
                         worksheet.cell(row=(j+1), column=15).value = row[5]
                         j = j + 1
+                  
+                  worksheet = workbook['experiment_bleu_result']
+                  worksheet.cell(row=(2), column=1).value = str(sacrebleu)
+                  worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
+
                   workbook.save(workbook_name_file)
 
                   # 4. Show results

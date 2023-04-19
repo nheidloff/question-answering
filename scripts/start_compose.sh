@@ -1,5 +1,12 @@
 #!/bin/bash
 
+echo "************************************"
+echo " Build and start containers with Docker compose " 
+echo "- 'QA-Service'"
+echo "- 'Experiment-runner'"
+echo "- 'maas-mock'"
+echo "************************************"
+
 # 1. set needed common environment
 export HOME_PATH=$(pwd)
 export SESSION_ID=$(date +%s)
@@ -34,12 +41,15 @@ cd $HOME_PATH
 # 7. set metrics input docker mountpoint
 cd $HOME_PATH/../metrics/input
 export INPUT_MOUNTPOINT="$(pwd)"
+echo $INPUT_MOUNTPOINT
 cd $HOME_PATH
 
 docker compose version
+echo "**************** BUILD ******************" 
 docker compose -f ./docker_compose.yaml build
+echo "**************** START ******************" 
 docker compose -f ./docker_compose.yaml up # --detach
 
-#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $1;}')
-#docker docker exec -it $CONTAINER /bin/bash 
+#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $7;}')
+#docker exec -it experiment_runner sh
 #docker compose -f ./docker_compose.yaml stop
