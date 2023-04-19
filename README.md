@@ -108,7 +108,7 @@ docker run -i --rm -p 8080:8080 \
   -e EXPERIMENT_DISCOVERY_CHARACTERS=${EXPERIMENT_DISCOVERY_CHARACTERS} \
   -e EXPERIMENT_DISCOVERY_FIND_ANSWERS=${EXPERIMENT_DISCOVERY_FIND_ANSWERS} \
   -e EXPERIMENT_LLM_PROMPT=${EXPERIMENT_LLM_PROMPT} \
-  -v $(pwd)/../metrics:/deployments/metrics \
+  -v $(pwd)/../metrics/output:/deployments/metrics \
   question-answering:latest
 ```
 
