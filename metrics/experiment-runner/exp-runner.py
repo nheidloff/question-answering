@@ -99,7 +99,8 @@ def get_input_qa_service_metrics_container_path():
                 directory = os.getcwd()
                 directory = directory + "/../output"
         else:
-                new_directory = directory + "/../output"
+                directory = os.getcwd()
+                new_directory = directory + "/output"
         
         return new_directory
 
