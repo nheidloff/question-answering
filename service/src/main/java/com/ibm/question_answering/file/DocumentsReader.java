@@ -15,6 +15,10 @@ public class DocumentsReader {
 
     public final static String DOCUMENTS_FILE_NAME = "test-small.json";
     public final static int MINIMAL_AMOUNT_WORDS_PER_TEXT_ENTRY = 3;
+
+    public final static String ERROR_DOCUMENTS_READER_PREFIX = "Documents Reader error: ";
+    public final static String ERROR_DOCUMENTS_READER_FILE = ERROR_DOCUMENTS_READER_PREFIX + "File cannot be read";
+    public final static String ERROR_DOCUMENTS_READER_UNEXPECTED = ERROR_DOCUMENTS_READER_PREFIX + "Unexpected";
  
     public List<Document> read() {
         List<Document> output = new ArrayList<Document>();
@@ -34,13 +38,15 @@ public class DocumentsReader {
             
             output = documents;
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(ERROR_DOCUMENTS_READER_FILE);
+            throw new RuntimeException(ERROR_DOCUMENTS_READER_FILE);
         }
         return output;
     }
 
-    public DocumentScore[] getReRankerInput(List<Document> documents) {
-        DocumentScore[] output = null;
+    // every row (every sentence) is put in one ReRanker input document
+    public DocumentScoreUrl[] getDocumentScoreUrls(List<Document> documents) {
+        DocumentScoreUrl[] output = null;
         int totalFilteredDocuments = 0;
         List<Document> filteredDocuments = new ArrayList<Document>();
         for (int index = 0; index < documents.size(); index++) {
@@ -62,8 +68,8 @@ public class DocumentsReader {
             newDocument.text = strings;
             filteredDocuments.add(newDocument);
         }
-        System.out.println(totalFilteredDocuments);
-        output = new DocumentScore[totalFilteredDocuments];
+        
+        output = new DocumentScoreUrl[totalFilteredDocuments];
         int id = 0;
         for (int index = 0; index < filteredDocuments.size(); index++) {
             for (int indexTextEntries = 0; indexTextEntries < filteredDocuments.get(index).text.length; indexTextEntries++) {
@@ -72,7 +78,10 @@ public class DocumentsReader {
                 document.title = filteredDocuments.get(index).title;
                 document.text = filteredDocuments.get(index).text[indexTextEntries].trim();
                 DocumentScore documentScore = new DocumentScore(document, 0);
-                output[id] = documentScore;
+                DocumentScoreUrl documentScoreUrl = new DocumentScoreUrl();
+                documentScoreUrl.documentScore = documentScore;
+                documentScoreUrl.url = filteredDocuments.get(index).url;
+                output[id] = documentScoreUrl;
                 id++;
             }
         }
@@ -83,5 +92,16 @@ public class DocumentsReader {
         text = text.trim(); 
         long count = text.chars().filter(ch -> ch == ' ').count();
         return (int)count + 1;
+    }
+
+    public DocumentScore[] getReRankerInput(DocumentScoreUrl[] documentScoreUrls) {
+        DocumentScore[] output = null;
+        if (documentScoreUrls != null) {
+            output= new DocumentScore[documentScoreUrls.length];
+            for (int index = 0; index < documentScoreUrls.length; index++) {
+                output[index] = documentScoreUrls[index].documentScore;
+            }
+        }
+        return output;
     }
 }
