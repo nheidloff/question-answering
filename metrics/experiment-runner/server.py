@@ -23,4 +23,4 @@ api.add_resource(Alive, '/')
 api.add_resource(Start, '/start')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8084)

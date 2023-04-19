@@ -1,0 +1,5 @@
+curl -v POST http://localhost:8082/v1/generate  -H 'Content-Type: application/json' -H 'Authorization: Bearer 123456789' -d '{ "model_id": "google/flan-ul2", "inputs": [ "'$QUERY'"], "parameters": { "temperature": 0, "min_new_tokens": 1, "max_new_tokens": 5 } }'
+curl -v POST http://maas_mock:8082/v1/generate  -H 'Content-Type: application/json' -H 'Authorization: Bearer 123456789' -d '{ "model_id": "google/flan-ul2", "inputs": [ "'$QUERY'"], "parameters": { "temperature": 0, "min_new_tokens": 1, "max_new_tokens": 5 } }'
+
+curl -v -X POST -u "apikey:F(GFJ)6gkhfgr4w&gjz" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://localhost:8080/query"
+curl -v -X POST -u "apikey:F(GFJ)6gkhfgr4w&gjz" --header "Content-Type: application/json" --data "{   \"query\": \"text:When and for how much did IBM acquire Red Hat?\" }" "http://qa_service:8080/query"

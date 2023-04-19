@@ -32,5 +32,5 @@ COPY generate_env-config.sh /app
 COPY docker_entrypoint.sh /app
 COPY start.sh /app
 
-EXPOSE 8080
+EXPOSE 8084
 CMD ["/bin/sh","docker_entrypoint.sh"]
