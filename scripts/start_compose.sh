@@ -36,7 +36,6 @@ cd $HOME_PATH
 # 6. set metrics output docker mountpoint
 cd $HOME_PATH/../metrics/output
 export OUTPUT_MOUNTPOINT="$(pwd)"
-echo $OUTPUT_MOUNTPOINT
 cd $HOME_PATH
 
 # 7. set metrics input docker mountpoint
@@ -44,7 +43,6 @@ cd $HOME_PATH/../metrics/input
 export INPUT_MOUNTPOINT="$(pwd)"
 echo $INPUT_MOUNTPOINT
 cd $HOME_PATH
-
 
 docker compose version
 echo "**************** BUILD ******************" 
