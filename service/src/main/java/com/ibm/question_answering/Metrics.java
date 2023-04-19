@@ -15,9 +15,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 
-@ApplicationScoped
+@RequestScoped
 public class Metrics {
 
     @ConfigProperty(name = "EXPERIMENT_METRICS_SESSION") 
@@ -149,6 +149,7 @@ public class Metrics {
     String directoryAndfileNameRuns;
     String directoryAndfileNameLastRun;
     boolean reRankerUsed = false;
+    boolean discoveryUsed = false;
 
     public void end() {
         this.tsEnd = getTimestamp();
@@ -205,9 +206,17 @@ public class Metrics {
                 data.add(this.endpoint);
                 data.add(this.query);
                 data.add(this.answer);
-                for (int index = 0; index < 10; index++) {
-                    data.add(this.resultDiscovery[index]);
-                    data.add(this.resultDiscoveryChunkIds[index]);
+                if (this.discoveryUsed == true) {
+                    for (int index = 0; index < 10; index++) {
+                        data.add(this.resultDiscovery[index]);
+                        data.add(this.resultDiscoveryChunkIds[index]);
+                    }
+                }
+                else {
+                    for (int index = 0; index < 10; index++) {
+                        data.add("");
+                        data.add("");
+                    }
                 }
                 for (int index = 0; index < 10; index++) {
                     data.add(this.resultReRanker[index]);
@@ -215,13 +224,25 @@ public class Metrics {
                 }
                 data.add(this.tsStart);
                 data.add(this.tsEnd);
-                data.add(this.tsDiscoveryStart);
-                data.add(this.tsDiscoveryEnd);
+                if (this.discoveryUsed == true) {
+                    data.add(this.tsDiscoveryStart);
+                    data.add(this.tsDiscoveryEnd);
+                }
+                else {
+                    data.add("");
+                    data.add("");
+                }
                 data.add(this.tsRRStart);
                 data.add(this.tsRREnd);
                 data.add(this.tsMaaSEnd);
                 data.add(this.tsMaaSEnd);
-                data.add(this.sizeDiscoveryResults);
+                
+                if (this.discoveryUsed == true) {
+                    data.add(this.sizeDiscoveryResults);
+                }
+                else {
+                    data.add("0");
+                }
                 data.add(this.sizeReRankerInputs);
                 data.add(this.sizeReRankerResults);                
                 data.add(prompt.replaceAll(System.getProperty("line.separator"), "\\\\n"));
@@ -301,6 +322,7 @@ public class Metrics {
     public void discoveryStarted(int maxDocuments) {
         this.tsDiscoveryStart = getTimestamp();
         this.discoveryMaxDocuments = String.valueOf(maxDocuments);
+        this.discoveryUsed = true;
     }
 
     public void discoveryStopped(com.ibm.question_answering.api.Answer answer) {
@@ -384,30 +406,32 @@ public class Metrics {
             writer.write("*Duration in Milliseconds:* " + getDuration(this.tsStart, this.tsEnd) + "\n");
             writer.write("\n");
             writer.write("\n");
-            writer.write("### Watson Discovery" + "\n");
-            writer.write("\n");
-            writer.write("*Results (matching):* " + this.sizeDiscoveryResults + "\n");
-            writer.write("\n");
-            writer.write("*Results (returned):* " + this.sizeDiscoverySentResults + "\n");
-            writer.write("\n");
-            writer.write("*Results (max):* " + this.discoveryMaxDocuments + "\n");
-            writer.write("\n");            
-            writer.write("*Characters per Passage:* " + this.discoveryCharacters + "\n");
-            writer.write("\n");            
-            writer.write("*Find Answers:* " + this.discoveryFindAnswers + "\n");
-            writer.write("\n");            
-            writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
-            writer.write("\n");
-            writer.write("*Result 1 chunckid or document_id:* " + this.resultDiscoveryChunkIds[0] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 1</summary>" + this.resultDiscovery[0] + "</details>\n\n");
-            writer.write("*Result 2 chunckid or document_id:* " + this.resultDiscoveryChunkIds[1] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 2</summary>" + this.resultDiscovery[1] + "</details>\n\n");
-            writer.write("*Result 3 chunckid or document_id:* " + this.resultDiscoveryChunkIds[3] + "\n");
-            writer.write("\n");
-            writer.write("<details><summary>Result 3</summary>" + this.resultDiscovery[2] + "</details>\n\n");
-            writer.write("\n");
+            if (this.discoveryUsed == true) {
+                writer.write("### Watson Discovery" + "\n");
+                writer.write("\n");
+                writer.write("*Results (matching):* " + this.sizeDiscoveryResults + "\n");
+                writer.write("\n");
+                writer.write("*Results (returned):* " + this.sizeDiscoverySentResults + "\n");
+                writer.write("\n");
+                writer.write("*Results (max):* " + this.discoveryMaxDocuments + "\n");
+                writer.write("\n");            
+                writer.write("*Characters per Passage:* " + this.discoveryCharacters + "\n");
+                writer.write("\n");            
+                writer.write("*Find Answers:* " + this.discoveryFindAnswers + "\n");
+                writer.write("\n");            
+                writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
+                writer.write("\n");
+                writer.write("*Result 1 chunckid or document_id:* " + this.resultDiscoveryChunkIds[0] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 1</summary>" + this.resultDiscovery[0] + "</details>\n\n");
+                writer.write("*Result 2 chunckid or document_id:* " + this.resultDiscoveryChunkIds[1] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 2</summary>" + this.resultDiscovery[1] + "</details>\n\n");
+                writer.write("*Result 3 chunckid or document_id:* " + this.resultDiscoveryChunkIds[3] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 3</summary>" + this.resultDiscovery[2] + "</details>\n\n");
+                writer.write("\n");
+            }
             if (this.reRankerUsed == true) {
                 writer.write("### Re-Ranker" + "\n");
                 writer.write("\n");

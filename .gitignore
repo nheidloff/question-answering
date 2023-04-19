@@ -13,6 +13,9 @@ metrics/input/*
 !metrics/input/your-ground-truth.xlsx
 !metrics/input/demo-ground-truth.xlsx
 
+service/src/main/resources/test-small.json
+service/src/main/resources/test.json
+
 evaluations/error.log
 evaluations/env
 evaluations/__pycache__

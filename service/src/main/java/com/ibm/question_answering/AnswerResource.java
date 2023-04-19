@@ -22,7 +22,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.resteasy.reactive.RestHeader;
-
 import com.ibm.question_answering.api.Answer;
 
 @ApplicationScoped
@@ -34,7 +33,10 @@ import com.ibm.question_answering.api.Answer;
 )
 @OpenAPIDefinition(info = @Info(title = "Question Answering Service", version = "0.0.1", description = "Question Answering APIs"))
 public class AnswerResource {
- 
+
+    @Inject
+    QueryReRankerMaaS queryReRankerMaaS;
+
     @Inject
     AnswerResourceUtilities utilities;
 
@@ -123,6 +125,24 @@ public class AnswerResource {
         return output;       
     }
     */
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-reranker-maas")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+        summary = "Returns answer from ReRanker and MaaS",
+        description = "Returns answer from ReRanker and MaaS"
+    )
+    public Answer queryReRankerAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryReRankerMaaS.query(utilities.getQuery(data));
+        output = utilities.removeRedundantDocuments(output);
+        metrics.end();
+        return output;
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
