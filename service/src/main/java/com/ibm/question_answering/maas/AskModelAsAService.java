@@ -159,12 +159,16 @@ public class AskModelAsAService {
                 // special case
                 String EVIDENCE_MARKER1 = "; evidence:";
                 String EVIDENCE_MARKER2 = ". evidence:";
+                String EVIDENCE_MARKER3 = "? evidence:";
                 String RESPONSE_MARKER = "response: ";
                 if (generatedText.contains(EVIDENCE_MARKER1)) {
                     generatedText = generatedText.substring(RESPONSE_MARKER.length(), generatedText.indexOf(EVIDENCE_MARKER1));
                 }
                 if (generatedText.contains(EVIDENCE_MARKER2)) {
                     generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER2) + 1);
+                }
+                if (generatedText.contains(EVIDENCE_MARKER3)) {
+                    generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER3) + 1);
                 }
 
                 output.matching_results = 1;
