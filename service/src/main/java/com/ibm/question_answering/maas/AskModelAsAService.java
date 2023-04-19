@@ -35,13 +35,11 @@ public class AskModelAsAService {
     ProxyServiceResource proxyResource;
 
     final String PROXY_API_KEY_NOT_SET = "NOT_SET"; 
-    @ConfigProperty(name = "PROXY_API_KEY", defaultValue = PROXY_API_KEY_NOT_SET) 
-    private String proxyApiKey;
+    String proxyApiKey = System.getenv("PROXY_API_KEY");
     private boolean useProxy = false;
 
     final String PROXY_URL_NOT_SET = "NOT_SET"; 
-    @ConfigProperty(name = "PROXY_URL", defaultValue = PROXY_URL_NOT_SET) 
-    private String proxyUrl;
+    private String proxyUrl = System.getenv("PROXY_URL");
     final static String ERROR_PROXY_URL_NOT_SET = ProxyExceptionMapper.ERROR_PROXY_PREFIX + "PROXY_URL not defined";
 
     final String MAAS_URL_NOT_SET = "NOT_SET";   
@@ -100,11 +98,13 @@ public class AskModelAsAService {
     }
 
     public com.ibm.question_answering.api.Answer execute(String prompt) {
-        if (!proxyApiKey.equalsIgnoreCase(PROXY_API_KEY_NOT_SET)) {
-            useProxy = true;
-            if (proxyUrl.equalsIgnoreCase(PROXY_URL_NOT_SET)) {
-                System.err.println(ERROR_PROXY_URL_NOT_SET);
-                throw new RuntimeException(ERROR_PROXY_URL_NOT_SET);
+        if ((proxyApiKey != null) && (!proxyApiKey.equals(""))) {
+            if (!proxyApiKey.equalsIgnoreCase(PROXY_API_KEY_NOT_SET)) {
+                useProxy = true;
+                if ((proxyUrl == null) || (proxyUrl.equals("")) || (proxyUrl.equalsIgnoreCase(PROXY_URL_NOT_SET))) {
+                    System.err.println(ERROR_PROXY_URL_NOT_SET);
+                    throw new RuntimeException(ERROR_PROXY_URL_NOT_SET);
+                }
             }
         }
         if (url.equalsIgnoreCase(MAAS_URL_NOT_SET)) {
