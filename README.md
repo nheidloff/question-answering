@@ -52,7 +52,7 @@ There are five steps to run your first experiment against the ground truth file 
 4. Start three local containers
 5. Configure your experiment and run it
 
-See the [Getting Started](Setup#getting-started.md) instructions for details.
+See the [Getting Started](Setup.md#getting-started) instructions for details.
 
 
 ## API
