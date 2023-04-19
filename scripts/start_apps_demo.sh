@@ -28,7 +28,6 @@ chmod 755 ${exp_runner}
 chmod 755 ${qa_service}
 chmod 755 ${maas_service}
 
-
 echo "************************************"
 echo "    Open application terminals"
 echo "************************************"

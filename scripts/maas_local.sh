@@ -20,5 +20,6 @@ echo "**************************"
 echo "Start maas-mock"
 echo "**************************"
 mvn package
+#mvn quarkus:dev
 mvn quarkus:dev
 
