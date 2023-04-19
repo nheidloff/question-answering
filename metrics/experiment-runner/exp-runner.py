@@ -93,9 +93,15 @@ def get_input_qa_service_metrics_local_path():
 
 def get_input_qa_service_metrics_container_path():
         global input_folder_name_qa_service_metrics
-        directory = os.getcwd()
-        directory = directory + "/../output"
-        return directory
+        global container_run
+        
+        if (container_run == "False"):
+                directory = os.getcwd()
+                directory = directory + "/../output"
+        else:
+                new_directory = directory + "/../output"
+        
+        return new_directory
 
 # ******************************************
 # Bleu prepare eval data functions 
