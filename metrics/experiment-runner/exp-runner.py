@@ -376,6 +376,9 @@ def main(args):
                         print(f"******* invoke REST API ********\n")
                         for row in rows:
                                 very_golden_answer = row[1]
+                                if (end_experiment == True):
+                                        break
+                                
                                 if (len(very_golden_answer) != 0):
                                         question      = row[0]
                                         golden_answer = row[1]
