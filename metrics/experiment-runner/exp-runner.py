@@ -18,7 +18,7 @@ from datetime import date
 # Global variables
 
 # Customm debug information
-app_debug_channel = = os.environ.get("custom_debug_channel")
+app_debug_channel = os.environ.get("custom_debug_channel")
 
 # qa service
 endpoint = os.environ.get("endpoint")
@@ -58,11 +58,11 @@ def debug_show_env_settings():
         global input_folder_name_qa_service_metrics
         global container_run
         # output
-        global output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
-        global output_error_log = os.environ.get("output_error_log")
-        global output_session_id = os.environ.get("output_session_id")
-        global output_folder_name = os.environ.get("output_folder_name")
-        global number_of_retries = os.environ.get("number_of_retries")
+        global output_question_resp_anwser_excel
+        global output_error_log 
+        global output_session_id
+        global output_folder_name
+        global number_of_retries
 
         if (app_debug_channel == "True"):
                 print("*************************")
@@ -94,9 +94,6 @@ def debug_show_value (value):
                 return True
         else:
                 return False
-
-
-
 
 # ******************************************
 # get os path information
@@ -258,12 +255,14 @@ def load_input_excel(excel_input):
 # ******************************************
 # load qa service metrics from csv file
 def load_qa_service_metrics(csv_filepath):
-        print(f"QA -service experiment file: {csv_filepath}")
+        d_value = "QA -service experiment file: " + csv_filepath
+        debug_show_value(d_value)
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
-        print(f"{header}")
+        d_value = "QA -service experiment file Header: " + str(header)
+        debug_show_value(d_value)
 
         # Reranker extract
         i = 0
@@ -376,11 +375,14 @@ def main(args):
         # Get date to be added to the file names
         today = str(date.today())
 
-        # Set paths for input
+        # Set paths for input and output
         output_directory = get_output_path()
-        print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
-        print(f"- Input dir: {input_directory}")
+        d_value = " - Output dir: " + output_directory + "\n - Input dir: " + input_directory
+        debug_show_value(d_value)
+
+        
+
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()

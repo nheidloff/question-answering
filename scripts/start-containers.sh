@@ -4,7 +4,7 @@ echo "************************************"
 echo " Build and start containers with Docker compose " 
 echo "- 'QA-Service'"
 echo "- 'Experiment-runner'"
-echo "- 'maas-mock'"
+echo "- 'Maas-mock'"
 echo "************************************"
 
 # 1. set needed common environment
@@ -50,6 +50,6 @@ docker compose -f ./docker_compose.yaml build
 echo "**************** START ******************" 
 docker compose -f ./docker_compose.yaml up # --detach
 
-#CONTAINER=$(docker ps | grep experiment_runner | awk '{print $7;}')
-#docker exec -it experiment_runner sh
+#CONTAINER=$(docker ps | grep experimentrunner | awk '{print $7;}')
+#docker exec -it experimentrunner sh
 #docker compose -f ./docker_compose.yaml stop

@@ -21,6 +21,6 @@ export output_session_id=${output_session_id}
 export output_folder_name=${output_folder_name}
 export number_of_retries=${number_of_retries}
 export container_run=${container_run}
-# NOT NEEDED INSIDE EVALUATE APPLICATION
-# export host_ip="${number_of_retries}"
+#debug
+export app_debug_channel=${app_debug_channel}
 EOF
