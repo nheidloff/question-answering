@@ -21,6 +21,8 @@ Involved technologies:
 * Optional: IBM Watson Assistant
 * Optional: IBM Code Engine
 
+<kbd><img src="screenshots/Architecture.png" /></kbd>
+
 There are two main components:
 
 1. Question answering microservice which orchestrates the pipeline above
