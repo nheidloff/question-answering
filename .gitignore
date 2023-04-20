@@ -3,9 +3,13 @@ readnik.md
 service/.env
 service/.env_demo
 service/.env_real
+service/.env_service_demo
+service/.env_service_real
 metrics/experiment-runner/.env
 metrics/experiment-runner/.env_demo
 metrics/experiment-runner/.env_real
+metrics/experiment-runner/.env_runner_demo
+metrics/experiment-runner/.env_runner_real
 data/product-doc
 
 metrics/input/*
