@@ -6,7 +6,7 @@ The experiment-runner is a Python command line application and the QA pipeline s
 
 The bash script `start_apps.sh` automates the start of both applications
 
-### 1. Create an experiment-runner `.env` file
+### 1.1 Create an experiment-runner `.env` file
 
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
@@ -15,7 +15,7 @@ cd ./metrics/experiment-runner
 cat ./env_template > .env
 ```
 
-### 2. Create a QA pipeline service `.env` file
+### 1.2 Create a QA pipeline service `.env` file
 
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
@@ -24,7 +24,7 @@ cd ./service/experiment-runner
 cat ./env_template > .env
 ```
 
-### 3. Start the automation
+### 1.3 Start the automation
 
 The automation starts the bash automation for [experiment-runner](./exp_runner_local.sh) and for the [QA pipeline service](./qa_local.sh).
 

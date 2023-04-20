@@ -98,8 +98,14 @@ def debug_show_value (value):
 def get_input_path():
         global input_folder_name
         global container_run
+
+        d_value = "get_input_path(): " + str(container_run)
+        debug_show_value(d_value)
+        
         if (container_run == "False"):
                 directory = os.getcwd()
+                d_value = "False: " + str(directory)
+                debug_show_value(d_value)
                 directory = directory + "/../" + input_folder_name
         else:
                 directory = os.getcwd()
@@ -121,12 +127,23 @@ def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
         global output_folder_name
         directory = os.getcwd()
-        
-        if input_folder_name_qa_service_metrics != "":
-                new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+       
+        if (container_run == "False"):
+                directory = os.getcwd()
+                d_value = "False: " + str(directory)
+                debug_show_value(d_value)
+
+                if input_folder_name_qa_service_metrics != "":
+                        new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+                else:
+                        new_directory = directory + "/../" + output_folder_name
         else:
-                new_directory = directory + "/" + output_folder_name
-                
+                directory = os.getcwd()
+                if input_folder_name_qa_service_metrics != "":
+                        new_directory = directory + "/" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+                else:
+                        new_directory = directory + "/" + output_folder_name
+             
         return new_directory
 
 def get_input_qa_service_metrics_container_path():
@@ -361,7 +378,7 @@ def main(args):
         # Does input data exist?
         # - False: Invoke the microservice
         # - True: Use an existing csv file
-        input_data_exists = False
+        input_data_exists = True
         
         # Temp list for creating output files
         golds = [[]]
