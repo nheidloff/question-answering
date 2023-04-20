@@ -371,18 +371,12 @@ def main(args):
 
         # End experiment, when not all requests can be processed!
         end_experiment = False 
-        
-        # Get date to be added to the file names
-        today = str(date.today())
 
         # Set paths for input and output
         output_directory = get_output_path()
         input_directory = get_input_path()
         d_value = " - Output dir: " + output_directory + "\n - Input dir: " + input_directory
         debug_show_value(d_value)
-
-        
-
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
