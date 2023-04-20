@@ -64,7 +64,7 @@ def debug_show_env_settings():
         global output_folder_name = os.environ.get("output_folder_name")
         global number_of_retries = os.environ.get("number_of_retries")
 
-        if (app_debug_channel == "False"):
+        if (app_debug_channel == "True"):
                 print("*************************")
                 print("Experiment-runner configuration:")
                 print("")
@@ -85,6 +85,16 @@ def debug_show_env_settings():
                 return True
         else:   
                 return False
+
+def debug_show_value (value):
+        global app_debug_channel
+        if (app_debug_channel == "True"):
+                print("********** DEBUG Value***************")
+                print(value)
+                return True
+        else:
+                return False
+
 
 
 
@@ -374,11 +384,13 @@ def main(args):
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
-                print(f"- Input qa dir (local): {input_qa_directory}")
+                d_value = "- Input qa dir (local): " + input_qa_directory
+                debug_show_value(d_value)
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
         else:
                 input_qa_directory = get_input_qa_service_metrics_container_path()
-                print(f"- Input qa dir (container): {input_qa_directory}")
+                d_value = "- Input qa dir (container):" + input_qa_directory
+                debug_show_value(d_value)
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
    
         workbook_name_file = output_directory + "/"  + output_session_id + "-" + output_question_resp_anwser_excel
@@ -387,17 +399,25 @@ def main(args):
         if (input_data_exists == False):
 
                         # 1.1 load data from input file 
-                        print(f"******* prepare input data from file {input_excel_filename} ********\n")    
+                        d_value = "******* prepare input data from file " + input_excel_filename + " ********\n"
+                        debug_show_value(d_value)
                         excel_input_filepath = input_directory + "/" + input_excel_filename                       
                         header, rows = load_input_excel(excel_input_filepath) 
-                        print(f"- Input header: {header}")                    
+                        
+                        d_value = "- Input header: " + str(header)
+                        debug_show_value(d_value)                  
                         input_len=len(rows)
-                        print(f"- Input len: {input_len}")
+                        
+                        d_value = "- Input len: " + str(input_len)
+                        debug_show_value(d_value)
                         row = rows[0]
                         question = row[0]
-                        print(f"- First question: {question}")
+                        
+                        d_value = "First question: " + question
+                        debug_show_value(d_value)
                         golden_answer = row[1]
-                        print(f"- First golden answer: {golden_answer}")
+                        d_value = "- First golden answer: " + golden_answer
+                        debug_show_value(d_value)
                                
                         # 1.2. Prepare an output excel for logging the execution results
                         workbook = create_output_workbook(workbook_name_file)
