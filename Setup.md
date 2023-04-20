@@ -12,6 +12,8 @@ Two or three online components need to be set up and/or configured:
 2. PrimeQA ReRanker
 3. Model as a Service provider
 
+<kbd><img src="screenshots/Experiments.png" /></kbd>
+
 
 ## Getting Started
 
