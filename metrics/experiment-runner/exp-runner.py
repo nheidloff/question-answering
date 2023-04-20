@@ -17,6 +17,9 @@ from datetime import date
 # ******************************************
 # Global variables
 
+# Customm debug information
+app_debug_channel = = os.environ.get("custom_debug_channel")
+
 # qa service
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
@@ -37,23 +40,53 @@ output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
 number_of_retries = os.environ.get("number_of_retries")
 
-print("*************************")
-print("Experiment-runner configuration:")
-print("")
-print(f"- Endpoint: {endpoint}")
-print(f"- API URL: {api_url}")
-print(f"- retries: {number_of_retries}")
-print(f"- Username: {username}")
-print(f"- Password: {password}")
-print(f"- Verify answer: {verify_answer}\n")
-print(f"- Input Excel: {input_excel_filename}")
-print(f"- Input folder name: {input_folder_name}")
-print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
-print(f"- Output folder name: {output_folder_name}")
-print(f"- Sesssion ID output prefix: {output_session_id}")
-print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
-print(f"- Error log name: {output_error_log}")
-print(f"- Container run: {container_run}")
+# *****************************************
+# Debug info
+
+def debug_show_env_settings():
+
+        global app_debug_channel
+        # qa service
+        global endpoint
+        global api_url
+        global username
+        global password
+        global verify_answer
+        # input
+        global input_excel_filename
+        global input_folder_name
+        global input_folder_name_qa_service_metrics
+        global container_run
+        # output
+        global output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
+        global output_error_log = os.environ.get("output_error_log")
+        global output_session_id = os.environ.get("output_session_id")
+        global output_folder_name = os.environ.get("output_folder_name")
+        global number_of_retries = os.environ.get("number_of_retries")
+
+        if (app_debug_channel == "False"):
+                print("*************************")
+                print("Experiment-runner configuration:")
+                print("")
+                print(f"- Endpoint: {endpoint}")
+                print(f"- API URL: {api_url}")
+                print(f"- retries: {number_of_retries}")
+                print(f"- Username: {username}")
+                print(f"- Password: {password}")
+                print(f"- Verify answer: {verify_answer}\n")
+                print(f"- Input Excel: {input_excel_filename}")
+                print(f"- Input folder name: {input_folder_name}")
+                print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
+                print(f"- Output folder name: {output_folder_name}")
+                print(f"- Sesssion ID output prefix: {output_session_id}")
+                print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
+                print(f"- Error log name: {output_error_log}")
+                print(f"- Container run: {container_run}")
+                return True
+        else:   
+                return False
+
+
 
 # ******************************************
 # get os path information
@@ -295,12 +328,10 @@ def invoke_qa(question):
                                 
                                 if( len(answer_text_list)>1):
                                         for answer_part in answer_text_list:
-                                                #answer_text_clean = answer_part.replace('\n', '')
                                                 answer_text_clean = answer_part
                                                 answer_text = answer_text + ' ' + answer_text_clean
                                 else:
                                         answer_text = answer_text_list[0]
-                                        #answer_text = answer_text.replace('\n', '')
 
                                 print(f"Question: {question}")
                                 print(f"Answer  : {answer_text}")
