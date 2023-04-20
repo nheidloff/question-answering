@@ -16,8 +16,27 @@ import openpyxl
 # ******************************************
 # Global variables
 
-# Customm debug information
-app_debug_channel = os.environ.get("app_debug_channel")
+# ------------------------
+# Environment variables
+
+# ------------------------
+# Defaults
+# - Customm debug information 
+if (os.environ.get("app_debug_channel") == None):
+        app_debug_channel = 'True'
+else:
+        app_debug_channel = os.environ.get("app_debug_channel")
+
+# - Does input data exist?
+#       - If 'False': Invoke the microservice
+#            'True' : Use an existing data
+if (os.environ.get("input_data_exists") == None):
+        input_data_exists = 'False'
+else:
+        input_data_exists = os.environ.get("input_data_exists")
+
+# -----------------------
+# Loaded from env file
 # qa service
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
@@ -161,6 +180,46 @@ def get_input_qa_service_metrics_container_path():
         return new_directory
 
 # ******************************************
+# Score prepare eval data functions
+def get_score_grundtruth(excel_input_file, prefix_passage_id):
+            
+            wb = openpyxl.load_workbook(excel_input_file)
+            ws = wb.active
+
+            rows = []
+            for rdx, row in enumerate(ws.iter_rows(values_only=True)):
+                if rdx:
+                        rows.append(list(row))
+                else:
+                        header = row
+            new_rows = []
+
+            # Extract data
+            for row in rows:
+                tmp = row[3]
+                if (prefix_passage_id == ""):
+                        passage_1_id = tmp
+                else:
+                        passage_1_id  = tmp.split(prefix_passage_id)
+
+                tmp = row[5]
+                if (prefix_passage_id == ""):
+                        passage_2_id = tmp
+                else:
+                        passage_2_id  = tmp.split(prefix_passage_id)
+               
+                tmp = row[5]
+                if (prefix_passage_id == ""):
+                        passage_3_id = tmp
+                else:
+                        passage_3_id  = tmp.split(prefix_passage_id)
+                
+                new_rows.append([passage_1_id, passage_2_id, passage_3_id ])
+                new_header = [ "passage_1_id", "passage_2_id", "passage_3_id"]
+        
+            return new_header, new_rows
+
+# ******************************************
 # Bleu prepare eval data functions 
 
 def bleu_run(input_filename):
@@ -191,13 +250,20 @@ def bleu_from_list_to_dict(header):
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "-" + output_error_log)
-logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
-file_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+
+def create_logger():
+        global output_session_id
+        global output_error_log
+
+        logger = logging.getLogger(output_session_id + "-" + output_error_log)
+        logger.setLevel(logging.INFO)
+        file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
+        file_handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        
+        return logger
 
 # Create a "experiment_data" worksheet
 def create_output_workbook (workbook_name):
@@ -249,19 +315,13 @@ def load_input_excel(excel_input):
     
     new_rows = []
     
-    # Extract data
+    # Extract passage IDs
     for row in rows:
-        
-        question      = row[1]
-        passage_1     = row[2]
         passage_1_id  = row[3]
-        passage_2     = row[4]
         passage_2_id  = row[5]
-        passage_3     = row[6]
         passage_3_id  = row[7]
-        golden_answer = row[8]
 
-        new_rows.append([question, golden_answer, passage_1, passage_1_id, passage_2, passage_2_id, passage_3, passage_3_id ])
+    new_rows.append([passage_1_id, passage_2_id, passage_3_id ])
 
     new_header = [ "question", "golden_answer", "passage_1", "passage_1_id", "passage_2", "passage_2_id", "passage_3", "passage_3_id"]
     
@@ -375,10 +435,7 @@ def invoke_qa(question):
 # ******************************************
 # Execution
 def main(args):
-        # Does input data exist?
-        # - False: Invoke the microservice
-        # - True: Use an existing csv file
-        input_data_exists = True
+        logger = create_logger()
         
         # Temp list for creating output files
         golds = [[]]
@@ -391,6 +448,8 @@ def main(args):
         input_directory = get_input_path()
         d_value = " - Output dir: " + output_directory + "\n - Input dir: " + input_directory
         debug_show_value(d_value)
+
+        excel_input_filepath = input_directory + "/" + input_excel_filename 
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
@@ -406,12 +465,11 @@ def main(args):
         workbook_name_file = output_directory + "/"  + output_session_id + "-" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
-        if (input_data_exists == False):
+        if (input_data_exists == "False"):
 
                         # 1.1 load data from input file 
                         d_value = "******* prepare input data from file " + input_excel_filename + " ********\n"
-                        debug_show_value(d_value)
-                        excel_input_filepath = input_directory + "/" + input_excel_filename                       
+                        debug_show_value(d_value)                      
                         header, rows = load_input_excel(excel_input_filepath) 
                         
                         d_value = "- Input header: " + str(header)
@@ -524,6 +582,10 @@ def main(args):
                         workbook.save(workbook_name_file)                       
         
         if (end_experiment == False):
+
+                  header, rows = get_score_grundtruth(,"loio")
+                  print(f"{header}")
+                  print(f"{rows}")
 
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
