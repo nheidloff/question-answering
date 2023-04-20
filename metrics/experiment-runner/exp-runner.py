@@ -12,14 +12,12 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
-from datetime import date
 
 # ******************************************
 # Global variables
 
 # Customm debug information
-app_debug_channel = os.environ.get("custom_debug_channel")
-
+app_debug_channel = os.environ.get("app_debug_channel")
 # qa service
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
@@ -65,7 +63,7 @@ def debug_show_env_settings():
         global number_of_retries
 
         if (app_debug_channel == "True"):
-                print("*************************")
+                print("********** app DEBUG ***************")
                 print("Experiment-runner configuration:")
                 print("")
                 print(f"- Endpoint: {endpoint}")
@@ -89,7 +87,7 @@ def debug_show_env_settings():
 def debug_show_value (value):
         global app_debug_channel
         if (app_debug_channel == "True"):
-                print("********** DEBUG Value***************")
+                print("********** app DEBUG ***************")
                 print(value)
                 return True
         else:
@@ -360,7 +358,6 @@ def invoke_qa(question):
 # ******************************************
 # Execution
 def main(args):
-
         # Does input data exist?
         # - False: Invoke the microservice
         # - True: Use an existing csv file
