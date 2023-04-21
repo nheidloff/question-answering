@@ -276,8 +276,12 @@ def score_matcher(groundtruth, search, inputname, workbook_name_file):
         print(f"Search: {len(search)} \n")
         # worksheet = workbook[sheet_name]
         worksheet = workbook.create_sheet(sheet_name)
-        worksheet.cell(row=(1), column=1).value = "query_passage_ids_groundtruth"
-        worksheet.cell(row=(1), column=2).value = "passage_id_groundtruth"
+        
+        groundtruth_passage_ids_column=1
+        passages_id_groundtruth_column=2
+
+        worksheet.cell(row=(1), column=groundtruth_passage_ids_column).value = "groundtruth_passage_ids"
+        worksheet.cell(row=(1), column=passages_id_groundtruth_column).value = "passages_id_groundtruth"
         
         print("*************Verify interation***************")
        
@@ -286,25 +290,28 @@ def score_matcher(groundtruth, search, inputname, workbook_name_file):
                         valuetocompare = groundtruth[i][j] 
                         print(f"Groundtruth_{i}_passage_{j}: {valuetocompare}\n\n")
 
-                        worksheet.cell(row=(i+1), column=1).value = "ground_truth_" + str(i) + "_passage"
-                        worksheet.cell(row=(i+1), column=2).value = valuetocompare
+                        worksheet.cell(row=((i)+(j)+2), column=groundtruth_passage_ids_column).value = "ground_truth_" + str(i)+ ":" + str(j) + "_passage"
+                        worksheet.cell(row=((i)+(j)+2), column=passages_id_groundtruth_column).value = valuetocompare
                         
                         for k in range(len(search)):
                                 for l in  range(len(search[k])):
+                                        column_id=passages_id_groundtruth_column+k+l+1
+                                        print(f"Column ID {column_id}")
+                                        
                                         # set search value
                                         searchvalue=search[k][l]
-
-                                        
+                                    
                                         print(f"Response_{k} Passage_{l}: {searchvalue}\n\n")
 
-                                        worksheet.cell(row=(1), column=(k+2)).value = inputname + "_ID" + str(k)  
+                                        worksheet.cell(row=(1), column=(column_id)).value = inputname + "_ID" + str(k)  
 
                                         if valuetocompare == searchvalue:
                                                 print(f"match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
-                                                worksheet.cell(row=(i+1), column=k+2).value = "true"
+                                                worksheet.cell(row=(i+1), column=column_id).value = "true"
                                         else:
                                                 print(f"no match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
-                                                worksheet.cell(row=(i+1), column=k+2).value = "false"
+                                                worksheet.cell(row=(i+1), column=column_id).value = "false"
+                                column_id = column_id + 1
         workbook.save(workbook_name_file)
         return True
 
@@ -670,9 +677,9 @@ def main(args):
         
         if (end_experiment == False):
 
-                  header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
-                  score_ranker = load_score_ranker(qa_metrics_run_file)
-                  score_matcher(ground_truth_rows,score_ranker,"RANKER",workbook_name_file)
+                  #header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
+                  #score_ranker = load_score_ranker(qa_metrics_run_file)
+                  #score_matcher(ground_truth_rows,score_ranker,"RANKER",workbook_name_file)
 
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
