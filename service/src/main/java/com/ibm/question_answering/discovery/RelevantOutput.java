@@ -50,7 +50,23 @@ public class RelevantOutput {
                     output = passageText;
                 }
             }
-        }               
+
+            /*
+            // full text
+            if (discoveryResult != null) {
+                if (discoveryResult.text != null) {
+                    if (discoveryResult.text.text != null) {
+                        if (discoveryResult.text.text.length > 0) {
+                            for (int indexText = 0; indexText < discoveryResult.text.text.length; indexText++) {
+                                output = output + discoveryResult.text.text[indexText] + " ";
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+        */            
+
         return output;
     }
 }
