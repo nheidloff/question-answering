@@ -35,6 +35,15 @@ if (os.environ.get("input_data_exists") == None):
 else:
         input_data_exists = os.environ.get("input_data_exists")
 
+# - Prefix passage ID groundtruth
+#       - If 'False': Invoke the microservice
+#            'True' : Use an existing data
+if (os.environ.get("prefix_passage_id") == None):
+        prefix_passage_id = ''
+else:
+        prefix_passage_id = os.environ.get("prefix_passage_id")
+
+
 # -----------------------
 # Loaded from env file
 # qa service
@@ -181,7 +190,25 @@ def get_input_qa_service_metrics_container_path():
 
 # ******************************************
 # Score prepare eval data functions
-def get_score_grundtruth(excel_input_file, prefix_passage_id):
+def extract_prefix(input_string, prefix):
+        work_string = str(input_string)
+        work_prefix = str(prefix)
+
+        if (work_string == ""):
+                return_string = 'none'
+                return return_string
+        
+        if (work_prefix == ""):
+                return_string = work_string
+                return return_string
+
+        if(work_string.find(work_prefix)== -1):
+                return work_string
+        else:               
+                return_string  = work_string.split(work_prefix,1)
+                return return_string[1]
+
+def get_score_groundtruth(excel_input_file, prefix_passage_id):
             
             wb = openpyxl.load_workbook(excel_input_file)
             ws = wb.active
@@ -194,30 +221,92 @@ def get_score_grundtruth(excel_input_file, prefix_passage_id):
                         header = row
             new_rows = []
 
-            # Extract data
+            # Extract passage data
             for row in rows:
-                tmp = row[3]
-                if (prefix_passage_id == ""):
-                        passage_1_id = tmp
-                else:
-                        passage_1_id  = tmp.split(prefix_passage_id)
 
-                tmp = row[5]
-                if (prefix_passage_id == ""):
-                        passage_2_id = tmp
-                else:
-                        passage_2_id  = tmp.split(prefix_passage_id)
-               
-                tmp = row[5]
-                if (prefix_passage_id == ""):
-                        passage_3_id = tmp
-                else:
-                        passage_3_id  = tmp.split(prefix_passage_id)
-                
+                passage_1_id = extract_prefix(str(row[3]),prefix_passage_id)
+                passage_2_id = extract_prefix(str(row[5]),prefix_passage_id)
+                passage_3_id = extract_prefix(str(row[7]),prefix_passage_id)
+                     
                 new_rows.append([passage_1_id, passage_2_id, passage_3_id ])
                 new_header = [ "passage_1_id", "passage_2_id", "passage_3_id"]
         
             return new_header, new_rows
+
+def load_score_ranker(csv_filepath):
+        d_value = "QA -service experiment file: " + csv_filepath
+        debug_show_value(d_value)
+        file = open(csv_filepath)
+        csvreader = csv.reader(file)
+        header = []
+        header = next(csvreader)
+        d_value = "QA -service experiment file Header: " + str(header)
+        debug_show_value(d_value)
+
+        # Reranker extract
+        i = 0
+        for column in header:
+                # print(f"Column: {column} : {i}")
+                if str(column) == "RESULT_RERANKER_PASSAGE1_ID":
+                        ranker_p_1_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE2_ID":
+                        ranker_p_2_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE3_ID":
+                        ranker_p_3_id = i
+                i = i + 1                         
+
+        score_ranker = []
+        for row in csvreader: 
+                values = [ str(row[ranker_p_1_id]) , str(row[ranker_p_2_id]) , str(row[ranker_p_3_id]) ]
+                # print(f"Values:\n {values}")          
+                score_ranker.append(values)
+        file.close()
+        return score_ranker
+
+def score_matcher(groundtruth, search, inputname, workbook_name_file):
+        
+        workbook = openpyxl.load_workbook(workbook_name_file)
+        sheet_name = inputname + "_matches"
+        print("*************Config***************")
+        print(f"Sheet name: {sheet_name} \n")
+        print(f"Workbook name: {workbook_name_file} \n")
+        print(f"Groundtruth content: {groundtruth} \n")
+        print(f"Groundtruth: {len(groundtruth)} \n")
+        print(f"Search content: {search} \n")
+        print(f"Search: {len(search)} \n")
+        # worksheet = workbook[sheet_name]
+        worksheet = workbook.create_sheet(sheet_name)
+        worksheet.cell(row=(1), column=1).value = "query_passage_ids_groundtruth"
+        worksheet.cell(row=(1), column=2).value = "passage_id_groundtruth"
+        
+        print("*************Verify interation***************")
+       
+        for i in range(len(groundtruth)):
+                for j in range(len(groundtruth[i])):
+                        valuetocompare = groundtruth[i][j] 
+                        print(f"Groundtruth_{i}_passage_{j}: {valuetocompare}\n\n")
+
+                        worksheet.cell(row=(i+1), column=1).value = "ground_truth_" + str(i) + "_passage"
+                        worksheet.cell(row=(i+1), column=2).value = valuetocompare
+                        
+                        for k in range(len(search)):
+                                for l in  range(len(search[k])):
+                                        # set search value
+                                        searchvalue=search[k][l]
+
+                                        
+                                        print(f"Response_{k} Passage_{l}: {searchvalue}\n\n")
+
+                                        worksheet.cell(row=(1), column=(k+2)).value = inputname + "_ID" + str(k)  
+
+                                        if valuetocompare == searchvalue:
+                                                print(f"match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
+                                                worksheet.cell(row=(i+1), column=k+2).value = "true"
+                                        else:
+                                                print(f"no match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
+                                                worksheet.cell(row=(i+1), column=k+2).value = "false"
+        workbook.save(workbook_name_file)
+        return True
 
 # ******************************************
 # Bleu prepare eval data functions 
@@ -245,12 +334,10 @@ def bleu_get_data(input_filename):
 def bleu_from_list_to_dict(header):
     indices = [i for i in range(0, len(header))]
     header = {k: v for k, v in zip(header, indices)}
-    # print ( header )
     return header
 
 # ******************************************
 # Define logging
-
 def create_logger():
         global output_session_id
         global output_error_log
@@ -583,9 +670,9 @@ def main(args):
         
         if (end_experiment == False):
 
-                  header, rows = get_score_grundtruth(,"loio")
-                  print(f"{header}")
-                  print(f"{rows}")
+                  header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
+                  score_ranker = load_score_ranker(qa_metrics_run_file)
+                  score_matcher(ground_truth_rows,score_ranker,"RANKER",workbook_name_file)
 
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
