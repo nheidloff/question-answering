@@ -101,10 +101,11 @@ function deploy_ce_application(){
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
     APPLICATION_EXISTS=$(ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
     
-    if [ $APPLICATION_EXISTS == $CE_APP_NAME ]
+    if [ $APPLICATION_EXISTS == $CE_APP_NAME ]; then
        $COMMAND=update
     else
        $COMMAND=create
+    fi
 
     ibmcloud ce application $COMMAND --name "$CE_APP_NAME" \
                                    --image "$CE_APP_IMAGE_URL" \
