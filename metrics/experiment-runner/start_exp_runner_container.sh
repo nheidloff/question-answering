@@ -14,7 +14,7 @@ source ./.env
 
 export version="v0.0.1"
 export api_url=$QA_SERVICE_API_URL
-export image_name="experiment-runner-local"
+export image_name="experimentrunner"
 #export host_ip_addr=$host_ip
 
 # temp set metrics problem with '../' in the question-answering service

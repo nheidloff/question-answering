@@ -187,6 +187,7 @@ function start_experiment_runner(){
     cd "${HOME_PATH}"/../metrics/experiment-runner/
     sh start_exp_runner_container.sh
     cd "${HOME_PATH}"
+    docker exec -it experimentrunner sh ./start.sh
 }
 
 #**********************************************************************************
