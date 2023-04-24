@@ -23,4 +23,5 @@ export number_of_retries=${number_of_retries}
 export container_run=${container_run}
 #debug
 export app_debug_channel=${app_debug_channel}
+export qa_service_on_cloud=${qa_service_on_cloud}
 EOF

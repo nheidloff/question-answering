@@ -34,7 +34,6 @@ docker container rm -f "experiment-runner-run"
 
 echo "***** START experiment-runner container ******"
 docker run --name="experiment-runner-run" -it --rm \
-                --add-host host.docker.internal:"${host_ip_addr}" \
                 -v "${mountpath_outputs}":/app/outputs \
                 -v "${mountpath_inputs}":/app/inputs \
                 -v "${mountpath_metrics}":/app/metrics \

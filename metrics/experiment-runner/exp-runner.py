@@ -29,6 +29,14 @@ if (os.environ.get("app_debug_channel") == None):
 else:
         app_debug_channel = os.environ.get("app_debug_channel")
 
+# ------------------------
+# Defaults
+# - qa_server_on_cloud
+if (os.environ.get("qa_service_on_cloud") == None):
+        qa_service_on_cloud = 'False'
+else:
+        qa_service_on_cloud = os.environ.get("qa_service_on_cloud")
+
 # - Does input data exist?
 #       - If 'False': Invoke the microservice
 #            'True' : Use an existing data
@@ -536,6 +544,32 @@ def invoke_qa(question):
                         return answer_text, answer_text_len,  answer_text_list, False
 
 # ******************************************
+# Add results from the qa service metrics to output excel
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file):
+
+        metrics_results = load_qa_service_metrics(qa_metrics_run_file)
+        print(f"metrics_results: {len(metrics_results)} \n")
+        workbook = openpyxl.load_workbook(workbook_name_file)
+        
+        j = 1
+        for row in metrics_results:
+                worksheet = workbook['experiment_data']
+                worksheet.cell(row=(j+1), column=10).value = row[0]
+                worksheet.cell(row=(j+1), column=11).value = row[1]
+                worksheet.cell(row=(j+1), column=12).value = row[2]
+                worksheet.cell(row=(j+1), column=13).value = row[3]
+                worksheet.cell(row=(j+1), column=14).value = row[4]
+                worksheet.cell(row=(j+1), column=15).value = row[5]
+                j = j + 1
+                  
+                worksheet = workbook['experiment_bleu_result']
+                worksheet.cell(row=(2), column=1).value = str(sacrebleu)
+                worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
+
+        workbook.save(workbook_name_file)
+        return True
+        
+# ******************************************
 # Execution
 def main(args):
         logger = create_logger()
@@ -697,7 +731,7 @@ def main(args):
 
                   #header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
                   #score_ranker = load_score_ranker(qa_metrics_run_file)
-                  score_matcher(csv_input_filepath, qa_metrics_run_file)
+                  #score_matcher(csv_input_filepath, qa_metrics_run_file)
 
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
@@ -713,28 +747,9 @@ def main(args):
                   metric.add_batch(predictions=responses, references=golds)
                   rouge = metric.compute()["rougeL"]
 
-                  # 3. add results from the qa service metrics
-
-                  metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-                  print(f"metrics_results: {len(metrics_results)} \n")
-                  workbook = openpyxl.load_workbook(workbook_name_file)
-        
-                  j = 1
-                  for row in metrics_results:
-                        worksheet = workbook['experiment_data']
-                        worksheet.cell(row=(j+1), column=10).value = row[0]
-                        worksheet.cell(row=(j+1), column=11).value = row[1]
-                        worksheet.cell(row=(j+1), column=12).value = row[2]
-                        worksheet.cell(row=(j+1), column=13).value = row[3]
-                        worksheet.cell(row=(j+1), column=14).value = row[4]
-                        worksheet.cell(row=(j+1), column=15).value = row[5]
-                        j = j + 1
-                  
-                  worksheet = workbook['experiment_bleu_result']
-                  worksheet.cell(row=(2), column=1).value = str(sacrebleu)
-                  worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
-
-                  workbook.save(workbook_name_file)
+                  # 3. Add results from the qa service metrics to output excel
+                  if ()
+                  add_qa_service_metrics_to_excel(qa_metrics_run_file,workbook_name_file)
 
                   # 4. Show results
                 
