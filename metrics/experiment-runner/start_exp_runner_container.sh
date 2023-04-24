@@ -4,6 +4,7 @@ source ~/.env_profile
 
 echo "*************************"
 echo "HOME_PATH: ${GLOBAL_HOME_PATH}"
+echo "QA_SERVICE_API_URL: ${QA_SERVICE_API_URL}"
 echo "*************************"
 
 cd $GLOBAL_HOME_PATH/../metrics/experiment-runner
@@ -12,8 +13,9 @@ cd $GLOBAL_HOME_PATH/../metrics/experiment-runner
 source ./.env
 
 export version="v0.0.1"
+export api_url=$QA_SERVICE_API_URL
 export image_name="experiment-runner-local"
-export host_ip_addr=$host_ip
+#export host_ip_addr=$host_ip
 
 # temp set metrics problem with '../' in the question-answering service
 tmp_home=$(pwd)

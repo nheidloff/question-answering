@@ -72,10 +72,10 @@ function build_and_push_container () {
     ibmcloud cr login   
     ibmcloud target -g $CR_RESOURCE_GROUP
     ibmcloud cr region-set $CR_REGION
-    CURR_CONTAINER_NAMESPACE=$(ibmcloud cr namespace-list -v | grep $CR_REPOSITORY | awk '{print $1;}')
 
     # Create a new namespace, if the namespace doesn't exists
-    if [[ "$CR_REPOSITORY" != "$CURR_CONTAINER_NAMESPACE" ]]; then
+    CURR_CONTAINER_NAMESPACE=$(ibmcloud cr namespace-list -v | grep $CR_REPOSITORY | awk '{print $1;}')
+    if [ "$CR_REPOSITORY" != "$CURR_CONTAINER_NAMESPACE" ]; then
         ibmcloud cr namespace-add $CR_REPOSITORY
     fi
 
@@ -132,7 +132,7 @@ function deploy_ce_application(){
                                    --port $CE_APP_PORT 
 
     ibmcloud ce application get --name "$CE_APP_NAME"
-    CE_APP_NAME_URL=$(ibmcloud ce application get --name "$CE_APP_NAME" -o url)
+    export CE_APP_NAME_URL=$(ibmcloud ce application get --name "$CE_APP_NAME" -o url)
     echo "************************************"
     echo "Access the application $CE_APP_NAME - URL: $CE_APP_NAME_URL/q/openapi"
     echo "************************************"
@@ -180,10 +180,11 @@ function log_deployment_configuration(){
 
 function start_experiment_runner(){
     export SESSION_ID=$(date +%s)
+    export QA_SERVICE_API_URL=$CE_APP_NAME_URL
     # Environment configuration save in '~/.env_profile'"
     "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
 
-    cd "${HOME_PATH}"/metrics/experiment-runner/
+    cd "${HOME_PATH}"/../metrics/experiment-runner/
     sh start_exp_runner_container.sh
     cd "${HOME_PATH}"
 }
@@ -200,3 +201,4 @@ deploy_ce_application
 kube_information
 kube_pod_log
 log_deployment_configuration
+start_experiment_runner
