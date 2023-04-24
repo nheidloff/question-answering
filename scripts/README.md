@@ -51,4 +51,6 @@ Environment configuration save in '~/.env_profile'
 ************************************
 - Open terminals
 ************************************
+- QA Service
+- Experiment runner
 ```
