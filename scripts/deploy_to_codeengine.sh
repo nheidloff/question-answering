@@ -178,6 +178,16 @@ function log_deployment_configuration(){
 
 }
 
+function start_experiment_runner(){
+    export SESSION_ID=$(date +%s)
+    # Environment configuration save in '~/.env_profile'"
+    "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
+
+    cd "${HOME_PATH}"/metrics/experiment-runner/
+    sh start_exp_runner_container.sh
+    cd "${HOME_PATH}"
+}
+
 #**********************************************************************************
 # Execution
 # *********************************************************************************

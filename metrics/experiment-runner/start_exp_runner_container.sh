@@ -50,4 +50,5 @@ docker run --name="experiment-runner-run" -it --rm \
                 -e output_folder_name="$output_folder_name" \
                 -e number_of_retries="$number_of_retries" \
                 -e container_run="${container_run}" \
+                -e qa_service_on_cloud='True' \
                 $image_name:$version

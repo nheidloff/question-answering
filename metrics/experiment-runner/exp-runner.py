@@ -748,8 +748,9 @@ def main(args):
                   rouge = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
-                  if ()
-                  add_qa_service_metrics_to_excel(qa_metrics_run_file,workbook_name_file)
+                  
+                  if (qa_service_on_cloud == 'False'):
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file)
 
                   # 4. Show results
                 
