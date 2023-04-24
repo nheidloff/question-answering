@@ -107,7 +107,9 @@ function deploy_ce_application(){
        $COMMAND=create
     fi
 
-    ibmcloud ce application $COMMAND --name "$CE_APP_NAME" \
+    echo $COMMAND
+
+    ibmcloud ce application ${COMMAND} --name "$CE_APP_NAME" \
                                    --image "$CE_APP_IMAGE_URL" \
                                    --cpu "$CE_APP_CPU_CONFIG" \
                                    --memory "$CE_APP_MEMORY_CONFIG" \
@@ -212,5 +214,5 @@ setup_ce_container_registry_access
 deploy_ce_application
 kube_information
 kube_pod_log
-start_experiment_runner
+#start_experiment_runner
 log_deployment_configuration
