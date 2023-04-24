@@ -1,10 +1,13 @@
 #!/bin/bash
 
+
 # **************** Global variables
+export HOME_PATH=$(pwd)
+
 # IBM Cloud - variables
-source ./.env
+source "$HOME_PATH"/.env
 # QA Service - variables
-source ../service/.env
+source "$HOME_PATH"/../service/.env
 
 # Optional to change
 export CE_CR_ACCESS_NAME=$CR
@@ -60,10 +63,9 @@ function build_and_push_container () {
     export CE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
 
     echo "****** BUILD *********"
-    tmp_home=$(pwd)
-    cd $(pwd)/../service
+    cd "$HOME_PATH"/../service
     docker build -f "$QA_DOCKERFILE_NAME" -t "$CE_APP_IMAGE_URL" .
-    cd $tmp_home
+    cd "$HOME_PATH"
 
     ibmcloud cr login
     docker push "$CE_APP_IMAGE_URL"
@@ -109,6 +111,7 @@ function deploy_ce_application(){
                                    --env EXPERIMENT_RERANKER_ID="$EXPERIMENT_RERANKER_ID" \
                                    --env EXPERIMENT_METRICS_SESSION="$EXPERIMENT_METRICS_SESSION" \
                                    --env EXPERIMENT_METRICS_DIRECTORY="$EXPERIMENT_METRICS_DIRECTORY" \
+                                   --env MAX_RESULTS="$MAX_RESULTS"
                                    --max-scale $CE_APP_MAX_SCALE \
                                    --min-scale $CE_APP_MIN_SCALE \
                                    --port $CE_APP_PORT 
@@ -148,13 +151,24 @@ function kube_pod_log(){
     kubectl logs $APP_POD
 }
 
+function log_deployment_configuration(){
+    
+    # Save configurations in deployment-log
+    cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-qa-service.env
+    cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-ibm-cloud-configuration.env
+    cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-experiment-runner.env
+
+}
+
 #**********************************************************************************
 # Execution
 # *********************************************************************************
 
 login_to_ibm_cloud
+build_and_push_container
 setup_ce_project
 setup_ce_container_registry_access
 deploy_ce_application
 kube_information
 kube_pod_log
+log_deployment_configuration
