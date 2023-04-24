@@ -19,9 +19,9 @@ echo "- SESSION_ID:          ${SESSION_ID}"
 # cat ~/.env_profile
 
 # bash scripts
-export exp_runner="${HOME_PATH}/exp_runner_local.sh"
-export qa_service="${HOME_PATH}/qa_local.sh"
-export maas_service="${HOME_PATH}/maas_local.sh"
+export exp_runner="${HOME_PATH}/local_exp_runner.sh"
+export qa_service="${HOME_PATH}/local_qa_service.sh"
+export maas_service="${HOME_PATH}/local_maas.sh"
 
 # Enable bash automation for execution"
 chmod 755 ${exp_runner}

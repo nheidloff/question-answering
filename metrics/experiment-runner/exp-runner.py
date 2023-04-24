@@ -12,6 +12,8 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
+import regex
+import sys
 
 # ******************************************
 # Global variables
@@ -65,6 +67,8 @@ output_error_log = os.environ.get("output_error_log")
 output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
 number_of_retries = os.environ.get("number_of_retries")
+
+logger = None
 
 # *****************************************
 # Debug info
@@ -263,56 +267,46 @@ def load_score_ranker(csv_filepath):
         file.close()
         return score_ranker
 
-def score_matcher(groundtruth, search, inputname, workbook_name_file):
+def score_matcher(groundtruth, qa_run):
+
+        documents_in_ground_truth = {}
         
-        workbook = openpyxl.load_workbook(workbook_name_file)
-        sheet_name = inputname + "_matches"
-        print("*************Config***************")
-        print(f"Sheet name: {sheet_name} \n")
-        print(f"Workbook name: {workbook_name_file} \n")
-        print(f"Groundtruth content: {groundtruth} \n")
-        print(f"Groundtruth: {len(groundtruth)} \n")
-        print(f"Search content: {search} \n")
-        print(f"Search: {len(search)} \n")
-        # worksheet = workbook[sheet_name]
-        worksheet = workbook.create_sheet(sheet_name)
+        with open(groundtruth, 'rt') as in_f:
+                
+                reader = csv.DictReader(in_f, delimiter=',', quotechar='\"')
+                
+                for r, row in enumerate(reader):
+                        for pos in ("1", "2", "3"):
+                                if row['loio ' + pos] != "":
+                                        documents_in_ground_truth[regex.sub(r'^loio', '', row['loio ' + pos])] = row['passage ' + pos]
+
+                                documents_in_corpus = {}
         
-        groundtruth_passage_ids_column=1
-        passages_id_groundtruth_column=2
+        with open(qa_run) as passages_file:
+                print(f'# Reading {qa_run}')
+                records = json.load(passages_file)
+                for rec in records:
+                        id = rec['chunckid']
+                        documents_in_corpus[regex.sub(r'^[0-9]\.', '', id)] = ' '.join(rec['text']), rec['title']
 
-        worksheet.cell(row=(1), column=groundtruth_passage_ids_column).value = "groundtruth_passage_ids"
-        worksheet.cell(row=(1), column=passages_id_groundtruth_column).value = "passages_id_groundtruth"
-        
-        print("*************Verify interation***************")
-       
-        for i in range(len(groundtruth)):
-                for j in range(len(groundtruth[i])):
-                        valuetocompare = groundtruth[i][j] 
-                        print(f"Groundtruth_{i}_passage_{j}: {valuetocompare}\n\n")
+        num_not_found = 0
+        for id in documents_in_ground_truth.keys():
+                if not id in documents_in_corpus:
+                        print(f'Not found: {id}')
+                        num_not_found += 1
 
-                        worksheet.cell(row=((i)+(j)+2), column=groundtruth_passage_ids_column).value = "ground_truth_" + str(i)+ ":" + str(j) + "_passage"
-                        worksheet.cell(row=((i)+(j)+2), column=passages_id_groundtruth_column).value = valuetocompare
-                        
-                        for k in range(len(search)):
-                                for l in  range(len(search[k])):
-                                        column_id=passages_id_groundtruth_column+k+l+1
-                                        print(f"Column ID {column_id}")
-                                        
-                                        # set search value
-                                        searchvalue=search[k][l]
-                                    
-                                        print(f"Response_{k} Passage_{l}: {searchvalue}\n\n")
+        print(f'{num_not_found} ground truth documents not found in the corpus')
 
-                                        worksheet.cell(row=(1), column=(column_id)).value = inputname + "_ID" + str(k)  
+        return True
 
-                                        if valuetocompare == searchvalue:
-                                                print(f"match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
-                                                worksheet.cell(row=(i+1), column=column_id).value = "true"
-                                        else:
-                                                print(f"no match G{i}:{j} & S{k}:{l}-\n{groundtruth[i][j]} : {search[k][l]}")
-                                                worksheet.cell(row=(i+1), column=column_id).value = "false"
-                                column_id = column_id + 1
-        workbook.save(workbook_name_file)
+def convert_groundtruth_excel_to_csv(groundtruth_xlsx,groundtruth_csv):
+        wb = openpyxl.load_workbook(groundtruth_xlsx)
+        sh = wb.active
+        with open(groundtruth_csv, 'w', newline="" ) as f:
+                c = csv.writer(f)
+                for r in sh.rows:
+                        c.writerow([cell.value for cell in r])
+        f.close()
         return True
 
 # ******************************************
@@ -348,6 +342,8 @@ def bleu_from_list_to_dict(header):
 def create_logger():
         global output_session_id
         global output_error_log
+        global logger
+
 
         logger = logging.getLogger(output_session_id + "-" + output_error_log)
         logger.setLevel(logging.INFO)
@@ -397,12 +393,24 @@ def create_output_workbook (workbook_name):
 # ******************************************
 # load input excel
 def load_input_excel(excel_input):
+    global logger
     wb = openpyxl.load_workbook(excel_input)
     ws = wb.active
     
     rows = []
     for rdx, row in enumerate(ws.iter_rows(values_only=True)):
-        if rdx:
+        
+        # End if the row contains data like this:
+        # ('None', 'None' ... )
+        if not any(row):
+                new_header=[]
+                new_rows=[]
+                message = "ERROR: Input data, please verify your ground truth input."
+                print(message)
+                logger.error(message)
+                return new_header, new_rows, False
+
+        if rdx:          
             rows.append(list(row))
         else:
             header = row
@@ -419,7 +427,7 @@ def load_input_excel(excel_input):
 
     new_header = [ "question", "golden_answer", "passage_1", "passage_1_id", "passage_2", "passage_2_id", "passage_3", "passage_3_id"]
     
-    return new_header, new_rows
+    return new_header, new_rows, True
 
 # ******************************************
 # load qa service metrics from csv file
@@ -468,6 +476,7 @@ def invoke_qa(question):
         global username
         global password
         global output_error_log
+        global logger
         
         request_url = api_url + endpoint
         question_obj = {"query": ""}
@@ -543,7 +552,10 @@ def main(args):
         d_value = " - Output dir: " + output_directory + "\n - Input dir: " + input_directory
         debug_show_value(d_value)
 
-        excel_input_filepath = input_directory + "/" + input_excel_filename 
+        excel_input_filepath = input_directory + "/" + input_excel_filename     
+        input_name = input_excel_filename.split(".xlsx",1)
+        csv_input_filepath = input_directory  + "/" + input_name[1] + ".csv"
+        convert_groundtruth_excel_to_csv(excel_input_filepath,csv_input_filepath)
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
@@ -561,11 +573,17 @@ def main(args):
         # 1. use an input file to get the answers from the qa microserice
         if (input_data_exists == "False"):
 
-                        # 1.1 load data from input file 
+                        # 1.1 Load data from input file 
                         d_value = "******* prepare input data from file " + input_excel_filename + " ********\n"
                         debug_show_value(d_value)                      
-                        header, rows = load_input_excel(excel_input_filepath) 
+                        header, rows, check = load_input_excel(excel_input_filepath) 
                         
+                        # 1.1.1 Exit when the problems with the input data
+                        if (check == False):
+                                end_experiment == True
+                                sys.exit("Problem with the input data the automation ends here.")
+                        
+                        end_experiment == False
                         d_value = "- Input header: " + str(header)
                         debug_show_value(d_value)                  
                         input_len=len(rows)
@@ -679,7 +697,7 @@ def main(args):
 
                   #header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
                   #score_ranker = load_score_ranker(qa_metrics_run_file)
-                  #score_matcher(ground_truth_rows,score_ranker,"RANKER",workbook_name_file)
+                  score_matcher(csv_input_filepath, qa_metrics_run_file)
 
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
