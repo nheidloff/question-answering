@@ -36,7 +36,7 @@ function login_to_ibm_cloud () {
     echo "*********************"
     echo ""
 
-    ibmcloud login --apikey $IC_API_KEY
+    ibmcloud login --apikey $IC_API_KEY 
     ibmcloud target -r $IC_REGION
     ibmcloud target -g $IC_RESOURCE_GROUP
 }
@@ -58,17 +58,32 @@ function setup_ce_project() {
 }
 
 function build_and_push_container () {
-
-    export CI_TAG=$(git rev-parse HEAD)
+  
+    export COMMIT_ID=$(git rev-parse HEAD)
+    export CI_TAG=$COMMIT_ID
     export CE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
-
+    echo "Name: $CE_APP_IMAGE_URL"
     echo "****** BUILD *********"
     cd "$HOME_PATH"/../service
-    docker build -f "$QA_DOCKERFILE_NAME" -t "$CE_APP_IMAGE_URL" .
+    docker build -f "$HOME_PATH"/../service/src/main/docker/"$QA_DOCKERFILE_NAME" -t "$CE_APP_IMAGE_URL" .
     cd "$HOME_PATH"
+    
+    # Login to container with IBM Cloud registy  
+    ibmcloud cr login   
+    ibmcloud target -g $CR_RESOURCE_GROUP
+    ibmcloud cr region-set $CR_REGION
+    CURR_CONTAINER_NAMESPACE=$(ibmcloud cr namespace-list -v | grep $CR_REPOSITORY | awk '{print $1;}')
 
-    ibmcloud cr login
+    # Create a new namespace, if the namespace doesn't exists
+    if [[ "$CR_REPOSITORY" != "$CURR_CONTAINER_NAMESPACE" ]]; then
+        ibmcloud cr namespace-add $CR_REPOSITORY
+    fi
+
+    # Login to IBM Cloud registy with Docker
+    docker login -u iamapikey -p $IC_API_KEY $CR_REGION 
     docker push "$CE_APP_IMAGE_URL"
+    
+    ibmcloud target -g $IC_RESOURCE_GROUP
 
 }
 
@@ -111,7 +126,7 @@ function deploy_ce_application(){
                                    --env EXPERIMENT_RERANKER_ID="$EXPERIMENT_RERANKER_ID" \
                                    --env EXPERIMENT_METRICS_SESSION="$EXPERIMENT_METRICS_SESSION" \
                                    --env EXPERIMENT_METRICS_DIRECTORY="$EXPERIMENT_METRICS_DIRECTORY" \
-                                   --env MAX_RESULTS="$MAX_RESULTS"
+                                   --env MAX_RESULTS="$MAX_RESULTS" \
                                    --max-scale $CE_APP_MAX_SCALE \
                                    --min-scale $CE_APP_MIN_SCALE \
                                    --port $CE_APP_PORT 
@@ -153,7 +168,10 @@ function kube_pod_log(){
 
 function log_deployment_configuration(){
     
-    # Save configurations in deployment-log
+    echo "************************************"
+    echo "Save configurations in deployment-log"
+    echo "************************************"
+    cd  $HOME_PATH
     cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-qa-service.env
     cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-ibm-cloud-configuration.env
     cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-experiment-runner.env
