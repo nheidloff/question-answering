@@ -14,7 +14,7 @@ source ./.env
 
 export version="v0.0.1"
 export api_url=$QA_SERVICE_API_URL
-export image_name="experimentrunner"
+export image_name="experimentrunner_local"
 #export host_ip_addr=$host_ip
 
 # temp set metrics problem with '../' in the question-answering service
@@ -31,11 +31,11 @@ echo "***** BUILD experiment-runner container ******"
 docker build -t $image_name:$version .
 
 echo "***** STOP and DELETE existing experiment-runner container ******"
-docker container stop -f "experiment-runner-run"
-docker container rm -f "experiment-runner-run"
+docker container stop -f "experimentrunner"
+docker container rm -f "experimentrunner"
 
 echo "***** START experiment-runner container ******"
-docker run --name="experiment-runner-run" -it --rm \
+docker run --name="experimentrunner" -it --rm \
                 -v "${mountpath_outputs}":/app/outputs \
                 -v "${mountpath_inputs}":/app/inputs \
                 -v "${mountpath_metrics}":/app/metrics \

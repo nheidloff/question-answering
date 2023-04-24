@@ -187,7 +187,10 @@ function start_experiment_runner(){
     cd "${HOME_PATH}"/../metrics/experiment-runner/
     sh start_exp_runner_container.sh
     cd "${HOME_PATH}"
-    docker exec -it experimentrunner sh ./start.sh
+    
+    export start_docker_exec="${HOME_PATH}/../metrics/experiment-runner/start_docker_exec.sh"
+    # Enable bash automation for execution"
+    chmod 755 ${start_docker_exec}
 }
 
 #**********************************************************************************
@@ -201,5 +204,5 @@ setup_ce_container_registry_access
 deploy_ce_application
 kube_information
 kube_pod_log
-log_deployment_configuration
 start_experiment_runner
+log_deployment_configuration
