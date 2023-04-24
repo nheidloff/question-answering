@@ -99,7 +99,14 @@ function setup_ce_container_registry_access() {
 function deploy_ce_application(){
    
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
-    ibmcloud ce application create --name "$CE_APP_NAME" \
+    APPLICATION_EXISTS=$(ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
+    
+    if [ $APPLICATION_EXISTS == $CE_APP_NAME ]
+       $COMMAND=update
+    else
+       $COMMAND=create
+
+    ibmcloud ce application $COMMAND --name "$CE_APP_NAME" \
                                    --image "$CE_APP_IMAGE_URL" \
                                    --cpu "$CE_APP_CPU_CONFIG" \
                                    --memory "$CE_APP_MEMORY_CONFIG" \
