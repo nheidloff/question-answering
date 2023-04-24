@@ -153,10 +153,11 @@ Sample how the API of this service can be integrated in Watson Assistant:
 ## Resources
 
 * [Generative AI for Question Answering Scenarios](https://heidloff.net/article/question-answering-transformers/)
-* [Generative AI Sample Code for Question Answering](https://heidloff.net/article/sample-question-answering/)
 * [Introduction to Neural Information Retrieval](https://heidloff.net/article/introduction-neural-information-retrieval/)
 * [Optimizing Generative AI for Question Answering](https://heidloff.net/article/optimizing-generative-ai-for-question-answering/)
+* [Running Generative AI Experiments for Question Answering](https://heidloff.net/article/running-generative-ai-experiments-for-question-answering/)
 * [Integrating generative AI in Watson Assistant](https://heidloff.net/article/integrating-generative-ai-in-watson-assistant/)
+* [Generative AI Sample Code for Question Answering](https://heidloff.net/article/sample-question-answering/)
 * [Setup of Bring Your Own Search in Watson Assistant](https://github.com/nheidloff/question-answering/tree/main/assistant)
 * [Using PrimeQA For NLP Question Answering](https://www.deleeuw.me.uk/posts/Using-PrimeQA-For-NLP-Question-Answering/)
 * [Finding concise answers to questions in enterprise documents](https://medium.com/ibm-data-ai/finding-concise-answers-to-questions-in-enterprise-documents-53a865898dbd)

@@ -63,10 +63,8 @@ public class RelevantOutput {
                         }
                     }
                 }
-            }
-        } 
-        */            
-
+            }*/
+        }          
         return output;
     }
 }
