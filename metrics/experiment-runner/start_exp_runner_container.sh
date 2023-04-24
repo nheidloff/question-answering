@@ -20,12 +20,12 @@ export image_name="experimentrunner_local"
 # temp set metrics problem with '../' in the question-answering service
 tmp_home=$(pwd)
 cd ..
-project_path=$(pwd)
+project_path=$(pwd)/metrics
 cd $tmp_home
-export mountpath_metrics="${project_path}/${input_folder_name_qa_service_metrics}"
 
-echo "Path: $mountpath_outputs"
-echo "Path: $mountpath_inputs"
+export mountpath_metrics="${project_path}/${output_folder_name}"
+export mountpath_outputs="${project_path}/${output_folder_name}"
+export mountpath_inputs="${project_path}/${input_folder_name}"
 
 echo "***** BUILD experiment-runner container ******"
 docker build -t $image_name:$version .

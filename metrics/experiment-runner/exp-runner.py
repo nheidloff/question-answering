@@ -404,10 +404,10 @@ def load_input_excel(excel_input):
     global logger
     wb = openpyxl.load_workbook(excel_input)
     ws = wb.active
-    
+    print(f"Input: {excel_input}")
     rows = []
     for rdx, row in enumerate(ws.iter_rows(values_only=True)):
-        
+        print(f"Input: {row}")
         # End if the row contains data like this:
         # ('None', 'None' ... )
         if not any(row):
@@ -425,13 +425,19 @@ def load_input_excel(excel_input):
     
     new_rows = []
     
-    # Extract passage IDs
+    # Extract data
     for row in rows:
+        
+        question      = row[1]
+        passage_1     = row[2]
         passage_1_id  = row[3]
+        passage_2     = row[4]
         passage_2_id  = row[5]
+        passage_3     = row[6]
         passage_3_id  = row[7]
+        golden_answer = row[8]
 
-    new_rows.append([passage_1_id, passage_2_id, passage_3_id ])
+        new_rows.append([question, golden_answer, passage_1, passage_1_id, passage_2, passage_2_id, passage_3, passage_3_id ])
 
     new_header = [ "question", "golden_answer", "passage_1", "passage_1_id", "passage_2", "passage_2_id", "passage_3", "passage_3_id"]
     
@@ -644,7 +650,7 @@ def main(args):
                                 very_golden_answer = row[1]
                                 if (end_experiment == True):
                                         break
-                                
+                                print(f"Row: {row} Length: {len(row)}")
                                 if (len(very_golden_answer) != 0):
                                         question      = row[0]
                                         golden_answer = row[1]

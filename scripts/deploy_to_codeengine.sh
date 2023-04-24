@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # **************** Global variables
 export HOME_PATH=$(pwd)
 
@@ -99,17 +98,9 @@ function setup_ce_container_registry_access() {
 function deploy_ce_application(){
    
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
-    APPLICATION_EXISTS=$(ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
+    # APPLICATION_EXISTS=$(ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
     
-    if [ $APPLICATION_EXISTS == $CE_APP_NAME ]; then
-       $COMMAND=update
-    else
-       $COMMAND=create
-    fi
-
-    echo $COMMAND
-
-    ibmcloud ce application ${COMMAND} --name "$CE_APP_NAME" \
+    ibmcloud ce application create --name "$CE_APP_NAME" \
                                    --image "$CE_APP_IMAGE_URL" \
                                    --cpu "$CE_APP_CPU_CONFIG" \
                                    --memory "$CE_APP_MEMORY_CONFIG" \
@@ -197,10 +188,6 @@ function start_experiment_runner(){
     cd "${HOME_PATH}"/../metrics/experiment-runner/
     sh start_exp_runner_container.sh
     cd "${HOME_PATH}"
-    
-    export start_docker_exec="${HOME_PATH}/../metrics/experiment-runner/start_docker_exec.sh"
-    # Enable bash automation for execution"
-    chmod 755 ${start_docker_exec}
 }
 
 #**********************************************************************************
