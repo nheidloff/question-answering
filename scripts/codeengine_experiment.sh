@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # **************** Source Global variables
-source ./.env
+source ~/.env_profile
+
 
 echo "************************************"
 echo " Build and start with experiment-runner " 
@@ -16,6 +17,8 @@ export QA_SERVICE_API_URL=$GLOBAL_QA_SERVICE_API_URL
 
 function start_experiment_runner(){
     cd "${HOME_PATH}"/../metrics/experiment-runner/
-    sh start_exp_container.sh
+    bash ./start_exp_container.sh
     cd "${HOME_PATH}"
 }
+
+start_experiment_runner

@@ -119,12 +119,18 @@ function setup_ce_container_registry_access() {
 function deploy_ce_application(){
    
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
-    RESULT==$(ibmcloud ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
+    RESULT=$(ibmcloud ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
     if [[ $RESULT == $CE_APP_NAME ]]; then
         echo "*** The ce application $CE_APP_NAME for the $CE_PROJECT_NAME exists."
-        echo "*** I delete the application. ***"
+        echo "*** Delete application!"
         RESULT=$(ibmcloud ce application delete --name $CE_APP_NAME --force)
-        sleep 5
+        VERIFY=$(echo $RESULT | grep OK | awk -F" " '{print $NF}')
+        if [[ $VERIFY != "OK" ]]; then
+           echo "Error problem to delete the $CE_APP_NAME application"
+           echo "$RESULT"
+           echo "The script stops here."
+           exit 1
+        fi
     fi
 
     ibmcloud ce application create --name "$CE_APP_NAME" \
@@ -216,7 +222,7 @@ function set_global_env () {
     echo "Home path:    $HOME_PATH"
     echo "Session ID:   $SESSION_ID"
     echo "Code Engine URL: $QA_SERVICE_URL"
-    "/bin/sh" "${HOME_PATH}"/generate_env_profile.sh > ~/.env_profile
+    "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
 }
 
 #**********************************************************************************
