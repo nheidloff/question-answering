@@ -55,9 +55,15 @@ function setup_ce_project() {
   echo " Using following project: $CE_PROJECT_NAME" 
   echo "**********************************"
 
-  ibmcloud ce project create --name $CE_PROJECT_NAME 
-  ibmcloud ce project select -n $CE_PROJECT_NAME
-  
+  RESULT=$(ibmcloud ce project get --name $CE_PROJECT_NAME | grep "Status" |  awk '{print $2;}')
+  if [[ $RESULT == "active" ]]; then
+        echo "*** The project $PROJECT_NAME exists."
+        ibmcloud ce project select -n $CE_PROJECT_NAME
+  else
+        ibmcloud ce project create --name $CE_PROJECT_NAME 
+        ibmcloud ce project select -n $CE_PROJECT_NAME
+  fi
+
   #to use the kubectl commands
   ibmcloud ce project select -n $CE_PROJECT_NAME --kubecfg
   
@@ -97,19 +103,30 @@ function build_and_push_container () {
 }
 
 function setup_ce_container_registry_access() {
-   
-   ibmcloud ce registry create --name $CE_CR_ACCESS_NAME \
+
+    RESULT=$(ibmcloud ce registry get --name $CE_CR_ACCESS_NAME --output  jsonpath='{.metadata.name}')
+    if [[ $RESULT == $CE_CR_ACCESS_NAME ]]; then
+        echo "*** The ce container registry $CE_CR_ACCESS_NAME for the $CE_PROJECT_NAME exists."
+    else
+        ibmcloud ce registry create --name $CE_CR_ACCESS_NAME \
                                --server $CE_CR_SERVER_NAME \
                                --username $CE_CR_USERNAME \
                                --password $CE_CR_PASSWORD \
                                --email $CE_CR_EMAIL
+    fi
 }
 
 function deploy_ce_application(){
    
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
-    # APPLICATION_EXISTS=$(ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
-    
+    RESULT==$(ibmcloud ce application get --name "$CE_APP_NAME" --output  jsonpath='{.metadata.name}')
+    if [[ $RESULT == $CE_APP_NAME ]]; then
+        echo "*** The ce application $CE_APP_NAME for the $CE_PROJECT_NAME exists."
+        echo "*** I delete the application. ***"
+        RESULT=$(ibmcloud ce application delete --name $CE_APP_NAME --force)
+        sleep 5
+    fi
+
     ibmcloud ce application create --name "$CE_APP_NAME" \
                                    --image "$CE_APP_IMAGE_URL" \
                                    --cpu "$CE_APP_CPU_CONFIG" \
@@ -140,8 +157,8 @@ function deploy_ce_application(){
                                    --env MAX_RESULTS="$MAX_RESULTS" \
                                    --max-scale $CE_APP_MAX_SCALE \
                                    --min-scale $CE_APP_MIN_SCALE \
-                                   --port $CE_APP_PORT 
-
+                                   --port $CE_APP_PORT
+    
     ibmcloud ce application get --name "$CE_APP_NAME"
     export CE_APP_NAME_URL=$(ibmcloud ce application get --name "$CE_APP_NAME" -o url)
     echo "************************************"
@@ -185,12 +202,11 @@ function log_deployment_configuration(){
     echo "Save configurations in deployment-log"
     echo "************************************"
     cd  $HOME_PATH
-    FOLDERNAME="$(date '%Y-%m-%d-%T-')-git-$COMMIT_ID"
+    FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
     mkdir $HOME_PATH/../deployment-log/$FOLDERNAME
     cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-qa-service.env
     cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-ibm-cloud-configuration.env
     cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$FOLDERNAME//$COMMIT_ID-experiment-runner.env
-
 }
 
 function set_global_env () {
