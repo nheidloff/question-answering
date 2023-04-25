@@ -58,4 +58,5 @@ docker run --name="experimentrunner" -it --rm \
                 -e container_run="${container_run}" \
                 -e app_debug_channel="$app_debug_channel" \
                 -e qa_service_on_cloud='True' \
+                --expose 8084:8084 \
                 $image_name:$version
