@@ -157,11 +157,11 @@ def get_output_path():
         global container_run
         if (container_run == "False"):
                 directory = os.getcwd()
-                directory = directory + "/../" + output_folder_name
+                new_directory = directory + "/../" + output_folder_name
         else:
                 directory = os.getcwd()
-                directory = directory + "/" + output_folder_name
-        return directory
+                new_directory = directory + "/" + output_folder_name
+        return new_directory
 
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
@@ -352,10 +352,12 @@ def create_logger():
         global output_error_log
         global logger
 
+        print(f"{output_error_log}")
 
         logger = logging.getLogger(output_session_id + "-" + output_error_log)
         logger.setLevel(logging.INFO)
-        file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
+        path=get_output_path()
+        file_handler = logging.FileHandler(path + "/" + output_session_id + "-" + output_error_log)
         file_handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
         file_handler.setFormatter(formatter)
