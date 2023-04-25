@@ -1,18 +1,18 @@
 # Automation with scripts
 
 There are various options to start an experiment.
-An experiment needs to run a minimum these two applications.
+An experiment needs to run a minimum following applications.
 
-* QA - Service
-* Experiment-runner
+1. QA - Service
+2. Experiment-runner
 
-_Note:_ The following combination is possible when `Model as a Service` is available.
+_Note:_ The following combinations are possible when `Model as a Service` is available.
 
-| Combination | QA - Service | Experiment-runner | Valid option | Notes |
+| Combination | QA - Service | Experiment-runner | Config | Notes |
 | --- | --- | --- | --- | --- |
-| 1 |  runs as a local Quarkus application | runs as a local Python application | Yes | Both applications using the `output` and `input` folders on the local machine. |
-| 2 | runs as a container in `Docker compose` | runs as a Python application | Yes | Both applications using the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
-| 3 | runs as a container in `on Code Engine` | runs as a container local container in Docker | Yes | Only the experiment application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
+| 1 |  runs as a local Quarkus application | runs as a local Python application | LocalApp/LocalApp | Both applications using the `output` and `input` folders on the local machine. |
+| 2 | runs as a container in `Docker compose` | runs as a Python application | Container/Container | Both applications using the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
+| 3 | runs as a container in `on Code Engine` | runs as a container local container in Docker | Cloud/LocalContainer | Only the experiment application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
 | 4 | runs as a container in `on Code Engine` | runs as a local Python application | Yes | Only the experiment application uses the `output` and `input` folders on the local machine. |
 
 
