@@ -1,5 +1,23 @@
 # Automation with scripts
 
+There are various options to start an experiment.
+An experiment needs to run a minimum these two applications.
+
+* QA - Service
+* Experiment-runner
+
+_Note:_ The following combination is possible when `Model as a Service` is available.
+
+| Combination | QA - Service | Experiment-runner | Valid option | Notes |
+| --- | --- | --- | --- | --- |
+| 1 |  runs as a local Quarkus application | runs as a local Python application | Yes | Both applications using the `output` and `input` folders on the local machine. |
+| 2 | runs as a container in `Docker compose` | runs as a Python application | Yes | Both applications using the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
+| 3 | runs as a container in `on Code Engine` | runs as a container local container in Docker | Yes | Only the experiment application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
+| 4 | runs as a container in `on Code Engine` | runs as a local Python application | Yes | Only the experiment application uses the `output` and `input` folders on the local machine. |
+
+
+* The c
+
 ## 1. Automated start of QA - pipeline service and experiment-runner as applications
 
 The experiment-runner is a Python command line application and the QA pipeline service is a Quarkus server application.
