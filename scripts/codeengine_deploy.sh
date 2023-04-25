@@ -27,6 +27,16 @@ export QA_DOCKERFILE_NAME="Dockerfile.jvm"
 # Functions definition
 # **********************************************************************************
 
+function check_docker () {
+    ERROR=$(docker ps 2>&1)
+    RESULT=$(echo $ERROR | grep 'Cannot' | awk '{print $1;}')
+    VERIFY="Cannot"
+    if [ "$RESULT" == "$VERIFY" ]; then
+        echo "Docker is not running. Stop script execution."
+        exit 1 
+    fi
+}
+
 function login_to_ibm_cloud () {
     
     echo ""
@@ -197,6 +207,7 @@ function set_global_env () {
 # Execution
 # *********************************************************************************
 
+check_docker
 login_to_ibm_cloud
 build_and_push_container
 setup_ce_project

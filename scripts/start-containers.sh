@@ -7,6 +7,18 @@ echo "- 'Experiment-runner'"
 echo "- 'Maas-mock'"
 echo "************************************"
 
+function check_docker () {
+    ERROR=$(docker ps 2>&1)
+    RESULT=$(echo $ERROR | grep 'Cannot' | awk '{print $1;}')
+    VERIFY="Cannot"
+    if [ "$RESULT" == "$VERIFY" ]; then
+        echo "Docker is not running. Stop script execution."
+        exit 1 
+    fi
+}
+
+check_docker
+
 # 1. set needed common environment
 export HOME_PATH=$(pwd)
 export SESSION_ID=$(date +%s)
