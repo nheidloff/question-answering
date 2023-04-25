@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# ***** Source global variables ****
 source ~/.env_profile
 
 echo "*************************"

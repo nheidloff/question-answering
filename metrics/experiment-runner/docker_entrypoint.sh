@@ -11,7 +11,14 @@ CURRENT_USER=$(whoami)
 #cat .env
 
 echo "*********************"
-echo "** Start python server"
+echo " To start the experiment-runner"
+echo " open a new terminal session"
+echo " and execute following command:"
+echo " 'docker exec -it experimentrunner sh ./start.sh'"
+echo "*********************"
+
+echo "*********************"
+echo "** Start dummy Python server"
 echo "*********************"
 
 python server.py

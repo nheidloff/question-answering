@@ -167,27 +167,30 @@ function kube_pod_log(){
     kubectl logs $APP_POD
 }
 
+# **** Logging *****
+
 function log_deployment_configuration(){
     
     echo "************************************"
     echo "Save configurations in deployment-log"
     echo "************************************"
     cd  $HOME_PATH
-    cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-qa-service.env
-    cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-ibm-cloud-configuration.env
-    cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$COMMIT_ID-experiment-runner.env
+    FOLDERNAME="$(date '%Y-%m-%d-%T-')-git-$COMMIT_ID"
+    mkdir $HOME_PATH/../deployment-log/$FOLDERNAME
+    cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-qa-service.env
+    cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-ibm-cloud-configuration.env
+    cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$FOLDERNAME//$COMMIT_ID-experiment-runner.env
 
 }
 
-function start_experiment_runner(){
+function set_global_env () {
+    # 1. set needed common environment
     export SESSION_ID=$(date +%s)
-    export QA_SERVICE_API_URL=$CE_APP_NAME_URL
-    # Environment configuration save in '~/.env_profile'"
-    "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
-
-    cd "${HOME_PATH}"/../metrics/experiment-runner/
-    sh start_exp_runner_container.sh
-    cd "${HOME_PATH}"
+    export QA_SERVICE_URL=$CE_APP_NAME_URL
+    echo "Home path:    $HOME_PATH"
+    echo "Session ID:   $SESSION_ID"
+    echo "Code Engine URL: $QA_SERVICE_URL"
+    "/bin/sh" "${HOME_PATH}"/generate_env_profile.sh > ~/.env_profile
 }
 
 #**********************************************************************************
@@ -201,5 +204,5 @@ setup_ce_container_registry_access
 deploy_ce_application
 kube_information
 kube_pod_log
-#start_experiment_runner
+set_global_env
 log_deployment_configuration

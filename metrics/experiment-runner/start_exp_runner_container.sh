@@ -3,7 +3,8 @@
 source ~/.env_profile
 
 echo "*************************"
-echo "HOME_PATH: ${GLOBAL_HOME_PATH}"
+echo "Execute experiment-runner"
+#echo "HOME_PATH: ${GLOBAL_HOME_PATH}"
 echo "QA_SERVICE_API_URL: ${QA_SERVICE_API_URL}"
 echo "*************************"
 
