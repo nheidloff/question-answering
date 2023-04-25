@@ -25,11 +25,6 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 | 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
 
-
-
-
-
-
 ## 1. Automated start of QA - pipeline service and experiment-runner as applications
 
 The experiment-runner is a Python command line application and the QA pipeline service is a Quarkus server application.
@@ -56,7 +51,7 @@ cat ./env_template > .env
 
 ### 1.3 Start the automation
 
-The automation starts the bash automation for [experiment-runner](./exp_runner_local.sh) and for the [QA pipeline service](./qa_local.sh).
+The automation starts the bash automation for [experiment-runner](./local_exp_runner.sh) and for the [QA pipeline service](./local_qa_service.sh).
 
 It also creates an `~/.env_profile` file to save global variables.
 
