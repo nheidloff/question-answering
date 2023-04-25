@@ -10,14 +10,21 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 
 | Combination | QA - Service - runtime | Experiment-runner - runtime | Config | Notes |
 | --- | --- | --- | --- | --- |
-| 1 | Runs as a local Quarkus application | runs as a local Python application | LocalApp:LocalApp | Both applications using the `output` and `input` folders on the local machine. |
-| 2 | Runs as a container in `Docker compose` | runs as a container in `Docker compose` | LocalContainer:LocalContainer | Both applications using the `output` and `input` folders on the local machine. The `experiment-runner` must be started in a new terminal session with a `docker exec` command. |
-| 3 | Runs as a container in `Code Engine` | runs as a container local container in Docker | CloudContainer:LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
-| 4 | Runs as a container in `on Code Engine` | runs as a local Python application | CloudContainer:LocalApp | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. |
-
-
+| 1 | Local Quarkus application | Local Python application | LocalApp : LocalApp | Both applications using the `output` and `input` folders on the local machine. |
+| 2 | Container in local `Docker compose` | Container in local `Docker compose` | LocalContainer:LocalContainer | Both applications using the `output` and `input` folders on the local machine. <br />The `experiment-runner` must be started in a new terminal session with a `docker exec` command. |
+| 3 | Container in `Code Engine` | Local container in Docker | CloudContainer:LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. <br />The experiment must be started in a *new terminal* session with a `docker exec` command. |
+| 4 | Container in `on Code Engine` | Local Python application | CloudContainer:LocalApp | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. |
 
 * Automation scripts and environment configuration
+
+| Combination | Scripts | Experiment-runner<br />configuation | Config | Notes |
+| --- | --- | --- | --- | --- |
+| 1 | [start_apps.sh](./start_apps.sh) | <br />See <br />export api_url="http://localhost:8080"<br />export input_excel_filename="your-ground-truth.xlsx"<br />export password="xxx" | LocalApp : LocalApp | Both applications using the `output` and `input` folders on the local machine. |
+| 2 | [start_containers.sh](./start_containers.sh)<br />[stop-containers.sh](./stop_containers.sh) | Container in local `Docker compose` | LocalContainer:LocalContainer | Both applications using the `output` and `input` folders on the local machine. <br />The `experiment-runner` must be started in a new terminal session with a `docker exec` command. |
+| 3 | Container in `Code Engine` | Local container in Docker | CloudContainer:LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. <br />The experiment must be started in a *new terminal* session with a `docker exec` command. |
+| 4 | Container in `on Code Engine` | Local Python application | CloudContainer:LocalApp | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. |
+
+
 
 
 
