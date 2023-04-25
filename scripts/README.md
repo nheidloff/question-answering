@@ -6,17 +6,14 @@ An experiment needs to run a minimum following applications.
 1. QA - Service
 2. Experiment-runner
 
-_Note:_ The following combinations are possible when `Model as a Service` is available.
+_Note:_ The following combinations are possible when `Model as a Service` is available on the Cloud.
 
 | Combination | QA - Service - runtime | Experiment-runner - runtime | Config | Notes |
 | --- | --- | --- | --- | --- |
 | 1 |  runs as a local Quarkus application | runs as a local Python application | LocalApp/LocalApp | Both applications using the `output` and `input` folders on the local machine. |
 | 2 | runs as a container in `Docker compose` | runs as a container in `Docker compose` | LocalContainer/LocalContainer | Both applications using the `output` and `input` folders on the local machine. The `experiment-runner` must be started in a new terminal session with a `docker exec` command. |
-| 3 | runs as a container in `on Code Engine` | runs as a container local container in Docker | CloudContainer/LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
+| 3 | runs as a container in Code Engine` | runs as a container local container in Docker | CloudContainer/LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. The experiment must be started in a new terminal session with a `docker exec` command. |
 | 4 | runs as a container in `on Code Engine` | runs as a local Python application | CloudContainer/LocalApp | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. |
-
-
-* The c
 
 ## 1. Automated start of QA - pipeline service and experiment-runner as applications
 
