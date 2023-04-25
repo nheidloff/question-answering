@@ -17,12 +17,12 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 
 * Automation scripts and environment configuration
 
-| Combination | Scripts | Experiment-runner<br />configuation | Config | Notes |
+| Combination | Scripts | Experiment-runner<br />configuation | QA-service<br />configuration  | Notes |
 | --- | --- | --- | --- | --- |
-| 1 | [start_apps.sh](./start_apps.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) | LocalApp : LocalApp | Both applications using the `output` and `input` folders on the local machine. |
-| 2 | [start_containers.sh](./start_containers.sh)<br />[stop-containers.sh](./stop_containers.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) | LocalContainer:LocalContainer | Both applications using the `output` and `input` folders on the local machine. <br />The `experiment-runner` must be started in a new terminal session with a `docker exec` command. |
-| 3 | Container in `Code Engine` | Local container in Docker | CloudContainer:LocalContainer | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. <br />The experiment must be started in a *new terminal* session with a `docker exec` command. |
-| 4 | Container in `on Code Engine` | Local Python application | CloudContainer:LocalApp | Only the `experiment-runner` application uses the `output` and `input` folders on the local machine. |
+| 1 | [start_apps.sh](./start_apps.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) |  Example [`.env_template file`](../service/.env_template) |  |
+| 2 | [start_containers.sh](./start-containers.sh)<br />[stop-containers.sh](./stop-containers.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_2_example) | Example [`.env_template file`](../service/.env_template) |  |
+| 3 | [codeengine_deploy.sh](./codeengine_deploy.sh)<br />[codeengine_experiment.sh](./codeengine_experiment.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
+| 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
 
 
