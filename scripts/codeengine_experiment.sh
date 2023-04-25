@@ -3,7 +3,6 @@
 # **************** Source Global variables
 source ~/.env_profile
 
-
 echo "************************************"
 echo " Build and start with experiment-runner " 
 echo " as a container and connect to Code Engine"

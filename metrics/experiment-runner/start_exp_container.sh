@@ -27,9 +27,9 @@ cd ..
 project_path=$(pwd)
 cd $tmp_home
 
-export mountpath_metrics="${project_path}/${output_folder_name}"
-export mountpath_outputs="${project_path}/${output_folder_name}"
-export mountpath_inputs="${project_path}/${input_folder_name}"
+export mountpath_metrics="${project_path}/output"
+export mountpath_outputs="${project_path}/output"
+export mountpath_inputs="${project_path}/input"
 
 echo "***** BUILD experiment-runner container ******"
 docker build -t $image_name:$version .
@@ -58,5 +58,5 @@ docker run --name="experimentrunner" -it --rm \
                 -e container_run="${container_run}" \
                 -e app_debug_channel="$app_debug_channel" \
                 -e qa_service_on_cloud='True' \
-                --expose 8084:8084 \
+                -p '8084:8084' \
                 $image_name:$version

@@ -57,7 +57,6 @@ class GetEnv(Resource):
 
 class Alive(Resource):
     def get(self):
-
         return_value = "Yes, I am alive!"
         return return_value
 

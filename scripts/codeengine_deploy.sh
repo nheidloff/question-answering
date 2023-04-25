@@ -218,10 +218,10 @@ function log_deployment_configuration(){
 function set_global_env () {
     # 1. set needed common environment
     export SESSION_ID=$(date +%s)
-    export QA_SERVICE_URL=$CE_APP_NAME_URL
+    export QA_SERVICE_API_URL=$CE_APP_NAME_URL
     echo "Home path:    $HOME_PATH"
     echo "Session ID:   $SESSION_ID"
-    echo "Code Engine URL: $QA_SERVICE_URL"
+    echo "Code Engine URL: $QA_SERVICE_API_URL"
     "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
 }
 
