@@ -3,16 +3,16 @@
 # **************** Global variables
 source ./.env
 
-export CE_CR_ACCESS_NAME=$CR
-export CE_CR_SERVER_NAME=$CR
+export CODEENGINE_CR_ACCESS_NAME=$CR
+export CODEENGINE_CR_SERVER_NAME=$CR
 
-export CE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
-export CE_APP_CPU_CONFIG=1
-export CE_APP_MEMORY_CONFIG=4G
-export CE_APP_MAX_SCALE=10
-export CE_APP_MIN_SCALE=1
-export CE_APP_PORT=8080
-export CE_PROJECT_NAMESPACE=""
+export CODEENGINE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
+export CODEENGINE_APP_CPU_CONFIG=1
+export CODEENGINE_APP_MEMORY_CONFIG=4G
+export CODEENGINE_APP_MAX_SCALE=10
+export CODEENGINE_APP_MIN_SCALE=1
+export CODEENGINE_APP_PORT=8080
+export CODEENGINE_PROJECT_NAMESPACE=""
 
 # **********************************************************************************
 # Functions definition
@@ -33,16 +33,16 @@ function login_to_ibm_cloud () {
 
 function setup_ce_project() {
   echo "**********************************"
-  echo " Using following project: $CE_PROJECT_NAME" 
+  echo " Using following project: $CODEENGINE_PROJECT_NAME" 
   echo "**********************************"
 
-  ibmcloud ce project select -n $CE_PROJECT_NAME
+  ibmcloud ce project select -n $CODEENGINE_PROJECT_NAME
   
   #to use the kubectl commands
-  ibmcloud ce project select -n $CE_PROJECT_NAME --kubecfg
+  ibmcloud ce project select -n $CODEENGINE_PROJECT_NAME --kubecfg
   
-  CE_PROJECT_NAMESPACE=$(ibmcloud ce project get --name $CE_PROJECT_NAME --output json | grep "namespace" | awk '{print $2;}' | sed 's/"//g' | sed 's/,//g')
-  echo "Code Engine project namespace: $CE_PROJECT_NAMESPACE"
+  CODEENGINE_PROJECT_NAMESPACE=$(ibmcloud ce project get --name $CODEENGINE_PROJECT_NAME --output json | grep "namespace" | awk '{print $2;}' | sed 's/"//g' | sed 's/,//g')
+  echo "Code Engine project namespace: $CODEENGINE_PROJECT_NAMESPACE"
   kubectl get pods -n $CE_PROJECT_NAMESPACE
 }
 
@@ -51,23 +51,23 @@ function setup_ce_project() {
 function kube_information(){
 
     echo "************************************"
-    echo " Kubernetes info '$CE_APP_NAME': pods, deployments and configmaps details "
+    echo " Kubernetes info '$CODEENGINE_APP_NAME': pods, deployments and configmaps details "
     echo "************************************"
     
-    kubectl get pods -n $CE_PROJECT_NAMESPACE
-    kubectl get deployments -n $CE_PROJECT_NAMESPACE
-    kubectl get configmaps -n $CE_PROJECT_NAMESPACE
+    kubectl get pods -n $CODEENGINE_PROJECT_NAMESPACE
+    kubectl get deployments -n $CODEENGINE_PROJECT_NAMESPACE
+    kubectl get configmaps -n $CODEENGINE_PROJECT_NAMESPACE
 
 }
 
 function kube_pod_log(){
 
     echo "************************************"
-    echo " Kubernetes $CE_APP_NAME: log"
+    echo " Kubernetes $CODEENGINE_APP_NAME: log"
     echo "************************************"
 
-    FIND=$CE_APP_NAME
-    APP_POD=$(kubectl get pod -n $CE_PROJECT_NAMESPACE | grep $FIND | awk '{print $1}')
+    FIND=$CODEENGINE_APP_NAME
+    APP_POD=$(kubectl get pod -n $CODEENGINE_PROJECT_NAMESPACE | grep $FIND | awk '{print $1}')
     echo "************************************"
     echo "Show log for the pod: $APP_POD"
     echo "************************************"
