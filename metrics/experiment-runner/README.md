@@ -1,10 +1,10 @@
-# Evaluations
+# Experiment-runner
 
-## Used main libraries
+## 1. Used main libraries
 
 * [Hugging Face](https://huggingface.co/spaces/evaluate-metric/sacrebleu)
 
-## Setup environment
+## 2. Setup environment
 
 ```sh
 pip install -r requirements.txt
@@ -14,27 +14,27 @@ pip install --upgrade --force-reinstall -r requirements.txt
 or 
 
 ```sh
-python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp csv sacrebleu python-dotenv pyinstaller evaluate openpyxl absl nltk rouge_score
+python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp sacrebleu python-dotenv pyinstaller evaluate openpyxl nltk rouge_score
 ```
 
-## Create an `.env` file
+## 3. Create an `.env` file
 
 ```sh
-cd YOUR_PATH/question-answering/evaluations
+cd YOUR_PATH/question-answering/metrics/experiment-runner
 cat ./env_template > .env
 ```
 
-[Link to the ./env_template file.](/evaluations/.env_template)
+[Link to the ./env_template file.](/.env_template)
 
-## Run application
+## 4. Run `experiment-runner`
 
-### 1. Execute as command line application
+### 4.1. Execute as command line application
 
 ```sh
 python3 exp-runner.py
 ```
 
-* The `experiment runner app` ends an experiment, with the retry count being reached.
+* The `experiment runner` ends an experiment, when the retries count is reached.
 
 * Input files
 
@@ -42,40 +42,31 @@ python3 exp-runner.py
 
 * Output files
 
-    * **Excel:** It creates a file in the `outputs` folder `output/SESSION_ID_2023-03-31_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
+    * **Excel:** It creates a file in the `outputs` folder `output/SESSION_ID_output_anwser.xlsx`. The output file name is based on `output_session_id` and `output_question_resp_anwser_excel` environment variables.
     
-    * **Error Log:** It creates a file in the `output` folder `output/2023-03-31_SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
+    * **Error Log:** It creates a file in the `output` folder `output/SESSION_ID_error.log`. The output file name is based on `output_session_id` and `output_error_log` environment variables.
 
-### 2. Execute as a local container
+### 2. Execute as local containers
 
-#### 2.1 Build and run as a local container and the `QA pipeline service` **does run** on the same machine local machine as a container
+* You need to install Docker desktop application
 
-1. In this situation you need to get the local host IP address and save it, to use the address later 
+1. Execute the bash automation [start-containers.sh](../../scripts/start-containers.sh)
 
-```sh
-ifconfig | grep 192.
-```
+The automation builds the needed containers locally and executes them inside a Docker compose network.
 
-Example output:
+The applications:
 
-You should see your local host IP address.
-In our example below the value is the IP `192.168.178.36`.
-
-Insert the IP address in your `.env` file:
+* QA - Service
+* MaaS mao
 
 ```sh
-# Only needed when you run 
-# question answering microservice and evaluate container
-# on the same local machine.
-export host_ip="192.168.178.36"
-export container_run=True
+cd question-answering/scripts
+sh start-container.sh
 ```
 
-2. Execute the bash script in a new terminal session.
 
-```sh
-sh start_exp_runner_container.sh
-```
+
+
 
 
 

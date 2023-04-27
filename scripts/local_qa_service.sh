@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# ***** Source global variables ****
 source ~/.env_profile
 
 echo "*************************"
@@ -16,6 +17,7 @@ else
     echo "Current path: $(pwd)"
 fi
 
+# ***** Source qa service configuration ****
 source ./.env
 
 verify=""

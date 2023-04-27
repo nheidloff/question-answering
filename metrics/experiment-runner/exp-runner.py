@@ -12,11 +12,50 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
-from datetime import date
+import regex
+import sys
 
 # ******************************************
 # Global variables
 
+# ------------------------
+# Environment variables
+
+# ------------------------
+# Defaults
+# - Customm debug information 
+if (os.environ.get("app_debug_channel") == None):
+        app_debug_channel = 'True'
+else:
+        app_debug_channel = os.environ.get("app_debug_channel")
+
+# ------------------------
+# Defaults
+# - qa_server_on_cloud
+if (os.environ.get("qa_service_on_cloud") == None):
+        qa_service_on_cloud = 'False'
+else:
+        qa_service_on_cloud = os.environ.get("qa_service_on_cloud")
+
+# - Does input data exist?
+#       - If 'False': Invoke the microservice
+#            'True' : Use an existing data
+if (os.environ.get("input_data_exists") == None):
+        input_data_exists = 'False'
+else:
+        input_data_exists = os.environ.get("input_data_exists")
+
+# - Prefix passage ID groundtruth
+#       - If 'False': Invoke the microservice
+#            'True' : Use an existing data
+if (os.environ.get("prefix_passage_id") == None):
+        prefix_passage_id = ''
+else:
+        prefix_passage_id = os.environ.get("prefix_passage_id")
+
+
+# -----------------------
+# Loaded from env file
 # qa service
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
@@ -37,31 +76,76 @@ output_session_id = os.environ.get("output_session_id")
 output_folder_name = os.environ.get("output_folder_name")
 number_of_retries = os.environ.get("number_of_retries")
 
-print("*************************")
-print("Experiment-runner configuration:")
-print("")
-print(f"- Endpoint: {endpoint}")
-print(f"- API URL: {api_url}")
-print(f"- retries: {number_of_retries}")
-print(f"- Username: {username}")
-print(f"- Password: {password}")
-print(f"- Verify answer: {verify_answer}\n")
-print(f"- Input Excel: {input_excel_filename}")
-print(f"- Input folder name: {input_folder_name}")
-print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
-print(f"- Output folder name: {output_folder_name}")
-print(f"- Sesssion ID output prefix: {output_session_id}")
-print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
-print(f"- Error log name: {output_error_log}")
-print(f"- Container run: {container_run}")
+logger = None
+
+# *****************************************
+# Debug info
+
+def debug_show_env_settings():
+
+        global app_debug_channel
+        # qa service
+        global endpoint
+        global api_url
+        global username
+        global password
+        global verify_answer
+        # input
+        global input_excel_filename
+        global input_folder_name
+        global input_folder_name_qa_service_metrics
+        global container_run
+        # output
+        global output_question_resp_anwser_excel
+        global output_error_log 
+        global output_session_id
+        global output_folder_name
+        global number_of_retries
+
+        if (app_debug_channel == "True"):
+                print("********** app DEBUG ***************")
+                print("Experiment-runner configuration:")
+                print("")
+                print(f"- Endpoint: {endpoint}")
+                print(f"- API URL: {api_url}")
+                print(f"- retries: {number_of_retries}")
+                print(f"- Username: {username}")
+                print(f"- Password: {password}")
+                print(f"- Verify answer: {verify_answer}\n")
+                print(f"- Input Excel: {input_excel_filename}")
+                print(f"- Input folder name: {input_folder_name}")
+                print(f"- Input folder name qa service: {input_folder_name_qa_service_metrics}\n")
+                print(f"- Output folder name: {output_folder_name}")
+                print(f"- Sesssion ID output prefix: {output_session_id}")
+                print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
+                print(f"- Error log name: {output_error_log}")
+                print(f"- Container run: {container_run}")
+                return True
+        else:   
+                return False
+
+def debug_show_value (value):
+        global app_debug_channel
+        if (app_debug_channel == "True"):
+                print("********** app DEBUG ***************")
+                print(value)
+                return True
+        else:
+                return False
 
 # ******************************************
 # get os path information
 def get_input_path():
         global input_folder_name
         global container_run
+
+        d_value = "get_input_path(): " + str(container_run)
+        debug_show_value(d_value)
+        
         if (container_run == "False"):
                 directory = os.getcwd()
+                d_value = "False: " + str(directory)
+                debug_show_value(d_value)
                 directory = directory + "/../" + input_folder_name
         else:
                 directory = os.getcwd()
@@ -73,22 +157,33 @@ def get_output_path():
         global container_run
         if (container_run == "False"):
                 directory = os.getcwd()
-                directory = directory + "/../" + output_folder_name
+                new_directory = directory + "/../" + output_folder_name
         else:
                 directory = os.getcwd()
-                directory = directory + "/" + output_folder_name
-        return directory
+                new_directory = directory + "/" + output_folder_name
+        return new_directory
 
 def get_input_qa_service_metrics_local_path():
         global input_folder_name_qa_service_metrics
         global output_folder_name
         directory = os.getcwd()
-        
-        if input_folder_name_qa_service_metrics != "":
-                new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+       
+        if (container_run == "False"):
+                directory = os.getcwd()
+                d_value = "False: " + str(directory)
+                debug_show_value(d_value)
+
+                if input_folder_name_qa_service_metrics != "":
+                        new_directory = directory + "/../" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+                else:
+                        new_directory = directory + "/../" + output_folder_name
         else:
-                new_directory = directory + "/" + output_folder_name
-                
+                directory = os.getcwd()
+                if input_folder_name_qa_service_metrics != "":
+                        new_directory = directory + "/" + output_folder_name + "/" + input_folder_name_qa_service_metrics
+                else:
+                        new_directory = directory + "/" + output_folder_name
+             
         return new_directory
 
 def get_input_qa_service_metrics_container_path():
@@ -104,6 +199,123 @@ def get_input_qa_service_metrics_container_path():
                 new_directory = directory + "/" + output_folder_name
         
         return new_directory
+
+# ******************************************
+# Score prepare eval data functions
+def extract_prefix(input_string, prefix):
+        work_string = str(input_string)
+        work_prefix = str(prefix)
+
+        if (work_string == ""):
+                return_string = 'none'
+                return return_string
+        
+        if (work_prefix == ""):
+                return_string = work_string
+                return return_string
+
+        if(work_string.find(work_prefix)== -1):
+                return work_string
+        else:               
+                return_string  = work_string.split(work_prefix,1)
+                return return_string[1]
+
+def get_score_groundtruth(excel_input_file, prefix_passage_id):
+            
+            wb = openpyxl.load_workbook(excel_input_file)
+            ws = wb.active
+
+            rows = []
+            for rdx, row in enumerate(ws.iter_rows(values_only=True)):
+                if rdx:
+                        rows.append(list(row))
+                else:
+                        header = row
+            new_rows = []
+
+            # Extract passage data
+            for row in rows:
+
+                passage_1_id = extract_prefix(str(row[3]),prefix_passage_id)
+                passage_2_id = extract_prefix(str(row[5]),prefix_passage_id)
+                passage_3_id = extract_prefix(str(row[7]),prefix_passage_id)
+                     
+                new_rows.append([passage_1_id, passage_2_id, passage_3_id ])
+                new_header = [ "passage_1_id", "passage_2_id", "passage_3_id"]
+        
+            return new_header, new_rows
+
+def load_score_ranker(csv_filepath):
+        d_value = "QA -service experiment file: " + csv_filepath
+        debug_show_value(d_value)
+        file = open(csv_filepath)
+        csvreader = csv.reader(file)
+        header = []
+        header = next(csvreader)
+        d_value = "QA -service experiment file Header: " + str(header)
+        debug_show_value(d_value)
+
+        # Reranker extract
+        i = 0
+        for column in header:
+                # print(f"Column: {column} : {i}")
+                if str(column) == "RESULT_RERANKER_PASSAGE1_ID":
+                        ranker_p_1_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE2_ID":
+                        ranker_p_2_id = i   
+                if str(column) == "RESULT_RERANKER_PASSAGE3_ID":
+                        ranker_p_3_id = i
+                i = i + 1                         
+
+        score_ranker = []
+        for row in csvreader: 
+                values = [ str(row[ranker_p_1_id]) , str(row[ranker_p_2_id]) , str(row[ranker_p_3_id]) ]
+                # print(f"Values:\n {values}")          
+                score_ranker.append(values)
+        file.close()
+        return score_ranker
+
+def score_matcher(groundtruth, qa_run):
+
+        documents_in_ground_truth = {}
+        
+        with open(groundtruth, 'rt') as in_f:
+                
+                reader = csv.DictReader(in_f, delimiter=',', quotechar='\"')
+                
+                for r, row in enumerate(reader):
+                        for pos in ("1", "2", "3"):
+                                if row['loio ' + pos] != "":
+                                        documents_in_ground_truth[regex.sub(r'^loio', '', row['loio ' + pos])] = row['passage ' + pos]
+
+                                documents_in_corpus = {}
+        
+        with open(qa_run) as passages_file:
+                print(f'# Reading {qa_run}')
+                records = json.load(passages_file)
+                for rec in records:
+                        id = rec['chunckid']
+                        documents_in_corpus[regex.sub(r'^[0-9]\.', '', id)] = ' '.join(rec['text']), rec['title']
+
+        num_not_found = 0
+        for id in documents_in_ground_truth.keys():
+                if not id in documents_in_corpus:
+                        print(f'Not found: {id}')
+                        num_not_found += 1
+
+        print(f'{num_not_found} ground truth documents not found in the corpus')
+
+        return True
+
+def convert_groundtruth_excel_to_csv(groundtruth_xlsx,groundtruth_csv):
+        wb = openpyxl.load_workbook(groundtruth_xlsx)
+        sh = wb.active
+        with open(groundtruth_csv, 'w', newline="" ) as f:
+                c = csv.writer(f)
+                for r in sh.rows:
+                        c.writerow([cell.value for cell in r])
+        f.close()
+        return True
 
 # ******************************************
 # Bleu prepare eval data functions 
@@ -131,18 +343,27 @@ def bleu_get_data(input_filename):
 def bleu_from_list_to_dict(header):
     indices = [i for i in range(0, len(header))]
     header = {k: v for k, v in zip(header, indices)}
-    # print ( header )
     return header
 
 # ******************************************
 # Define logging
-logger = logging.getLogger(output_session_id + "-" + output_error_log)
-logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler(get_output_path() + "/" + output_session_id + "-" + output_error_log)
-file_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+def create_logger():
+        global output_session_id
+        global output_error_log
+        global logger
+
+        print(f"{output_error_log}")
+
+        logger = logging.getLogger(output_session_id + "-" + output_error_log)
+        logger.setLevel(logging.INFO)
+        path=get_output_path()
+        file_handler = logging.FileHandler(path + "/" + output_session_id + "-" + output_error_log)
+        file_handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        
+        return logger
 
 # Create a "experiment_data" worksheet
 def create_output_workbook (workbook_name):
@@ -182,12 +403,24 @@ def create_output_workbook (workbook_name):
 # ******************************************
 # load input excel
 def load_input_excel(excel_input):
+    global logger
     wb = openpyxl.load_workbook(excel_input)
     ws = wb.active
-    
+    print(f"Input: {excel_input}")
     rows = []
     for rdx, row in enumerate(ws.iter_rows(values_only=True)):
-        if rdx:
+        print(f"Input: {row}")
+        # End if the row contains data like this:
+        # ('None', 'None' ... )
+        if not any(row):
+                new_header=[]
+                new_rows=[]
+                message = "ERROR: Input data, please verify your ground truth input."
+                print(message)
+                logger.error(message)
+                return new_header, new_rows, False
+
+        if rdx:          
             rows.append(list(row))
         else:
             header = row
@@ -210,17 +443,19 @@ def load_input_excel(excel_input):
 
     new_header = [ "question", "golden_answer", "passage_1", "passage_1_id", "passage_2", "passage_2_id", "passage_3", "passage_3_id"]
     
-    return new_header, new_rows
+    return new_header, new_rows, True
 
 # ******************************************
 # load qa service metrics from csv file
 def load_qa_service_metrics(csv_filepath):
-        print(f"QA -service experiment file: {csv_filepath}")
+        d_value = "QA -service experiment file: " + csv_filepath
+        debug_show_value(d_value)
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
-        print(f"{header}")
+        d_value = "QA -service experiment file Header: " + str(header)
+        debug_show_value(d_value)
 
         # Reranker extract
         i = 0
@@ -257,6 +492,7 @@ def invoke_qa(question):
         global username
         global password
         global output_error_log
+        global logger
         
         request_url = api_url + endpoint
         question_obj = {"query": ""}
@@ -295,12 +531,10 @@ def invoke_qa(question):
                                 
                                 if( len(answer_text_list)>1):
                                         for answer_part in answer_text_list:
-                                                #answer_text_clean = answer_part.replace('\n', '')
                                                 answer_text_clean = answer_part
                                                 answer_text = answer_text + ' ' + answer_text_clean
                                 else:
                                         answer_text = answer_text_list[0]
-                                        #answer_text = answer_text.replace('\n', '')
 
                                 print(f"Question: {question}")
                                 print(f"Answer  : {answer_text}")
@@ -318,55 +552,94 @@ def invoke_qa(question):
                         return answer_text, answer_text_len,  answer_text_list, False
 
 # ******************************************
+# Add results from the qa service metrics to output excel
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file):
+
+        metrics_results = load_qa_service_metrics(qa_metrics_run_file)
+        print(f"metrics_results: {len(metrics_results)} \n")
+        workbook = openpyxl.load_workbook(workbook_name_file)
+        
+        j = 1
+        for row in metrics_results:
+                worksheet = workbook['experiment_data']
+                worksheet.cell(row=(j+1), column=10).value = row[0]
+                worksheet.cell(row=(j+1), column=11).value = row[1]
+                worksheet.cell(row=(j+1), column=12).value = row[2]
+                worksheet.cell(row=(j+1), column=13).value = row[3]
+                worksheet.cell(row=(j+1), column=14).value = row[4]
+                worksheet.cell(row=(j+1), column=15).value = row[5]
+                j = j + 1
+                  
+                worksheet = workbook['experiment_bleu_result']
+                worksheet.cell(row=(2), column=1).value = str(sacrebleu)
+                worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
+
+        workbook.save(workbook_name_file)
+        return True
+        
+# ******************************************
 # Execution
 def main(args):
-
-        # Does input data exist?
-        # - False: Invoke the microservice
-        # - True: Use an existing csv file
-        input_data_exists = False
+        logger = create_logger()
         
         # Temp list for creating output files
         golds = [[]]
 
         # End experiment, when not all requests can be processed!
         end_experiment = False 
-        
-        # Get date to be added to the file names
-        today = str(date.today())
 
-        # Set paths for input
+        # Set paths for input and output
         output_directory = get_output_path()
-        print(f"- Output dir: {output_directory}")
         input_directory = get_input_path()
-        print(f"- Input dir: {input_directory}")
+        d_value = " - Output dir: " + output_directory + "\n - Input dir: " + input_directory
+        debug_show_value(d_value)
+
+        excel_input_filepath = input_directory + "/" + input_excel_filename     
+        input_name = input_excel_filename.split(".xlsx",1)
+        csv_input_filepath = input_directory  + "/" + input_name[1] + ".csv"
+        convert_groundtruth_excel_to_csv(excel_input_filepath,csv_input_filepath)
         
         if (container_run == "False"):
                 input_qa_directory = get_input_qa_service_metrics_local_path()
-                print(f"- Input qa dir (local): {input_qa_directory}")
+                d_value = "- Input qa dir (local): " + input_qa_directory
+                debug_show_value(d_value)
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
         else:
                 input_qa_directory = get_input_qa_service_metrics_container_path()
-                print(f"- Input qa dir (container): {input_qa_directory}")
+                d_value = "- Input qa dir (container):" + input_qa_directory
+                debug_show_value(d_value)
                 qa_metrics_run_file = input_qa_directory + "/" + output_session_id + "-Runs.csv"
    
         workbook_name_file = output_directory + "/"  + output_session_id + "-" + output_question_resp_anwser_excel
 
         # 1. use an input file to get the answers from the qa microserice
-        if (input_data_exists == False):
+        if (input_data_exists == "False"):
 
-                        # 1.1 load data from input file 
-                        print(f"******* prepare input data from file {input_excel_filename} ********\n")    
-                        excel_input_filepath = input_directory + "/" + input_excel_filename                       
-                        header, rows = load_input_excel(excel_input_filepath) 
-                        print(f"- Input header: {header}")                    
+                        # 1.1 Load data from input file 
+                        d_value = "******* prepare input data from file " + input_excel_filename + " ********\n"
+                        debug_show_value(d_value)                      
+                        header, rows, check = load_input_excel(excel_input_filepath) 
+                        
+                        # 1.1.1 Exit when the problems with the input data
+                        if (check == False):
+                                end_experiment == True
+                                sys.exit("Problem with the input data the automation ends here.")
+                        
+                        end_experiment == False
+                        d_value = "- Input header: " + str(header)
+                        debug_show_value(d_value)                  
                         input_len=len(rows)
-                        print(f"- Input len: {input_len}")
+                        
+                        d_value = "- Input len: " + str(input_len)
+                        debug_show_value(d_value)
                         row = rows[0]
                         question = row[0]
-                        print(f"- First question: {question}")
+                        
+                        d_value = "First question: " + question
+                        debug_show_value(d_value)
                         golden_answer = row[1]
-                        print(f"- First golden answer: {golden_answer}")
+                        d_value = "- First golden answer: " + golden_answer
+                        debug_show_value(d_value)
                                
                         # 1.2. Prepare an output excel for logging the execution results
                         workbook = create_output_workbook(workbook_name_file)
@@ -379,7 +652,7 @@ def main(args):
                                 very_golden_answer = row[1]
                                 if (end_experiment == True):
                                         break
-                                
+                                print(f"Row: {row} Length: {len(row)}")
                                 if (len(very_golden_answer) != 0):
                                         question      = row[0]
                                         golden_answer = row[1]
@@ -464,6 +737,10 @@ def main(args):
         
         if (end_experiment == False):
 
+                  #header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
+                  #score_ranker = load_score_ranker(qa_metrics_run_file)
+                  #score_matcher(csv_input_filepath, qa_metrics_run_file)
+
                   # 2. Create experiment-runner blue result output         
                   header, rows = bleu_run(workbook_name_file)
                   header = bleu_from_list_to_dict(header)
@@ -478,28 +755,9 @@ def main(args):
                   metric.add_batch(predictions=responses, references=golds)
                   rouge = metric.compute()["rougeL"]
 
-                  # 3. add results from the qa service metrics
-
-                  metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-                  print(f"metrics_results: {len(metrics_results)} \n")
-                  workbook = openpyxl.load_workbook(workbook_name_file)
-        
-                  j = 1
-                  for row in metrics_results:
-                        worksheet = workbook['experiment_data']
-                        worksheet.cell(row=(j+1), column=10).value = row[0]
-                        worksheet.cell(row=(j+1), column=11).value = row[1]
-                        worksheet.cell(row=(j+1), column=12).value = row[2]
-                        worksheet.cell(row=(j+1), column=13).value = row[3]
-                        worksheet.cell(row=(j+1), column=14).value = row[4]
-                        worksheet.cell(row=(j+1), column=15).value = row[5]
-                        j = j + 1
-                  
-                  worksheet = workbook['experiment_bleu_result']
-                  worksheet.cell(row=(2), column=1).value = str(sacrebleu)
-                  worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
-
-                  workbook.save(workbook_name_file)
+                  # 3. Add results from the qa service metrics to output excel
+                  if (qa_service_on_cloud == 'False'):
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file)
 
                   # 4. Show results
                 

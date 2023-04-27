@@ -15,12 +15,12 @@ echo "- HOME_PATH :          ${HOME_PATH}"
 echo "- SESSION_ID:          ${SESSION_ID}"
 
 # Environment configuration save in '~/.env_profile'"
-"/bin/sh" "${HOME_PATH}"/generate_env_profile.sh > ~/.env_profile
+"/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
 # cat ~/.env_profile
 
 # bash scripts
-export exp_runner="${HOME_PATH}/exp_runner_local.sh"
-export qa_service="${HOME_PATH}/qa_local.sh"
+export exp_runner="${HOME_PATH}/local_exp_runner.sh"
+export qa_service="${HOME_PATH}/local_qa_service.sh"
 
 # Enable bash automation for execution"
 chmod 755 ${exp_runner}
@@ -31,7 +31,7 @@ echo "    Open application terminals"
 echo "************************************"
 echo "- QA Service"
 open -a Terminal ${qa_service}
-sleep 10
+sleep 15
 echo "- Experiment runner"
 open -a Terminal ${exp_runner}
 

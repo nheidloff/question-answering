@@ -12,6 +12,9 @@ metrics/experiment-runner/.env_runner_demo
 metrics/experiment-runner/.env_runner_real
 data/product-doc
 
+!deployment-log/README.md
+deployment-log/*
+
 metrics/input/*
 metrics/output/*
 !metrics/output/demo-Last-Run.md
@@ -100,3 +103,5 @@ metrics/myrun/1681329199-Runs.csv
 metrics/myrun/1681391917-Metadata.csv
 metrics/myrun/1681391917-Runs.csv
 metrics/myrun/Last-Run.md
+metrics/experiment-runner/score_temp.py
+metrics/experiment-runner/test
