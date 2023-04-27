@@ -14,6 +14,10 @@ data/product-doc
 
 !deployment-log/README.md
 deployment-log/*
+!deployment-log/last/README.md
+deployment-log/last/*
+!deployment-log/all/README.md
+deployment-log/all/*
 
 metrics/input/*
 metrics/output/*
