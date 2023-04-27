@@ -13,10 +13,10 @@ metrics/experiment-runner/.env_runner_real
 data/product-doc
 
 
-deployment-log/*
+!deployment-log/*
 !deployment-log/README.md
-!deployment-log/last/README.md
-!deployment-log/all/README.md
+!deployment-log/last/README_1.md
+!deployment-log/all/README_2.md
 
 
 metrics/input/*
@@ -81,15 +81,6 @@ nb-configuration.xml
 readnik.md
 scripts/.env_container_start
 scripts/env_container_start.sh
-metrics/1681396693-Metadata.csv
-metrics/1681396693-Runs.csv
-metrics/1681398722-Metadata.csv
-metrics/1681398722-Runs.csv
 metrics/Last-Run.md
-metrics/myrun/1681329199-Metadata.csv
-metrics/myrun/1681329199-Runs.csv
-metrics/myrun/1681391917-Metadata.csv
-metrics/myrun/1681391917-Runs.csv
-metrics/myrun/Last-Run.md
 metrics/experiment-runner/score_temp.py
 metrics/experiment-runner/test
