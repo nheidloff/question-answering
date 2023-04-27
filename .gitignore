@@ -13,7 +13,7 @@ metrics/experiment-runner/.env_runner_real
 data/product-doc
 
 
-!deployment-log/*
+deployment-log/*
 !deployment-log/README.md
 !deployment-log/last/README_1.md
 !deployment-log/all/README_2.md
