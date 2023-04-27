@@ -84,8 +84,15 @@ function build_and_push_container () {
     cd "$HOME_PATH"
     
     # Login to container with IBM Cloud registy  
-    ibmcloud cr login   
-    ibmcloud target -g $CR_RESOURCE_GROUP
+    ibmcloud cr login
+     
+    ERROR=$(ibmcloud target -g $CR_RESOURCE_GROUP | grep FAILED | awk '{print $1;}' 2>&1)
+    RESULT=$(echo $ERROR | grep 'FAILED' | awk '{print $1;}')
+    VERIFY="FAILED"
+    if [ "$RESULT" == "$VERIFY" ]; then
+        echo "Can't set to resource group: ($CR_RESOURCE_GROUP) but I move on."
+    fi
+
     ibmcloud cr region-set $CR_REGION
 
     # Create a new namespace, if the namespace doesn't exists
@@ -202,17 +209,47 @@ function kube_pod_log(){
 
 # **** Logging *****
 
-function log_deployment_configuration(){
+function log_deployment_configuration_all(){
     
     echo "************************************"
-    echo "Save configurations in deployment-log"
+    echo "Save configurations in deployment-log/all"
     echo "************************************"
     cd  $HOME_PATH
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
-    mkdir $HOME_PATH/../deployment-log/$FOLDERNAME
-    cat $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-qa-service.env
-    cat $HOME_PATH/.env > $HOME_PATH/../deployment-log/$FOLDERNAME/$COMMIT_ID-ibm-cloud-configuration.env
-    cat $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/$FOLDERNAME//$COMMIT_ID-experiment-runner.env
+    mkdir $HOME_PATH/../deployment-log/all/$FOLDERNAME
+    
+    # remove all comments of the envirement configuration and save in all
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/ibm-cloud.env
+    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/experiment-runner.env
+
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env 
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/service.env
+    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env
+
+    # create new files
+    REPO_URL=$(git config --get remote.origin.url)
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/code.txt
+    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/deployment-info.txt
+
+}
+
+function log_deployment_configuration_last(){
+    
+    echo "************************************"
+    echo "Save configurations in deployment-log/last"
+    echo "************************************"
+    cd  $HOME_PATH
+    
+    # remove all comments of the envirement configuration and save in all
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/last/service.env
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../deployment-log/last/ibm-cloud.env
+    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/last/experiment-runner.env
+
+    # create new files
+    REPO_URL=$(git config --get remote.origin.url)
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/code.txt
+    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../deployment-log/last/deployment-info.txt
+
 }
 
 function set_global_env () {
@@ -238,4 +275,5 @@ deploy_ce_application
 kube_information
 kube_pod_log
 set_global_env
-log_deployment_configuration
+log_deployment_configuration_all
+log_deployment_configuration_last
