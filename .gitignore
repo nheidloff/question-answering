@@ -12,12 +12,12 @@ metrics/experiment-runner/.env_runner_demo
 metrics/experiment-runner/.env_runner_real
 data/product-doc
 
-!deployment-log/README.md
+
 deployment-log/*
+!deployment-log/README.md
 !deployment-log/last/README.md
-deployment-log/last/*
 !deployment-log/all/README.md
-deployment-log/all/*
+
 
 metrics/input/*
 metrics/output/*
@@ -32,22 +32,6 @@ metrics/input/*
 service/src/main/resources/test-small.json
 service/src/main/resources/test.json
 service/src/main/resources/test-medium.json
-
-evaluations/error.log
-evaluations/env
-evaluations/__pycache__
-evaluations/test_input_export_from_excel.csv
-evaluations/test_input_excel.xlsx
-evaluations/metrics_output.csv
-evaluations/IBM_Gen_AI_Q_and_A_Consolidated.xlsx
-evaluations/test_output.csv
-evaluations/Book1.xlsx
-evaluations/outputs/*
-evaluations/inputs/*
-evaluations/outputs/*
-!evaluations/outputs/YOUR_OUTPUT.txt
-evaluations/inputs/*
-!evaluations/inputs/YOUR_INPUT.txt
 
 #Maven
 target/
