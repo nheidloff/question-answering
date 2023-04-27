@@ -48,11 +48,11 @@ python3 exp-runner.py
 
 ### 2. Execute as local containers
 
-* You need to install Docker desktop application
+* You need to install 'Docker desktop' application
 
 1. Execute the bash automation [start-containers.sh](../../scripts/start-containers.sh)
 
-The automation builds the needed containers locally and executes them inside a Docker compose network.
+The automation builds the needed containers locally and executes them inside a 'Docker compose network'.
 
 The applications:
 
@@ -61,7 +61,7 @@ The applications:
 
 ```sh
 cd question-answering/scripts
-sh start-container.sh
+sh start-containers.sh
 ```
 
 
