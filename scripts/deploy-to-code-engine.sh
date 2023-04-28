@@ -85,8 +85,8 @@ function build_and_push_container () {
     
     # Login to container with IBM Cloud registy  
     ibmcloud cr login
-     
-    ERROR=$(ibmcloud target -g $CR_RESOURCE_GROUP | grep FAILED | awk '{print $1;}' 2>&1)
+
+    ERROR=$(ibmcloud target -g $CR_RESOURCE_GROUP 2>&1)
     RESULT=$(echo $ERROR | grep 'FAILED' | awk '{print $1;}')
     VERIFY="FAILED"
     if [ "$RESULT" == "$VERIFY" ]; then
@@ -207,7 +207,7 @@ function kube_pod_log(){
     kubectl logs $APP_POD
 }
 
-# **** Logging *****
+# **** Logging deployment configuration *****
 
 function log_deployment_configuration_all(){
     
@@ -222,9 +222,11 @@ function log_deployment_configuration_all(){
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/ibm-cloud.env
     sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/experiment-runner.env
 
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env 
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/service.env
-    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env 
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/service.env
+    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env
+    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env
 
     # create new files
     REPO_URL=$(git config --get remote.origin.url)
@@ -241,13 +243,18 @@ function log_deployment_configuration_last(){
     cd  $HOME_PATH
     
     # remove all comments of the envirement configuration and save in all
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../service/.env > $HOME_PATH/../deployment-log/last/service.env
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../deployment-log/last/ibm-cloud.env
     sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/last/experiment-runner.env
 
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/last/tmp1-service.env 
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/last/tmp1-service.env > $HOME_PATH/../deployment-log/last/tmp2-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../deployment-log/last/tmp2-service.env > $HOME_PATH/../deployment-log/last/service.env
+    rm $HOME_PATH/../deployment-log/last/tmp1-service.env
+    rm $HOME_PATH/../deployment-log/last/tmp2-service.env
+
     # create new files
     REPO_URL=$(git config --get remote.origin.url)
-    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/code.txt
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/last/code.txt
     printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../deployment-log/last/deployment-info.txt
 
 }
