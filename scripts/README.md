@@ -19,9 +19,9 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 
 | Combination | Scripts | Experiment-runner<br />configuation | QA-service<br />configuration  | Notes |
 | --- | --- | --- | --- | --- |
-| 1 | [start_apps.sh](./start_apps.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) |  Example [`.env_template file`](../service/.env_template) |  |
-| 2 | [start_containers.sh](./start-containers.sh)<br />[stop-containers.sh](./stop-containers.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_2_example) | Example [`.env_template file`](../service/.env_template) |  |
-| 3 | [codeengine_deploy.sh](./codeengine_deploy.sh)<br />[codeengine_experiment.sh](./codeengine_experiment.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
+| 1 | [start-apps.sh](./start-apps.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) |  Example [`.env_template file`](../service/.env_template) |  |
+| 2 | [start-containers.sh](./start-containers.sh)<br />[stop-containers.sh](./stop-containers.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_2_example) | Example [`.env_template file`](../service/.env_template) |  |
+| 3 | [deploy-to-code-engine.sh](./deploy-to-code-engine.sh)<br />[codeengine_experiment.sh](./start-experiment-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
 | 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
 
@@ -29,7 +29,7 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 
 The experiment-runner is a Python command line application and the QA pipeline service is a Quarkus server application.
 
-The bash script `start_apps.sh` automates the start of both applications
+The bash script `start-apps.sh` automates the start of both applications
 
 ### 1.1 Create an experiment-runner `.env` file
 
@@ -51,7 +51,7 @@ cat ./env_template > .env
 
 ### 1.3 Start the automation
 
-The automation starts the bash automation for [experiment-runner](./local_exp_runner.sh) and for the [QA pipeline service](./local_qa_service.sh).
+The bash automation `start_apps.sh` starts the automation for [experiment-runner](./local_exp_runner.sh) and the [QA pipeline service](./local_qa_service.sh).
 
 It also creates an `~/.env_profile` file to save global variables.
 

@@ -12,8 +12,12 @@ metrics/experiment-runner/.env_runner_demo
 metrics/experiment-runner/.env_runner_real
 data/product-doc
 
-!deployment-log/README.md
+
 deployment-log/*
+!deployment-log/README.md
+!deployment-log/last/README_1.md
+!deployment-log/all/README_2.md
+
 
 metrics/input/*
 metrics/output/*
@@ -28,22 +32,6 @@ metrics/input/*
 service/src/main/resources/test-small.json
 service/src/main/resources/test.json
 service/src/main/resources/test-medium.json
-
-evaluations/error.log
-evaluations/env
-evaluations/__pycache__
-evaluations/test_input_export_from_excel.csv
-evaluations/test_input_excel.xlsx
-evaluations/metrics_output.csv
-evaluations/IBM_Gen_AI_Q_and_A_Consolidated.xlsx
-evaluations/test_output.csv
-evaluations/Book1.xlsx
-evaluations/outputs/*
-evaluations/inputs/*
-evaluations/outputs/*
-!evaluations/outputs/YOUR_OUTPUT.txt
-evaluations/inputs/*
-!evaluations/inputs/YOUR_INPUT.txt
 
 #Maven
 target/
@@ -93,15 +81,6 @@ nb-configuration.xml
 readnik.md
 scripts/.env_container_start
 scripts/env_container_start.sh
-metrics/1681396693-Metadata.csv
-metrics/1681396693-Runs.csv
-metrics/1681398722-Metadata.csv
-metrics/1681398722-Runs.csv
 metrics/Last-Run.md
-metrics/myrun/1681329199-Metadata.csv
-metrics/myrun/1681329199-Runs.csv
-metrics/myrun/1681391917-Metadata.csv
-metrics/myrun/1681391917-Runs.csv
-metrics/myrun/Last-Run.md
 metrics/experiment-runner/score_temp.py
 metrics/experiment-runner/test
