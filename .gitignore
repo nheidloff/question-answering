@@ -84,3 +84,4 @@ scripts/env_container_start.sh
 metrics/Last-Run.md
 metrics/experiment-runner/score_temp.py
 metrics/experiment-runner/test
+.env_backup

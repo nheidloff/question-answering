@@ -43,7 +43,7 @@ function setup_ce_project() {
   
   CODEENGINE_PROJECT_NAMESPACE=$(ibmcloud ce project get --name $CODEENGINE_PROJECT_NAME --output json | grep "namespace" | awk '{print $2;}' | sed 's/"//g' | sed 's/,//g')
   echo "Code Engine project namespace: $CODEENGINE_PROJECT_NAMESPACE"
-  kubectl get pods -n $CE_PROJECT_NAMESPACE
+  kubectl get pods -n $CODEENGINE_PROJECT_NAMESPACE
 }
 
 # **** Kubernetes CLI ****
