@@ -1,4 +1,5 @@
 readnik.md 
+dev/
 .env
 service/.env
 service/.env_demo
