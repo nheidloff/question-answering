@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.Sse;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
@@ -22,7 +24,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.resteasy.reactive.RestHeader;
+import org.jboss.resteasy.reactive.RestStreamElementType;
 import com.ibm.question_answering.api.Answer;
+import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
 @Path("")
@@ -34,6 +38,9 @@ import com.ibm.question_answering.api.Answer;
 @OpenAPIDefinition(info = @Info(title = "Question Answering Service", version = "0.0.1", description = "Question Answering APIs"))
 public class AnswerResource {
 
+    @Inject
+    Sse sse; 
+    
     @Inject
     QueryReRankerMaaS queryReRankerMaaS;
 
@@ -84,8 +91,8 @@ public class AnswerResource {
         )
     })
     @Operation(
-        summary = "Reads documents from Discovery and uses MaaS to return answer",
-        description = "Reads documents from Discovery and uses MaaS to return answer"
+            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer",
+            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer"
     )
     public Answer query(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, 
         @Parameter(description = "query", 
@@ -100,13 +107,12 @@ public class AnswerResource {
         metrics.start(uriInfo, utilities.getQuery(data));
         utilities.checkAuthorization(apikey);
         Answer output;
-        output = queryDiscoveryMaaS.query(utilities.getQuery(data));
+        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data));
         output = utilities.removeRedundantDocuments(output);
         metrics.end();
-        return output;
+        return output;       
     }
 
-    /*
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/query-discovery-reranker-maas")
@@ -124,7 +130,6 @@ public class AnswerResource {
         metrics.end();
         return output;       
     }
-    */
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -188,8 +193,19 @@ public class AnswerResource {
     )
     public Answer queryMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         utilities.checkAuthorization(apikey);
-        Answer output = queryMaaS.query(utilities.getQuery(data));
-        return output;
+        return queryMaaS.query(utilities.getQuery(data));
+    }
+
+    @POST
+    @Path("/query-maas-as-stream")
+    @SecurityRequirement(name = "apikey")
+    @RestStreamElementType(MediaType.APPLICATION_JSON)    
+    public Multi<OutboundSseEvent> queryMaaSAsStream(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        utilities.checkAuthorization(apikey);        
+        return queryMaaS.queryAsStream(utilities.getQuery(data))
+            .map(item -> sse.newEventBuilder() 
+                .data(item) 
+                .build());
     }
 
     @POST

@@ -16,9 +16,11 @@ public class Parameters {
         this.max_new_tokens = max_new_tokens;
         this.min_new_tokens = min_new_tokens;
         this.temperature = temperature;
+        this.stream = false;
     }
     
     public double temperature;
     public int max_new_tokens;
     public int min_new_tokens;
+    public boolean stream;
 }

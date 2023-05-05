@@ -14,6 +14,7 @@ import com.ibm.question_answering.primeqa.AskPrimeQA;
 import com.ibm.question_answering.prompts.QuestionAnswering;
 import com.ibm.question_answering.proxy.ProxyExceptionMapper;
 import com.ibm.question_answering.proxy.ProxyServiceResource;
+import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
 public class AskModelAsAService {
@@ -55,14 +56,17 @@ public class AskModelAsAService {
     final static String MAAS_LLM_NAME = "google/flan-t5-xxl";
     @ConfigProperty(name = "EXPERIMENT_LLM_NAME") 
     Optional<String> llmNameOptionalString;
+    String llmName = MAAS_LLM_NAME;
 
     final static int MAAS_LLM_MIN_NEW_TOKENS = 1;
     @ConfigProperty(name = "EXPERIMENT_LLM_MIN_NEW_TOKENS") 
     Optional<String> llmMinNewTokensOptionalString;
+    int llmMinNewTokens = MAAS_LLM_MIN_NEW_TOKENS;
 
     final static int MAAS_LLM_MAX_NEW_TOKENS = 300;
     @ConfigProperty(name = "EXPERIMENT_LLM_MAX_NEW_TOKENS") 
     Optional<String> llmMaxNewTokensOptionalString;
+    int llmMaxNewTokens = MAAS_LLM_MAX_NEW_TOKENS;
 
     final static int MAAS_LLM_MAX_INPUT_DOCUMENTS = 3;
     @ConfigProperty(name = "EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS") 
@@ -97,7 +101,7 @@ public class AskModelAsAService {
         return output;
     }
 
-    public com.ibm.question_answering.api.Answer execute(String prompt) {
+    private void readAndCheckEnvironmentVariables() {
         if ((proxyApiKey != null) && (!proxyApiKey.equals(""))) {
             if (!proxyApiKey.equalsIgnoreCase(PROXY_API_KEY_NOT_SET)) {
                 useProxy = true;
@@ -115,46 +119,96 @@ public class AskModelAsAService {
             System.err.println(ERROR_MAAS_API_KEY_NOT_SET);
             throw new RuntimeException(ERROR_MAAS_API_KEY_NOT_SET);
         }
-        int llmMinNewTokens = MAAS_LLM_MIN_NEW_TOKENS;
         if (llmMinNewTokensOptionalString.isPresent()) {
             try {
                 llmMinNewTokens = Integer.parseInt(llmMinNewTokensOptionalString.get());
             } catch (Exception e) {}
         }
-        int llmMaxNewTokens = MAAS_LLM_MAX_NEW_TOKENS;
         if (llmMaxNewTokensOptionalString.isPresent()) {
             try {
                 llmMaxNewTokens = Integer.parseInt(llmMaxNewTokensOptionalString.get());
             } catch (Exception e) {}
         }        
-        String llmName = MAAS_LLM_NAME;
         if (llmNameOptionalString.isPresent()) {
             llmName = llmNameOptionalString.get();
         }        
+    }
 
+    public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String prompt) {
+        this.readAndCheckEnvironmentVariables();
+        metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);
+        com.ibm.question_answering.maas.Parameters parameters = getParameters();
+        parameters.stream = true;
+
+        Multi<Answer> response = null;
+        if (useProxy == false) {
+            response = maasResource.askAsStream(new Input(llmName, getInputs(prompt), parameters));
+        }
+        else {
+            // TBD
+        }    
+        return response;
+    }
+
+    private com.ibm.question_answering.maas.Parameters getParameters() {
         com.ibm.question_answering.maas.Parameters parameters = new com.ibm.question_answering.maas.Parameters();
         parameters.min_new_tokens = llmMinNewTokens;
         parameters.max_new_tokens = llmMaxNewTokens;
         parameters.temperature = 0;
-        metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);
-        com.ibm.question_answering.api.Answer output;
-        output = new com.ibm.question_answering.api.Answer(true, 0, null);
+        return parameters;
+    }
+
+    private String[] getInputs(String prompt) {
         String[] inputs = new String[1];
         inputs[0] = prompt;
+        return inputs;
+    }
 
+    public com.ibm.question_answering.api.Answer execute(String prompt) {
+        this.readAndCheckEnvironmentVariables();
+        metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);       
+        
         Answer response;
         if (useProxy == false) {
-            response = maasResource.ask(new Input(llmName, inputs, parameters));
+            response = maasResource.ask(new Input(llmName, getInputs(prompt), getParameters()));
         }
         else {
             com.ibm.question_answering.proxy.Input proxyInput = new com.ibm.question_answering.proxy.Input(apiKey, url, 
-                new com.ibm.question_answering.maas.Input(llmName, inputs, parameters));
+                new com.ibm.question_answering.maas.Input(llmName, getInputs(prompt), getParameters()));
             response = proxyResource.ask(proxyInput);
-        }
+        }      
         
+        return convertToAPIAnswer(response);
+    }
+
+    private com.ibm.question_answering.api.Answer convertToAPIAnswer(Answer response) {
+        com.ibm.question_answering.api.Answer output;
+        output = new com.ibm.question_answering.api.Answer(true, 0, null);
+
         if (response != null) {
             if (response.results.length > 0) {
-                String generatedText = response.results[0].generated_text;
+                String generatedText = getGeneratedText(response);
+                output.matching_results = 1;
+                ArrayList<Result> results = new ArrayList<Result>();
+                String text[] = new String[1];
+                text[0] = generatedText;
+                results.add(new Result(Result.TITLE_ONE_ANSWER, 
+                    Result.TITLE_ONE_ANSWER,
+                    text,
+                    null,
+                    null));
+                output.results = results;
+            }
+        }
+        return output;
+    }
+
+    private String getGeneratedText(Answer response) {
+        String output = "";
+        String generatedText = "";
+        if (response != null) {
+            if (response.results.length > 0) {
+                generatedText = response.results[0].generated_text;
 
                 // special case
                 String EVIDENCE_MARKER1 = "; evidence:";
@@ -170,19 +224,9 @@ public class AskModelAsAService {
                 if (generatedText.contains(EVIDENCE_MARKER3)) {
                     generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER3) + 1);
                 }
-
-                output.matching_results = 1;
-                ArrayList<Result> results = new ArrayList<Result>();
-                String text[] = new String[1];
-                text[0] = generatedText;
-                results.add(new Result(Result.TITLE_ONE_ANSWER, 
-                    Result.TITLE_ONE_ANSWER,
-                    text,
-                    null,
-                    null));
-                output.results = results;
             }
         }
+        output = generatedText;
         return output;
     }
 

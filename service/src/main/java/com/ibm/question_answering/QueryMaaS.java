@@ -6,6 +6,8 @@ import javax.inject.Inject;
 import com.ibm.question_answering.api.Answer;
 import com.ibm.question_answering.maas.AskModelAsAService;
 
+import io.smallrye.mutiny.Multi;
+
 @ApplicationScoped
 public class QueryMaaS {
 
@@ -13,11 +15,10 @@ public class QueryMaaS {
     AskModelAsAService askMaaS;
 
     public Answer query(String prompt) {  
-        Answer answer = askMaaS.execute(prompt);
-        String answerAsText = answer.results.get(0).text.text[0];
-        String[] text = new String[1];
-        text[0] = answerAsText;
-        answer.results.get(0).text.text = text;
-        return answer;   
+        return askMaaS.execute(prompt);
     }  
+
+    public Multi<com.ibm.question_answering.maas.Answer> queryAsStream(String prompt) {
+        return askMaaS.executeAsStream(prompt);
+    }
 }
