@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: question-answering
-        image: icr.io/reanker-tsuedbro/reanker-tsuedbro:v1
+        image: {{ .Values.container_registry.CR }}/{{ .Values.container_registry.CR_REPOSITORY }}/{{ .Values.container_image.CI_NAME }}:{{ .Values.container_image.CI_TAG }}
         imagePullPolicy: Always
         livenessProbe:
           exec:

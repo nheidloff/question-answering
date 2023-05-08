@@ -1,8 +1,14 @@
-
 # Default values for chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+container_registry:
+  CR_RESOURCE_GROUP: ${CR_RESOURCE_GROUP}
+  CR_REGION: ${CR_REGION}
+  CR: ${CR}
+  CR_REPOSITORY: ${CR_REPOSITORY}
+container_image:
+  CI_NAME: ${CI_NAME}
+  CI_TAG: ${CI_TAG}
 qa:
   QA_API_KEY: ${QA_API_KEY}
 discovery:
