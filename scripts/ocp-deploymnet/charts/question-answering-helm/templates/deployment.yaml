@@ -31,13 +31,13 @@ spec:
         env:
         - name: QA_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: question-answering-confmap
+            secretKeyRef:
+              name: question-answering-secrets
               key: QA_API_KEY
         - name: DISCOVERY_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: question-answering-confmap
+            secretKeyRef:
+              name: question-answering-secrets
               key: DISCOVERY_API_KEY
         - name: DISCOVERY_URL
           valueFrom:
@@ -76,8 +76,8 @@ spec:
               key: MAAS_URL
         - name: MAAS_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: question-answering-confmap
+            secretKeyRef:
+              name: question-answering-secrets
               key: MAAS_API_KEY
         - name: PROXY_URL
           valueFrom:
@@ -86,8 +86,8 @@ spec:
               key: PROXY_URL
         - name: PROXY_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: question-answering-confmap
+            secretKeyRef:
+              name: question-answering-secrets
               key: PROXY_API_KEY
         - name: EXPERIMENT_METRICS_SESSION
           valueFrom:
