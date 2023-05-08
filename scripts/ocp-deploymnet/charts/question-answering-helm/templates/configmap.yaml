@@ -1,0 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: question-answering-confmap
+  namespace: question-answering
+data:
+  QA_API_KEY: {{ .Values.experiment.discovery.QA_API_KEY }}
+  DISCOVERY_API_KEY: {{ .Values.experiment.discovery.DISCOVERY_API_KEY}}
+  DISCOVERY_URL: {{ .Values.experiment.discovery.DISCOVERY_URL}}
+  DISCOVERY_INSTANCE: {{ .Values.experiment.discovery.DISCOVERY_INSTANCE}}
+  DISCOVERY_PROJECT: {{ .Values.experiment.discovery.DISCOVERY_PROJECT}}
+  DISCOVERY_COLLECTION_ID: {{ .Values.experiment.discovery.DISCOVERY_COLLECTION_ID}}
+  PRIME_QA_URL: {{ .Values.experiment.prime_qa.PRIME_QA_URL}}
+  RERANKER_URL: {{ .Values.experiment.reranker.RERANKER_URL}}
+  MAAS_URL: {{ .Values.experiment.maas.MAAS_URL}}
+  MAAS_API_KEY: {{ .Values.experiment.maas.MAAS_API_KEY}}
+  PROXY_URL: {{ .Values.experiment.proxy.PROXY_URL}}
+  PROXY_API_KEY: {{ .Values.experiment.proxy.PROXY_API_KEY}}
+  EXPERIMENT_METRICS_SESSION: {{ .Values.experiment.experiment.SESSION_ID}}
+  EXPERIMENT_LLM_NAME: {{ .Values.experiment.EXPERIMENT_LLM_NAME}}
+  EXPERIMENT_LLM_MIN_NEW_TOKENS: {{ .Values.experiment.EXPERIMENT_LLM_MIN_NEW_TOKENS}}
+  EXPERIMENT_LLM_MAX_NEW_TOKENS: {{ .Values.experiment.EXPERIMENT_LLM_MAX_NEW_TOKENS}}
+  EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS: {{ .Values.experiment.EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS}}
+  EXPERIMENT_LLM_PROMPT: {{ .Values.experiment.EXPERIMENT_LLM_PROMPT}}
+  EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS: {{ .Values.experiment.EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS}}
+  EXPERIMENT_RERANKER_MODEL: {{ .Values.experiment.EXPERIMENT_RERANKER_MODEL}}
+  EXPERIMENT_RERANKER_ID: {{ .Values.experiment.EXPERIMENT_RERANKER_ID}}
+  EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS: {{ .Values.experiment.EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS}}
+  EXPERIMENT_DISCOVERY_CHARACTERS: {{ .Values.experiment.EXPERIMENT_DISCOVERY_CHARACTERS}}
+  EXPERIMENT_DISCOVERY_FIND_ANSWERS: {{ .Values.experiment.EXPERIMENT_DISCOVERY_FIND_ANSWERS}}
+  EXPERIMENT_METRICS_DIRECTORYS: {{ .Values.experiment.EXPERIMENT_METRICS_DIRECTORYS}}

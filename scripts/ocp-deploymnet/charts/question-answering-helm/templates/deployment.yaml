@@ -1,0 +1,49 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: question-answering
+  namespace: question-answering
+  labels:
+      app: question-answering
+spec:
+  selector:
+    matchLabels:
+      app: question-answering
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: question-answering
+        version: v1
+    spec:
+      containers:
+      - name: question-answering
+        image: icr.io/reanker-tsuedbro/reanker-tsuedbro:v1
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "ls"]
+          initialDelaySeconds: 20
+        readinessProbe:
+          exec:
+            command: ["sh", "-c", "ls"]
+          initialDelaySeconds: 40
+        env:
+        - name: STORE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: STORE_DIR
+        - name: mode
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: mode
+        - name: require_ssl
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: require_ssl
+        ports:
+        - containerPort: 50052
+      restartPolicy: Always

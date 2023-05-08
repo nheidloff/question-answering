@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: question-answering-service
+  namespace: question-answering
+  labels:
+    app: question-answering
+spec:
+  selector:
+    app: question-answering
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: NodePort
