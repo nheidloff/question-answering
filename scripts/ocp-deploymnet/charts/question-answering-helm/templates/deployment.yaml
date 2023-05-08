@@ -29,21 +29,87 @@ spec:
             command: ["sh", "-c", "ls"]
           initialDelaySeconds: 40
         env:
+        - name: QA_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: QA_API_KEY
+        - name: DISCOVERY_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: DISCOVERY_API_KEY
+        - name: DISCOVERY_URL
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: DISCOVERY_URL
+        - name: DISCOVERY_INSTANCE
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: DISCOVERY_INSTANCE
+        - name: DISCOVERY_PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: DISCOVERY_PROJECT
+        - name: DISCOVERY_COLLECTION_ID
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: DISCOVERY_COLLECTION_ID
+        - name: PRIME_QA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: PRIME_QA_URL
+        - name: RERANKER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: RERANKER_URL
+        - name: MAAS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: MAAS_URL
+        - name: MAAS_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: MAAS_API_KEY
         - name: STORE_DIR
           valueFrom:
             configMapKeyRef:
               name: reranker-confmap
               key: STORE_DIR
-        - name: mode
+        - name: STORE_DIR
           valueFrom:
             configMapKeyRef:
               name: reranker-confmap
-              key: mode
-        - name: require_ssl
+              key: STORE_DIR
+        - name: STORE_DIR
           valueFrom:
             configMapKeyRef:
               name: reranker-confmap
-              key: require_ssl
+              key: STORE_DIR
+        - name: STORE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: STORE_DIR
+        - name: STORE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: STORE_DIR
+        - name: STORE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: reranker-confmap
+              key: STORE_DIR
+                 
         ports:
-        - containerPort: 50052
+        - containerPort: 8080
       restartPolicy: Always
