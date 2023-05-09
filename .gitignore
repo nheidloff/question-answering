@@ -96,3 +96,4 @@ service/.env_watbert_cpu_configuration
 scripts/.env_jason
 scripts/.env_tsuedbro
 scripts/ocp-deployment/custom_config.json
+scripts/ocp-deployment/charts/question-answering-helm/values.yaml
