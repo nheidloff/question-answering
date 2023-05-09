@@ -75,7 +75,7 @@ function install_helm_chart () {
 
     echo ""
     echo "*********************"
-    echo "installHelmChart"
+    echo "install Helm chart ./question-answering-helm/"
     echo "*********************"
     echo ""
 
@@ -86,6 +86,21 @@ function install_helm_chart () {
     helm dependency update ./question-answering-helm/
     helm install --dry-run --debug question-answering-helm ./question-answering-helm/
     helm install question-answering-helm ./question-answering-helm/
+    
+    cd $HOME_PATH
+}
+
+function uninstall_helm_chart () {
+
+    echo ""
+    echo "*********************"
+    echo "uninstall Helm chart"
+    echo "*********************"
+    echo ""
+
+    cd $HOME_PATH/charts
+    TEMP_PATH_EXECUTION=$(pwd)
+    helm uninstall question-answering-helm
     
     cd $HOME_PATH
 }
@@ -148,4 +163,5 @@ create_custom_docker_config_file
 connect_to_cluster
 login_to_cluster
 install_helm_chart
+uninstall_helm_chart
 
