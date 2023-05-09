@@ -59,13 +59,19 @@ function login_to_cluster () {
     echo "*********************"
     echo ""
     
-    export MASTER_NODE=$(ibmcloud oc cluster config -c  $CLUSTER_NAME --admin --output json | jq '."clusters" | .[] | ."cluster" | ."server" ')
-    	
+    export MASTER_NODE_TEMP=$(ibmcloud oc cluster config -c  $CLUSTER_NAME --admin --output json | jq '."clusters" | .[] | ."cluster" | ."server" ')
+    
+    echo "Master node: $MASTER_NODE_TEMP"
+    remove_string=http://
+    export MASTER_NODE=${MASTER_NODE_TEMP#"$remove_string"}
+    echo "Master node: $MASTER_NODE"
+
     open https://iam.cloud.ibm.com/identity/passcode
 
     echo "Insert passcode: "
     read login_passcode
-    oc login -u passcode -p $login_passcode --server=$MASTER_NODE
+    ${string#"$prefix"}
+    oc login -u passcode -p $login_passcode --server=${MASTER_NODE}
 }
 
 function install_helm_chart () {
