@@ -60,7 +60,7 @@ function login_to_cluster () {
     echo ""
     
     export MASTER_NODE_TEMP=$(ibmcloud oc cluster config -c  $CLUSTER_NAME --admin --output json | jq '."clusters" | .[] | ."cluster" | ."server" ')
-    export MASTER_NODE=$(echo $MASTER_NODE_TEMP | sed 's~http[s]*://~~g')
+    export MASTER_NODE=$(echo $MASTER_NODE_TEMP | sed 's~http[s]*://~~g' | sed 's/\"//g')
     echo "Master node: $MASTER_NODE"
 
     open https://iam.cloud.ibm.com/identity/passcode
@@ -68,7 +68,7 @@ function login_to_cluster () {
     echo "Insert passcode: "
     read login_passcode
 
-    oc login -u passcode -p "${login_passcode}" --server="${MASTER_NODE}"
+    oc login -u passcode -p "${login_passcode}" --server=https://${MASTER_NODE}
 }
 
 function install_helm_chart () {
@@ -153,8 +153,8 @@ function build_and_push_container () {
     fi
 
     # Login to IBM Cloud registy with Docker
-    docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION 
-    docker push "$CODEENGINE_APP_IMAGE_URL"
+    docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION  
+    docker push "$IMAGE_URL"
     
     ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
 
