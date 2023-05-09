@@ -59,7 +59,7 @@ function login_to_cluster () {
     echo "*********************"
     echo ""
     
-    export MASTER_NODE=ibmcloud oc cluster config -c  $CLUSTER_NAME --admin --output json | jq '."clusters" | .[] | ."cluster" | ."server" '
+    export MASTER_NODE=$(ibmcloud oc cluster config -c  $CLUSTER_NAME --admin --output json | jq '."clusters" | .[] | ."cluster" | ."server" ')
     	
     open https://iam.cloud.ibm.com/identity/passcode
 
