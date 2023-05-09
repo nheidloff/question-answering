@@ -79,7 +79,7 @@ function install_helm_chart () {
     echo "*********************"
     echo ""
 
-    "/bin/sh" ./generate_values_file.sh > ./charts/question-answering-helm/values.yaml
+    "/bin/sh" ./generate-values-file.sh > ./charts/question-answering-helm/values.yaml
 
     cd $HOME_PATH/charts
     TEMP_PATH_EXECUTION=$(pwd)
