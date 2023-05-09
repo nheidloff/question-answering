@@ -81,7 +81,7 @@ function installHelmChart () {
     helm dependency update ./question-answering-helm/
     helm install --dry-run \
          --debug helm-test \
-         --set pullsecret.IBMPULLSECRET=$
+         --set pullsecret.IBMPULLSECRET=${PULL_SECRET}  \
          --set container_registry.CR_RESOURCE_GROUP=${CR_RESOURCE_GROUP}  \
          --set container_registry.CR_REGION=${CR_REGION}  \
          --set container_registry.CR=${CR}  \
