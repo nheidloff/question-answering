@@ -155,6 +155,6 @@ spec:
               key: EXPERIMENT_METRICS_DIRECTORYS           
         ports:
         - containerPort: 8080
-        imagePullSecrets:
-        - name: question-answering-pull-secret
+      imagePullSecrets:
+      - name: question-answering-pull-secret
       restartPolicy: Always
