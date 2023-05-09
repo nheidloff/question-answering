@@ -3,11 +3,12 @@
 # **************** Global variables
 export HOME_PATH=$(pwd)
 
-# IBM Cloud - variables
+# OPC - variables
 source "$HOME_PATH"/.env
-# QA Service - variables
+# IBM Cloud - variables
 source "$HOME_PATH"/../.env
-
+# QA Service - variables
+source "$HOME_PATH"/../../service/.env
 
 function check_docker () {
     
