@@ -68,7 +68,7 @@ function login_to_cluster () {
     echo "Insert passcode: "
     read login_passcode
 
-    oc login -u passcode -p $login_passcode --server=${MASTER_NODE}
+    oc login -u passcode -p "${login_passcode}" --server="${MASTER_NODE}"
 }
 
 function install_helm_chart () {
