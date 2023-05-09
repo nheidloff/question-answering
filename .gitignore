@@ -93,3 +93,5 @@ service/.env_watbert_gpu_configuration
 metrics/experiment-runner/.env_gpu_configuration_watbert
 metrics/experiment-runner/.env_cpu_configuration_watbert
 service/.env_watbert_cpu_configuration
+scripts/.env_jason
+scripts/.env_tsuedbro
