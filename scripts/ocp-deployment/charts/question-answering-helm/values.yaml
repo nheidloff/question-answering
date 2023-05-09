@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 pullsecret: 
-  IBMPULLSECRET: ${PULL_SECRET}
+  PULLSECRET: ${PULL_SECRET}
 container_registry:
   CR_RESOURCE_GROUP: ${CR_RESOURCE_GROUP}
   CR_REGION: ${CR_REGION}
