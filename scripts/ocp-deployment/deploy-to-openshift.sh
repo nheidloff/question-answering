@@ -39,7 +39,7 @@ function login_to_ibm_cloud () {
     ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
 }
 
-function connectToCluster () {
+function connect_to_cluster () {
 
     echo ""
     echo "*********************"
@@ -50,7 +50,7 @@ function connectToCluster () {
     ibmcloud ks cluster config -c $CLUSTER_NAME
 }
 
-function loginToCluster () {
+function login_to_cluster () {
 
     echo ""
     echo "*********************"
@@ -67,7 +67,7 @@ function loginToCluster () {
     oc login -u passcode -p $login_passcode --server=$MASTER_NODE
 }
 
-function installHelmChart () {
+function install_helm_chart () {
 
     echo ""
     echo "*********************"
@@ -156,7 +156,7 @@ function build_and_push_container () {
 
 }
 
-function createCustomDockerConfigFile () {
+function create_custom_docker_config_file () {
 
     echo ""
     echo "*********************"
@@ -174,5 +174,9 @@ function createCustomDockerConfigFile () {
 
 check_docker
 login_to_ibm_cloud
-connectToCluster
 build_and_push_container
+create_custom_docker_config_file
+connect_to_cluster
+login_to_cluster
+install_helm_chart
+
