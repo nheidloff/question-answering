@@ -157,4 +157,6 @@ spec:
         - containerPort: 8080
       imagePullSecrets:
       - name: question-answering-pull-secret
+      securityContext:
+        allowPrivilegeEscalation: false 
       restartPolicy: Always
