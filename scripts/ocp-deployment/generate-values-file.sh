@@ -4,7 +4,7 @@ cat <<EOF
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 #  EXPERIMENT_LLM_PROMPT: "${EXPERIMENT_LLM_PROMPT}"
-serviceAccountPatch: '{"imagePullSecrets": [{"name": "${PULL_SECRET}"}]}'
+serviceAccountPatch: '{"imagePullSecrets": [{"name": "question-answering-pull-secret"}], "secrets":[{"name": "question-answering-pull-secret"}]}'
 pullsecret: 
   PULLSECRET: "${PULL_SECRET}"
 container_registry:
