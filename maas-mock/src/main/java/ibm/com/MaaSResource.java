@@ -1,13 +1,9 @@
 package ibm.com;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.jboss.resteasy.reactive.RestHeader;
 

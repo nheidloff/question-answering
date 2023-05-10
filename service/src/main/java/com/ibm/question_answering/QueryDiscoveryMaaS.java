@@ -36,36 +36,32 @@ public class QueryDiscoveryMaaS {
     @Inject
     Metrics metrics;
 
-    public String invokeRemoteServiceUsingBlockingIO(String s){
-        return s;
-    }
-    public Multi<com.ibm.question_answering.maas.Answer> queryAsStream(String query) {
-    //public Multi<Object> queryAsStream(String query) {
-        //Uni<String> uni = 
-  
-        Uni.createFrom().
-            item(() -> {
-                // 1. Discovery
-                com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query); 
-                if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
-                    // TODO return MockAnswers.getEmptyAnswer();
-                }
+    public AnswerDocument[] invokeDiscoveryUsingBlockingIO(String query) {
+        // 1. Discovery
+        com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query); 
+        if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
+            // TODO 
+        }
 
-                DocumentScore[] documentsAndScores = convert(discoveryAnswer);
-                AnswerDocument[] answerDocuments = queryDiscoveryReRankerMaaS.convertToAnswerDocuments(documentsAndScores, discoveryAnswer, documentsAndScores.length);
-                if ((answerDocuments == null) || (answerDocuments.length < 1)) {
-                    // TODO return MockAnswers.getEmptyAnswer();
-                }
-                return "item";
-                // TODO return askMaaS.executeAsStream(query);
-            })
-            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
-            .subscribe().asCompletionStage();
+        DocumentScore[] documentsAndScores = convert(discoveryAnswer);
+        AnswerDocument[] answerDocuments = queryDiscoveryReRankerMaaS.convertToAnswerDocuments(documentsAndScores, discoveryAnswer, documentsAndScores.length);
+        if ((answerDocuments == null) || (answerDocuments.length < 1)) {
+            // TODO 
+        }
+
+        return answerDocuments;
+    }
+
+    public Multi<com.ibm.question_answering.maas.Answer> queryAsStream(String query) {
+
+        var blockingOp = Uni.createFrom().item(() -> {
+            return this.invokeDiscoveryUsingBlockingIO(query);
+        }).runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
         
-        // TODO
-        // Does NOT work!
-        // https://stackoverflow.com/questions/76198665/how-to-invoke-asynch-operations-after-synch-operations-with-quarkus-smallrye-mut
-        return askMaaS.executeAsStream(query);
+        return blockingOp
+            .onItem().transformToMulti(answerDocuments -> {
+                return askMaaS.executeAsStream(query, answerDocuments);
+            });
     }
     
     public Answer query(String query) {        

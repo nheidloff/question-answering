@@ -6,8 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.ibm.question_answering.Metrics;
-import com.ibm.question_answering.api.DocumentPassage;
-import com.ibm.question_answering.api.PassageAnswer;
 import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.primeqa.AskPrimeQA;
@@ -139,6 +137,13 @@ public class AskModelAsAService {
         }        
     }
 
+    public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String query, AnswerDocument[] answerDocuments) {
+        answerDocuments = this.limitAnswerDocuments(answerDocuments);
+        String prompt = questionAnswering.getPrompt(query, answerDocuments);
+        return executeAsStream(prompt);
+        // TODO output = cleanUpAnswer(output, answerDocuments);
+    }
+
     public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String prompt) {
         this.readAndCheckEnvironmentVariables();
         metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);
@@ -150,7 +155,7 @@ public class AskModelAsAService {
             response = maasResource.askAsStream(new Input(llmName, getInputs(prompt), parameters));
         }
         else {
-            // TBD
+            // TODO
         }    
         return response;
     }
