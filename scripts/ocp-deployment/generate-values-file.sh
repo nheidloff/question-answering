@@ -4,6 +4,8 @@ cat <<EOF
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 #  EXPERIMENT_LLM_PROMPT: "${EXPERIMENT_LLM_PROMPT}"
+service_account_patch: |
+     {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"default"},"automountServiceAccountToken":false}
 pullsecret: 
   PULLSECRET: "${PULL_SECRET}"
 container_registry:

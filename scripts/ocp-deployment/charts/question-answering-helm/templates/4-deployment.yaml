@@ -155,8 +155,9 @@ spec:
               key: EXPERIMENT_METRICS_DIRECTORYS           
         ports:
         - containerPort: 8080
+      serviceAccountName: {{ .Values.serviceAccountPatch.metadata.name }}
       imagePullSecrets:
       - name: question-answering-pull-secret
       securityContext:
-        allowPrivilegeEscalation: false 
+      - allowPrivilegeEscalation: false 
       restartPolicy: Always
