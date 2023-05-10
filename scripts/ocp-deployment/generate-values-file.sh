@@ -4,8 +4,7 @@ cat <<EOF
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 #  EXPERIMENT_LLM_PROMPT: "${EXPERIMENT_LLM_PROMPT}"
-service_account_patch: |
-     {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"default"},"automountServiceAccountToken":false}
+serviceAccountPatch: '{"imagePullSecrets": [{"name": "${PULL_SECRET}"}]}'
 pullsecret: 
   PULLSECRET: "${PULL_SECRET}"
 container_registry:
@@ -48,4 +47,8 @@ experiment:
   EXPERIMENT_DISCOVERY_CHARACTERS: "${EXPERIMENT_DISCOVERY_CHARACTERS}"
   EXPERIMENT_DISCOVERY_FIND_ANSWERS: "${EXPERIMENT_DISCOVERY_FIND_ANSWERS}"
   EXPERIMENT_METRICS_DIRECTORY: "/deployments/metrics"
+hooks:
+  post-install:
+  - name: patch-service-account
+    command: kubectl patch serviceaccount default -n question-answering -p '{{ .Values.serviceAccountPatch }}'
 EOF

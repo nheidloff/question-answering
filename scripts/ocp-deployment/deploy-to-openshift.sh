@@ -163,5 +163,5 @@ create_custom_docker_config_file
 connect_to_cluster
 login_to_cluster
 install_helm_chart
-#uninstall_helm_chart
+uninstall_helm_chart
 

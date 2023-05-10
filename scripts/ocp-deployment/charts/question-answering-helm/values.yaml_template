@@ -1,7 +1,7 @@
 # Default values for chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-service_account_patch: |
+serviceAccountPatch: |
      {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"default"},"automountServiceAccountToken":false}
 pullsecret: 
   PULLSECRET: ${PULL_SECRET}
