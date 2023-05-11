@@ -243,9 +243,9 @@ function verify_service () {
             sleep 3
         done
     
-    QUERY="Test this simple question?"
+    QUERY="Do you know IBM?"
     
-    curl -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{ \"query\": \"text:$QUERY\" }" "$ROUTE/query" | jq '.'
+    curl -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{ \"query\": \"text:$QUERY\" }" "$ROUTE/query"
 }
 
 function log_deployment_configuration(){
@@ -255,14 +255,14 @@ function log_deployment_configuration(){
     echo "************************************"
     cd  $HOME_PATH
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
-    export LOG_FOLDER=$HOME_PATH/log/$FOLDERNAME
+    export LOG_FOLDER=$HOME_PATH/logs/$FOLDERNAME
     mkdir $LOG_FOLDER
     
     # remove all comments of the envirement configuration and save in all
     
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/../.env > $LOG_FOLDER/ibm-cloud.env
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $LOG_FOLDER/ocp-deployment.env
-    sed '/^#/d' $HOME_PATH/charts/quastion-answering-helm/values.yaml > $LOG_FOLDER/helm-values.yaml
+    sed '/^#/d' $HOME_PATH/charts/question-answering-helm/values.yaml > $LOG_FOLDER/helm-values.yaml
     sed '/^#/d' $HOME_PATH/generate-values-file.sh > $LOG_FOLDER/helm-generate-values-file.sh
     
     # service
