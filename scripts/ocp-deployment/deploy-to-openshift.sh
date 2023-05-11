@@ -100,6 +100,41 @@ function install_helm_chart () {
     cd $HOME_PATH
 }
 
+function wait_for_pod () {
+    echo ""
+    echo "-------------------------"
+    echo "Wait for pod"
+    echo "-------------------------"
+    echo ""
+    i=0
+    while :
+        do
+            FIND="question-answering"
+            STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $1;}')
+            echo "Status: $STATUS_CHECK"
+            if [ "$STATUS_CHECK" != "" ]; then
+                echo "$(date +'%F %H:%M:%S') Status: pod found."
+                STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $3;}')
+                if [ "$STATUS_CHECK" != "Running" ]; then
+                   echo "Pod is running"
+                   break
+                fi
+            else 
+                echo "$(date +'%F %H:%M:%S') Status: waiting"               
+            fi
+
+            if [[ "$i" -gt 3 ]]; then
+                echo "Verify the pod manually! The script ends here."
+                exit 1
+            fi
+            
+            i=$((i+1))
+            
+            sleep 3
+        done
+
+}
+
 function uninstall_helm_chart () {
 
     echo ""
@@ -162,6 +197,53 @@ function create_custom_docker_config_file () {
     export PULL_SECRET=$(base64 -i "$HOME_PATH/custom_config.json")
 }
 
+function verify_service () {
+
+    ROUTE_NAME=$(oc get routes -n question-answering | grep 'question-answering-route' | awk '{print $1;}')
+    echo $ROUTE
+        # ***** Wait for postgres instance
+    echo ""
+    echo "-------------------------"
+    echo "Wait for route"
+    echo "-------------------------"
+    echo ""
+    i=0
+    while :
+        do
+            FIND="question-answering-route"
+            STATUS_CHECK=$(oc get routes -n question-answering | grep $FIND | awk '{print $1;}')
+            echo "Status: $STATUS_CHECK"
+            if [ "$STATUS_CHECK" = "" ]; then
+                echo "$(date +'%F %H:%M:%S') Status: $FIND not found."
+                echo "------------------------------------------------------------------------"
+            fi
+
+            if [ "$STATUS_CHECK" = "$FIND" ]; then
+                echo "$(date +'%F %H:%M:%S') Status: $FIND is Ready"
+                ROUTE=$(oc get routes -n question-answering | grep $FIND | awk '{print $2;}')
+                echo "Route : $ROUTE"
+                echo "------------------------------------------------------------------------"
+                break
+            fi
+
+            if [[ "$i" -gt 3 ]]; then
+                echo "Verify the route manually! The script ends here."
+                exit 1
+            fi
+
+            i=$((i+1))
+            sleep 3
+        done
+    
+    QUERY="Test is a simple question?"
+    curl -X POST \
+    -u "apikey:$QA_API_KEY" \
+    --header "Content-Type: application/json" \
+    --data "{   \"query\": \"text:$QUERY\" }" \
+    "$ROUTE/query" \
+    | jq '.'
+}
+
 #**********************************************************************************
 # Execution
 # *********************************************************************************
@@ -173,5 +255,7 @@ create_custom_docker_config_file
 connect_to_cluster
 login_to_cluster
 install_helm_chart
+wait_for_pod
+verify_service
 #uninstall_helm_chart
 
