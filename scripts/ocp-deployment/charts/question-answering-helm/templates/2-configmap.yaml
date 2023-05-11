@@ -13,7 +13,7 @@ data:
   {{- if .Values.discovery.DISCOVERY_PROJECT }}
   DISCOVERY_PROJECT: "{{ .Values.discovery.DISCOVERY_PROJECT }}"
   {{- end }}
-  {{- if .Values.discovery.DISCOVERY_COLLECTION_ID
+  {{- if .Values.discovery.DISCOVERY_COLLECTION_ID }}
   DISCOVERY_COLLECTION_ID: "{{ .Values.discovery.DISCOVERY_COLLECTION_ID }}"
   {{- end }}
   {{- if .Values.prime_qa.PRIME_QA_URL  }}
