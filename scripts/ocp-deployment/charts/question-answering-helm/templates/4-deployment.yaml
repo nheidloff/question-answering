@@ -42,51 +42,65 @@ spec:
             secretKeyRef:
               name: question-answering-secrets
               key: DISCOVERY_API_KEY
+        {{- if .Values.discovery.DISCOVERY_URL }}
         - name: DISCOVERY_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: DISCOVERY_URL
+        {{- end }}
+        {{- if .Values.discovery.DISCOVERY_INSTANCE }}
         - name: DISCOVERY_INSTANCE
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: DISCOVERY_INSTANCE
+        {{- end }}
+        {{- if .Values.discovery.DISCOVERY_PROJECT }}
         - name: DISCOVERY_PROJECT
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: DISCOVERY_PROJECT
+        {{- end }}
+        {{- if .Values.discovery.DISCOVERY_COLLECTION_ID }}
         - name: DISCOVERY_COLLECTION_ID
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: DISCOVERY_COLLECTION_ID
+        {{- end }}
         - name: PRIME_QA_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: PRIME_QA_URL
+        {{- if .Values.reranker.RERANKER_URL }}
         - name: RERANKER_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: RERANKER_URL
+        {{- end }}
+        {{- if .Values.maas.MAAS_URL }}
         - name: MAAS_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: MAAS_URL
+        {{- end }}
         - name: MAAS_API_KEY
           valueFrom:
             secretKeyRef:
               name: question-answering-secrets
               key: MAAS_API_KEY
+        {{- if .Values.proxy.MAAS_URL }}
         - name: PROXY_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: PROXY_URL
+        {{- end }}       
         - name: PROXY_API_KEY
           valueFrom:
             secretKeyRef:
