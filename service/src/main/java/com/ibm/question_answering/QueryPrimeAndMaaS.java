@@ -18,10 +18,6 @@ public class QueryPrimeAndMaaS {
 
     public Answer query(String query) {
         AnswerDocument[] answerDocuments = askPrimeQA.executeAndReturnRawAnswerDocuments(query);
-        return queryMaaS(answerDocuments, query);
-    }
-
-    public Answer queryMaaS(AnswerDocument[] answerDocuments, String query) {        
         return askMaaS.execute(query, answerDocuments);
     }
 }

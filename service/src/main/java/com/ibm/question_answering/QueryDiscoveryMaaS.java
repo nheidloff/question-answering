@@ -11,6 +11,9 @@ import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.prompts.QuestionAnswering;
 import com.ibm.question_answering.reranker.Document;
 import com.ibm.question_answering.reranker.DocumentScore;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 
 @ApplicationScoped
 public class QueryDiscoveryMaaS {
@@ -33,15 +36,39 @@ public class QueryDiscoveryMaaS {
     @Inject
     Metrics metrics;
 
-    public Answer query(String query) {
+    public AnswerDocument[] invokeDiscoveryUsingBlockingIO(String query) {
+        // 1. Discovery
+        com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query); 
+        if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
+            // TODO 
+        }
+
+        DocumentScore[] documentsAndScores = convert(discoveryAnswer);
+        AnswerDocument[] answerDocuments = queryDiscoveryReRankerMaaS.convertToAnswerDocuments(documentsAndScores, discoveryAnswer, documentsAndScores.length);
+        if ((answerDocuments == null) || (answerDocuments.length < 1)) {
+            // TODO 
+        }
+
+        return answerDocuments;
+    }
+
+    public Multi<com.ibm.question_answering.maas.Answer> queryAsStream(String query) {
+
+        var blockingOp = Uni.createFrom().item(() -> {
+            return this.invokeDiscoveryUsingBlockingIO(query);
+        }).runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
         
+        return blockingOp
+            .onItem().transformToMulti(answerDocuments -> {
+                return askMaaS.executeAsStream(query, answerDocuments);
+            });
+    }
+    
+    public Answer query(String query) {        
         // 1. Discovery
         com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query);   
         if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
             return MockAnswers.getEmptyAnswer();
-        }
-        for (int index = 0; index < discoveryAnswer.results.size(); index++) {
-            discoveryAnswer.results.get(index).document_id = discoveryAnswer.results.get(index).chunckid;
         }
         
         // 2. MaaS
@@ -50,15 +77,9 @@ public class QueryDiscoveryMaaS {
         if ((answerDocuments == null) || (answerDocuments.length < 1)) {
             return MockAnswers.getEmptyAnswer();
         }
+        Answer output = askMaaS.execute(query, answerDocuments);
 
-        Answer output = queryPrimeAndMaaS.queryMaaS(answerDocuments, query);
-        String answerAsText = output.results.get(0).text.text[0];
-        answerAsText = queryDiscoveryReRankerMaaS.removeEverythingAfterLastDot(answerAsText);
-        String[] text = new String[1];
-        text[0] = answerAsText;
-        output.results.get(0).text.text = text;
         metrics.maaSStopped(output);
-
         return output;
     }
 

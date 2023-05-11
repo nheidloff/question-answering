@@ -72,7 +72,7 @@ public class QueryDiscoveryReRankerMaaS {
         if ((answerDocuments == null) || (answerDocuments.length < 1)) {
             return MockAnswers.getEmptyAnswer();
         }
-        Answer output = queryPrimeAndMaaS.queryMaaS(answerDocuments, query);
+        Answer output = askMaaS.execute(query, answerDocuments);
         metrics.maaSStopped(output);
 
         return output;

@@ -6,8 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.ibm.question_answering.Metrics;
-import com.ibm.question_answering.api.DocumentPassage;
-import com.ibm.question_answering.api.PassageAnswer;
 import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.primeqa.AnswerDocument;
 import com.ibm.question_answering.primeqa.AskPrimeQA;
@@ -77,7 +75,7 @@ public class AskModelAsAService {
     Optional<String> maxResultsOptionalString;
     int maxResults = MAX_RESULTS;
 
-    public com.ibm.question_answering.api.Answer execute(String query, AnswerDocument[] answerDocuments) {      
+    private AnswerDocument[] limitAnswerDocuments(AnswerDocument[] answerDocuments) {
         if (maxResultsOptionalString.isPresent()) {
             try {
                 maxResults = Integer.parseInt(maxResultsOptionalString.get());
@@ -95,6 +93,11 @@ public class AskModelAsAService {
             answerDocuments = new AnswerDocument[llmMaxInputDocuments];
             System.arraycopy(answerDocumentsOrg, 0, answerDocuments, 0, llmMaxInputDocuments);
         }
+        return answerDocuments;
+    }
+
+    public com.ibm.question_answering.api.Answer execute(String query, AnswerDocument[] answerDocuments) {      
+        answerDocuments = this.limitAnswerDocuments(answerDocuments);
         String prompt = questionAnswering.getPrompt(query, answerDocuments);
         com.ibm.question_answering.api.Answer output = execute(prompt);
         output = cleanUpAnswer(output, answerDocuments);
@@ -134,6 +137,13 @@ public class AskModelAsAService {
         }        
     }
 
+    public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String query, AnswerDocument[] answerDocuments) {
+        answerDocuments = this.limitAnswerDocuments(answerDocuments);
+        String prompt = questionAnswering.getPrompt(query, answerDocuments);
+        return executeAsStream(prompt);
+        // TODO output = cleanUpAnswer(output, answerDocuments);
+    }
+
     public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String prompt) {
         this.readAndCheckEnvironmentVariables();
         metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);
@@ -145,7 +155,7 @@ public class AskModelAsAService {
             response = maasResource.askAsStream(new Input(llmName, getInputs(prompt), parameters));
         }
         else {
-            // TBD
+            // TODO
         }    
         return response;
     }
@@ -257,8 +267,11 @@ public class AskModelAsAService {
                 output.results.remove(index);
             }
         }
+        
         for (int index = 0; index < output.results.size(); index++) {
             if (output.results.get(index).document_passages != null) {
+                output.results.get(index).document_passages =  null;
+                /*
                 int countPassages = output.results.get(index).document_passages.length;
                 if (countPassages > 0) {
                     String textRead = output.results.get(index).document_passages[0].passage_text;
@@ -271,6 +284,7 @@ public class AskModelAsAService {
                     text[0] = textRead;
                     output.results.get(index).document_passages = documentPassages;                    
                 } 
+                */
             }
         }
 

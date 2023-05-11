@@ -110,7 +110,7 @@ public class AnswerResource {
         output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data));
         output = utilities.removeRedundantDocuments(output);
         metrics.end();
-        return output;       
+        return output; 
     }
 
     @POST
@@ -157,7 +157,7 @@ public class AnswerResource {
         summary = "Returns answer from Discovery and MaaS",
         description = "Returns answer from Discovery and MaaS"
     )
-    public Answer queryDiscoveryAndMaaSProxy(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+    public Answer queryDiscoveryAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         metrics.start(uriInfo, utilities.getQuery(data));
         utilities.checkAuthorization(apikey);
         Answer output;
@@ -165,6 +165,26 @@ public class AnswerResource {
         output = utilities.removeRedundantDocuments(output);
         metrics.end();
         return output;
+    }
+
+    @POST
+    @Path("/query-discovery-maas-as-stream")
+    @SecurityRequirement(name = "apikey")
+    @RestStreamElementType(MediaType.APPLICATION_JSON)    
+    @Operation(
+        summary = "Not implemented",
+        description = "Not implemented"
+    )
+    public Multi<OutboundSseEvent> queryDiscoveryAndMaaSAsStream(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+
+        return queryDiscoveryMaaS.queryAsStream(utilities.getQuery(data))
+        .map(item -> sse.newEventBuilder() 
+            .data(item) 
+            .build());
+
+        // TODO: Implement
     }
 
     @POST
@@ -200,6 +220,10 @@ public class AnswerResource {
     @Path("/query-maas-as-stream")
     @SecurityRequirement(name = "apikey")
     @RestStreamElementType(MediaType.APPLICATION_JSON)    
+    @Operation(
+            summary = "Get an answer from MaaS as stream",
+            description = "Get an answer from MaaS as stream"
+    )
     public Multi<OutboundSseEvent> queryMaaSAsStream(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         utilities.checkAuthorization(apikey);        
         return queryMaaS.queryAsStream(utilities.getQuery(data))
