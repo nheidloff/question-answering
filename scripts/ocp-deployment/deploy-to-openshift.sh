@@ -85,7 +85,17 @@ function install_helm_chart () {
     TEMP_PATH_EXECUTION=$(pwd)
     helm dependency update ./question-answering-helm/
     helm install --dry-run --debug question-answering-helm ./question-answering-helm/
-    helm install question-answering-helm ./question-answering-helm/
+    echo "Verify the try run. Move on Y/N?"
+    
+    read INPUT_KEY
+
+    if [[ "${INPUT_KEY}" == "Y" ]]; then
+        echo "Moving on with the installation."
+        helm install question-answering-helm ./question-answering-helm/
+    else
+        echo "Based on your input ($INPUT_KEY) the script ends here."
+        exit 1
+    fi
     
     cd $HOME_PATH
 }
@@ -163,5 +173,5 @@ create_custom_docker_config_file
 connect_to_cluster
 login_to_cluster
 install_helm_chart
-uninstall_helm_chart
+#uninstall_helm_chart
 

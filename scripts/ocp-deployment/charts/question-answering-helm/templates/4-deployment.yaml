@@ -152,16 +152,16 @@ spec:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_DISCOVERY_FIND_ANSWERS
-        - name: EXPERIMENT_METRICS_DIRECTORYS
+        - name: EXPERIMENT_METRICS_DIRECTORY
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
-              key: EXPERIMENT_METRICS_DIRECTORYS           
+              key: EXPERIMENT_METRICS_DIRECTORY           
         ports:
         - containerPort: 8080
         securityContext:
           allowPrivilegeEscalation: false 
-      serviceAccountName: default
+      serviceAccountName: question-answering-serviceaccount
       imagePullSecrets:
       - name: question-answering-pull-secret
       restartPolicy: Always
