@@ -1,9 +1,9 @@
 # Open Shift deployment
 
-The automated deployment does a full automated deployment of the `question answering service` to an IBM Cloud Red Hat OpenShift cluster in a Virtual Private Cloud environment.
-The automation is implemented using bash scripting and a `Helm Chart`.
+The automated deployment does a full automated deployment of the [`question answering service`](./../../service/) to an IBM Cloud Red Hat OpenShift cluster in a Virtual Private Cloud environment.
+The automation is implemented using bash scripting and a [`Helm Chart`](./charts/question-answering-helm/).
 
-The automation does following deployment for you:
+The automation does the following deployment for you:
 
 1. It builds and pushes a new container image to the `IBM Cloud Container registry`. The image will be in the following format: `"xxx.icr.io/your-name-space/question-answering:last-git-commit-id"`
 
@@ -16,6 +16,8 @@ The automation does following deployment for you:
 5. It saves all configurations it has used in a log folder.
 
 ## Usage
+
+This is a short guide on how to use the automation.
 
 ### Configuration of the environment
 
