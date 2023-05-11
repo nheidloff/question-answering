@@ -201,11 +201,11 @@ function verify_service () {
 
     ROUTE_NAME=$(oc get routes -n question-answering | grep 'question-answering-route' | awk '{print $1;}')
     echo $ROUTE
-        # ***** Wait for postgres instance
+
     echo ""
-    echo "-------------------------"
+    echo "***********************"
     echo "Wait for route"
-    echo "-------------------------"
+    echo "***********************"
     echo ""
     i=0
     while :
@@ -235,13 +235,8 @@ function verify_service () {
             sleep 3
         done
     
-    QUERY="Test is a simple question?"
-    curl -X POST \
-    -u "apikey:$QA_API_KEY" \
-    --header "Content-Type: application/json" \
-    --data "{   \"query\": \"text:$QUERY\" }" \
-    "$ROUTE/query" \
-    | jq '.'
+    QUERY="Test this simple question?"
+    curl -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{ \"query\": \"text:$QUERY\" }" "$ROUTE/query" | jq '.'
 }
 
 #**********************************************************************************
