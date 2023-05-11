@@ -251,7 +251,7 @@ function verify_service () {
 function log_deployment_configuration(){
     
     echo "************************************"
-    echo "Save configurations in logs/all"
+    echo "Save configurations in `scripts/ocp-deployment/logs`"
     echo "************************************"
     cd  $HOME_PATH
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
