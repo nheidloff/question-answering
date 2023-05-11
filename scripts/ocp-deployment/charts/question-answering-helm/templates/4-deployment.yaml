@@ -106,71 +106,97 @@ spec:
             secretKeyRef:
               name: question-answering-secrets
               key: PROXY_API_KEY
+        {{- if .Values.experiment.EXPERIMENT_METRICS_SESSION }}
         - name: EXPERIMENT_METRICS_SESSION
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_METRICS_SESSION
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_LLM_NAME }} 
         - name: EXPERIMENT_LLM_NAME
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_LLM_NAME
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_LLM_MIN_NEW_TOKENS }} 
         - name: EXPERIMENT_LLM_MIN_NEW_TOKENS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_LLM_MIN_NEW_TOKENS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_LLM_MAX_NEW_TOKENS }} 
         - name: EXPERIMENT_LLM_MAX_NEW_TOKENS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_LLM_MAX_NEW_TOKENS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS }} 
         - name: EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_LLM_PROMPT }}         
         - name: EXPERIMENT_LLM_PROMPT
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_LLM_PROMPT
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS }}
         - name: EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_RERANKER_MODEL }}
         - name: EXPERIMENT_RERANKER_MODEL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
-              key: EXPERIMENT_RERANKER_MODEL    
+              key: EXPERIMENT_RERANKER_MODEL
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_RERANKER_ID }}
         - name: EXPERIMENT_RERANKER_ID
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
-              key: EXPERIMENT_RERANKER_ID    
+              key: EXPERIMENT_RERANKER_ID
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS }}
         - name: EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_DISCOVERY_CHARACTERS }}       
         - name: EXPERIMENT_DISCOVERY_CHARACTERS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_DISCOVERY_CHARACTERS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_DISCOVERY_FIND_ANSWERS }} 
         - name: EXPERIMENT_DISCOVERY_FIND_ANSWERS
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: EXPERIMENT_DISCOVERY_FIND_ANSWERS
+        {{- end }}
+        {{- if .Values.experiment.EXPERIMENT_METRICS_DIRECTORY }} 
         - name: EXPERIMENT_METRICS_DIRECTORY
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
-              key: EXPERIMENT_METRICS_DIRECTORY           
+              key: EXPERIMENT_METRICS_DIRECTORY 
+        {{- end }}          
         ports:
         - containerPort: 8080
         securityContext:
