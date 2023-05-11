@@ -43,7 +43,7 @@ sh deploy-to-openshift.sh
 
 * Interactive output:
 
-    1. The scripts opens a browser window where you can log on to IBM Cloud and get a passcode to log in. Insert the passcode from the webpage.
+    1. The script opens a browser window where you can log on to IBM Cloud and get a passcode to log in. Insert the passcode from the webpage.
 
     ```sh
     Insert passcode: 
