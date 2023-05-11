@@ -10,6 +10,11 @@ source "$HOME_PATH"/../.env
 # QA Service - variables
 source "$HOME_PATH"/../../service/.env
 
+# Internal global
+export COMMIT_ID=""
+export LOG_FOLDER=""
+export ROUTE=""
+
 function check_docker () {
     
     echo ""
@@ -78,7 +83,7 @@ function install_helm_chart () {
     echo "install Helm chart ./question-answering-helm/"
     echo "*********************"
     echo ""
-
+    
     "/bin/sh" ./generate-values-file.sh > ./charts/question-answering-helm/values.yaml
 
     cd $HOME_PATH/charts
@@ -102,9 +107,9 @@ function install_helm_chart () {
 
 function wait_for_pod () {
     echo ""
-    echo "-------------------------"
+    echo "*********************"
     echo "Wait for pod"
-    echo "-------------------------"
+    echo "*********************"
     echo ""
     i=0
     while :
@@ -151,8 +156,11 @@ function uninstall_helm_chart () {
 }
 
 function build_and_push_container () {
-  
+    
+    export COMMIT_ID=$(git rev-parse HEAD)
+    export CI_TAG=$COMMIT_ID
     export IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
+    
     echo "Name: $IMAGE_URL"
     echo "****** BUILD *********"
     cd "$HOME_PATH"/../../service
@@ -236,7 +244,41 @@ function verify_service () {
         done
     
     QUERY="Test this simple question?"
+    
     curl -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{ \"query\": \"text:$QUERY\" }" "$ROUTE/query" | jq '.'
+}
+
+function log_deployment_configuration(){
+    
+    echo "************************************"
+    echo "Save configurations in logs/all"
+    echo "************************************"
+    cd  $HOME_PATH
+    FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
+    export LOG_FOLDER=$HOME_PATH/log/$FOLDERNAME
+    mkdir $LOG_FOLDER
+    
+    # remove all comments of the envirement configuration and save in all
+    
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/../.env > $LOG_FOLDER/ibm-cloud.env
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $LOG_FOLDER/ocp-deployment.env
+    sed '/^#/d' $HOME_PATH/charts/quastion-answering-helm/values.yaml > $LOG_FOLDER/helm-values.yaml
+    sed '/^#/d' $HOME_PATH/generate-values-file.sh > $LOG_FOLDER/helm-generate-values-file.sh
+    
+    # service
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../../service/.env  > $LOG_FOLDER/tmp1-service.env
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env    
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/service.env
+    rm $LOG_FOLDER/tmp1-service.env
+    rm $LOG_FOLDER/tmp2-service.env
+    rm $LOG_FOLDER/tmp3-service.env
+
+    # create new files
+    REPO_URL=$(git config --get remote.origin.url)
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $LOG_FOLDER/code.txt
+    printf "query-url=%s\n" $ROUTE > $LOG_FOLDER/deployment-info.txt
+
 }
 
 #**********************************************************************************
@@ -252,5 +294,6 @@ login_to_cluster
 install_helm_chart
 wait_for_pod
 verify_service
+log_deployment_configuration
 #uninstall_helm_chart
 
