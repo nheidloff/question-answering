@@ -60,6 +60,9 @@ public class AnswerResource {
     QueryDiscoveryReRankerMaaS queryDiscoveryReRankerMaaS;
 
     @Inject
+    QueryElasticMaaS queryElasticMaaS;
+
+    @Inject
     QueryMaaS queryMaaS;
 
     @Inject
@@ -168,23 +171,49 @@ public class AnswerResource {
     }
 
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-elastic-maas")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+        summary = "Returns answer from ElasticSearch and MaaS",
+        description = "Returns answer from ElasticSearch and MaaS"
+    )
+    public Answer queryElasticAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryElasticMaaS.query(utilities.getQuery(data));
+        //TODO output = utilities.removeRedundantDocuments(output);
+        //TODOmetrics.end();
+        return output;
+    }
+
+    @POST
     @Path("/query-discovery-maas-as-stream")
     @SecurityRequirement(name = "apikey")
     @RestStreamElementType(MediaType.APPLICATION_JSON)    
     @Operation(
-        summary = "Not implemented",
-        description = "Not implemented"
+        summary = "Returns answer from Discovery and MaaS as stream",
+        description = "Returns answer from Discovery and MaaS as stream"
     )
     public Multi<OutboundSseEvent> queryDiscoveryAndMaaSAsStream(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
         metrics.start(uriInfo, utilities.getQuery(data));
         utilities.checkAuthorization(apikey);
-
+        
         return queryDiscoveryMaaS.queryAsStream(utilities.getQuery(data))
-        .map(item -> sse.newEventBuilder() 
-            .data(item) 
-            .build());
-
-        // TODO: Implement
+            .onFailure().recoverWithItem(t -> {
+                // TODO figure out how to throw an exception
+                com.ibm.question_answering.maas.Answer answerWithFailure = new com.ibm.question_answering.maas.Answer();
+                com.ibm.question_answering.maas.Result result = new com.ibm.question_answering.maas.Result();
+                result.generated_text = "Error";
+                com.ibm.question_answering.maas.Result[] results = new com.ibm.question_answering.maas.Result[1];
+                results[0] = result;
+                answerWithFailure.results = results;
+                return answerWithFailure;                                
+            })
+            .map(item -> sse.newEventBuilder() 
+                .data(item) 
+                .build());
     }
 
     @POST
@@ -225,7 +254,8 @@ public class AnswerResource {
             description = "Get an answer from MaaS as stream"
     )
     public Multi<OutboundSseEvent> queryMaaSAsStream(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
-        utilities.checkAuthorization(apikey);        
+        utilities.checkAuthorization(apikey);   
+        // TODO figure out how to throw an exception     
         return queryMaaS.queryAsStream(utilities.getQuery(data))
             .map(item -> sse.newEventBuilder() 
                 .data(item) 

@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import com.ibm.question_answering.api.Answer;
 import com.ibm.question_answering.api.Result;
 import com.ibm.question_answering.discovery.AskDiscoveryService;
+import com.ibm.question_answering.discovery.DiscoveryExceptionMapper;
 import com.ibm.question_answering.discovery.RelevantOutput;
 import com.ibm.question_answering.maas.AskModelAsAService;
 import com.ibm.question_answering.primeqa.AnswerDocument;
@@ -37,23 +38,20 @@ public class QueryDiscoveryMaaS {
     Metrics metrics;
 
     public AnswerDocument[] invokeDiscoveryUsingBlockingIO(String query) {
-        // 1. Discovery
         com.ibm.question_answering.api.Answer discoveryAnswer = askDiscoveryService.ask(query); 
         if ((discoveryAnswer == null) || (discoveryAnswer.matching_results < 1)) {
-            // TODO 
+            throw new RuntimeException(DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX);            
         }
 
         DocumentScore[] documentsAndScores = convert(discoveryAnswer);
         AnswerDocument[] answerDocuments = queryDiscoveryReRankerMaaS.convertToAnswerDocuments(documentsAndScores, discoveryAnswer, documentsAndScores.length);
         if ((answerDocuments == null) || (answerDocuments.length < 1)) {
-            // TODO 
+            throw new RuntimeException(DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX + DiscoveryExceptionMapper.ERROR_DISCOVERY_PREFIX);
         }
-
         return answerDocuments;
     }
 
     public Multi<com.ibm.question_answering.maas.Answer> queryAsStream(String query) {
-
         var blockingOp = Uni.createFrom().item(() -> {
             return this.invokeDiscoveryUsingBlockingIO(query);
         }).runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
