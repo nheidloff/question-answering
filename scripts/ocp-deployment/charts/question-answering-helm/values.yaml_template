@@ -4,10 +4,10 @@
 serviceAccountPatch: |
      {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"default"},"automountServiceAccountToken":false}
 elastic:
-  ELASTIC_SEARCH_URL=xxx
-  ELASTIC_SEARCH_INDEX=xxx
-  ELASTIC_SEARCH_USER=xxx
-  ELASTIC_SEARCH_PASSWORD=xxx
+  ELASTIC_SEARCH_URL: xxx
+  ELASTIC_SEARCH_INDEX: xxx
+  ELASTIC_SEARCH_USER: xxx
+  ELASTIC_SEARCH_PASSWORD: xxx
 pullsecret: 
   PULLSECRET: ${PULL_SECRET}
 container_registry:

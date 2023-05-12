@@ -8,7 +8,7 @@ data:
   ELASTIC_SEARCH_URL: "{{ .Values.elastic.ELASTIC_SEARCH_URL }}"
   {{- end }}
   {{- if .Values.elastic.ELASTIC_SEARCH_INDEX }}
-  EELASTIC_SEARCH_INDEX: "{{ .Values.elastic.ELASTIC_SEARCH_INDEX }}"
+  ELASTIC_SEARCH_INDEX: "{{ .Values.elastic.ELASTIC_SEARCH_INDEX }}"
   {{- end }}
   {{- if .Values.elastic.ELASTIC_SEARCH_USER }}
   ELASTIC_SEARCH_USER: "{{ .Values.elastic.ELASTIC_SEARCH_USER }}"
