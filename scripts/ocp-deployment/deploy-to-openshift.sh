@@ -132,12 +132,12 @@ function wait_for_pod () {
             if [ "$STATUS_CHECK" != "" ]; then
                 echo "$(date +'%F %H:%M:%S') Status: pod found."
                 STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $3;}')
-                if [ "$STATUS_CHECK" != "Running" ]; then
+                if [ "$STATUS_CHECK" == "Running" ]; then
                    echo "Pod is running"
                    oc get pods -n question-answering
                 fi
                 STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $2;}')
-                if [ "$STATUS_CHECK" != "1/1" ]; then
+                if [ "$STATUS_CHECK" == "1/1" ]; then
                    echo "Pod is ready"
                    oc get pods -n question-answering
                    break
