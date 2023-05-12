@@ -120,7 +120,7 @@ function wait_for_pod () {
 
     echo ""
     echo "*********************"
-    echo "Waiting for `question-answering` pod"
+    echo "Waiting for 'question-answering' pod"
     echo "*********************"
     echo ""
     i=0
