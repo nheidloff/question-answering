@@ -57,7 +57,7 @@ function connect_to_cluster () {
 
     echo ""
     echo "*********************"
-    echo "Connect to Cluster $CLUSTER_NAME"
+    echo "Connect to cluster $CLUSTER_NAME"
     echo "*********************"
     echo ""
 
@@ -90,7 +90,7 @@ function install_helm_chart () {
 
     echo ""
     echo "*********************"
-    echo "install Helm chart ./question-answering-helm/"
+    echo "Install Helm chart ./question-answering-helm/"
     echo "*********************"
     echo ""
     
@@ -120,7 +120,7 @@ function wait_for_pod () {
 
     echo ""
     echo "*********************"
-    echo "Wait for pod"
+    echo "Waiting for `question-answering` pod"
     echo "*********************"
     echo ""
     i=0
@@ -132,7 +132,7 @@ function wait_for_pod () {
             echo "Status: ($i:20)"
             echo "**************"
             if [ "$STATUS_CHECK" != "" ]; then
-                echo "$(date +'%F %H:%M:%S') Status: pod found"
+                echo "$(date +'%F %H:%M:%S') Status: pod $STATUS_CHECK"
                 STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $3;}')
                 if [ "$STATUS_CHECK" == "Running" ]; then
                    echo "Pod is running"
@@ -165,7 +165,7 @@ function uninstall_helm_chart () {
 
     echo ""
     echo "*********************"
-    echo "uninstall Helm chart"
+    echo "Uninstall Helm chart"
     echo "*********************"
     echo ""
 
@@ -219,7 +219,7 @@ function create_custom_docker_config_file () {
     cd  $HOME_PATH
     echo ""
     echo "*********************"
-    echo "Create custom Docker ConfigFile"
+    echo "Create custom Docker `ConfigFile`"
     echo "*********************"
     echo ""
 
@@ -235,7 +235,7 @@ function verify_service () {
 
     echo ""
     echo "***********************"
-    echo "Wait for route"
+    echo "Waiting for route"
     echo "***********************"
     echo ""
     i=0
