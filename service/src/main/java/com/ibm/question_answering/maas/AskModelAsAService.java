@@ -155,7 +155,7 @@ public class AskModelAsAService {
             response = maasResource.askAsStream(new Input(llmName, getInputs(prompt), parameters));
         }
         else {
-            // TODO
+           throw new RuntimeException(ProxyExceptionMapper.ERROR_PROXY_PREFIX + ProxyExceptionMapper.ERROR_PROXY_PREFIX);
         }    
         return response;
     }
