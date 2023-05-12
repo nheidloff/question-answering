@@ -219,7 +219,7 @@ function create_custom_docker_config_file () {
     cd  $HOME_PATH
     echo ""
     echo "*********************"
-    echo "Create custom Docker `ConfigFile`"
+    echo "Create custom Docker 'ConfigFile'"
     echo "*********************"
     echo ""
 
@@ -269,18 +269,21 @@ function verify_service () {
     QUERY="Do you know IBM?"
     
     curl -X POST -u "apikey:$QA_API_KEY" --header "Content-Type: application/json" --data "{ \"query\": \"text:$QUERY\" }" "$ROUTE/query"
+    echo ""
 }
 
 function log_deployment_configuration(){
-    
-    echo "************************************"
-    echo "Save configurations in `scripts/ocp-deployment/logs`"
-    echo "************************************"
-    cd  $HOME_PATH
+    cd  $HOME_PATH 
+
+
 
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
     export LOG_FOLDER=$HOME_PATH/logs/$FOLDERNAME
     mkdir $LOG_FOLDER
+
+    echo "************************************"
+    echo "Save configurations in '$LOG_FOLDER'"
+    echo "************************************"
     
     # remove all comments of the envirement configuration and save in all
     
