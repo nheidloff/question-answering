@@ -21,7 +21,8 @@ export ROUTE=""
 
 
 function check_docker () {
-    
+    cd  $HOME_PATH
+
     echo ""
     echo "*********************"
     echo "Check Docker"
@@ -38,7 +39,8 @@ function check_docker () {
 }
 
 function login_to_ibm_cloud () {
-    
+    cd  $HOME_PATH
+
     echo ""
     echo "*********************"
     echo "Login to IBM Cloud"
@@ -51,6 +53,7 @@ function login_to_ibm_cloud () {
 }
 
 function connect_to_cluster () {
+    cd  $HOME_PATH
 
     echo ""
     echo "*********************"
@@ -62,6 +65,7 @@ function connect_to_cluster () {
 }
 
 function login_to_cluster () {
+    cd  $HOME_PATH
 
     echo ""
     echo "*********************"
@@ -82,6 +86,7 @@ function login_to_cluster () {
 }
 
 function install_helm_chart () {
+    cd  $HOME_PATH
 
     echo ""
     echo "*********************"
@@ -111,6 +116,8 @@ function install_helm_chart () {
 }
 
 function wait_for_pod () {
+    cd  $HOME_PATH
+
     echo ""
     echo "*********************"
     echo "Wait for pod"
@@ -127,8 +134,15 @@ function wait_for_pod () {
                 STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $3;}')
                 if [ "$STATUS_CHECK" != "Running" ]; then
                    echo "Pod is running"
+                   oc get pods -n question-answering
+                fi
+                STATUS_CHECK=$(oc get pods -n question-answering | grep $FIND | awk '{print $2;}')
+                if [ "$STATUS_CHECK" != "1/1" ]; then
+                   echo "Pod is ready"
+                   oc get pods -n question-answering
                    break
                 fi
+
             else 
                 echo "$(date +'%F %H:%M:%S') Status: waiting"               
             fi
@@ -161,7 +175,8 @@ function uninstall_helm_chart () {
 }
 
 function build_and_push_container () {
-    
+    cd  $HOME_PATH
+
     export COMMIT_ID=$(git rev-parse HEAD)
     export CI_TAG=$COMMIT_ID
     export IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
@@ -199,7 +214,7 @@ function build_and_push_container () {
 }
 
 function create_custom_docker_config_file () {
-
+    cd  $HOME_PATH
     echo ""
     echo "*********************"
     echo "Create custom Docker ConfigFile"
@@ -211,6 +226,7 @@ function create_custom_docker_config_file () {
 }
 
 function verify_service () {
+    cd  $HOME_PATH
 
     ROUTE_NAME=$(oc get routes -n question-answering | grep 'question-answering-route' | awk '{print $1;}')
     echo $ROUTE
@@ -259,6 +275,7 @@ function log_deployment_configuration(){
     echo "Save configurations in `scripts/ocp-deployment/logs`"
     echo "************************************"
     cd  $HOME_PATH
+
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
     export LOG_FOLDER=$HOME_PATH/logs/$FOLDERNAME
     mkdir $LOG_FOLDER
