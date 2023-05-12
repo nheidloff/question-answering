@@ -100,3 +100,4 @@ scripts/ocp-deployment/charts/question-answering-helm/values.yaml
 service/.env_ocp_test_failed
 scripts/ocp-deployment/logs/*
 !scripts/ocp-deployment/logs/README.md
+service/.env_gpu

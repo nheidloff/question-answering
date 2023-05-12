@@ -4,6 +4,21 @@ metadata:
   name: question-answering-confmap
   namespace: question-answering
 data:
+  {{- if .Values.elastic.ELASTIC_SEARCH_URL }}
+  ELASTIC_SEARCH_URL: "{{ .Values.elastic.ELASTIC_SEARCH_URL }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_INDEX }}
+  ELASTIC_SEARCH_USER: "{{ .Values.elastic.ELASTIC_SEARCH_INDEX }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_USER }}
+  ELASTIC_SEARCH_USER: "{{ .Values.elastic.ELASTIC_SEARCH_USER }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_PASSWORD }}
+  ELASTIC_SEARCH_PASSWORD: "{{ .Values.elastic.ELASTIC_SEARCH_PASSWORD }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_URL }}
+  ELASTIC_SEARCH_URL: "{{ .Values.elastic.ELASTIC_SEARCH_URL }}"
+  {{- end }}
   {{- if .Values.discovery.DISCOVERY_URL }}
   DISCOVERY_URL: "{{ .Values.discovery.DISCOVERY_URL }}"
   {{- end }}
