@@ -25,7 +25,7 @@ function connect_to_cluster () {
 
     echo ""
     echo "*********************"
-    echo "Connect to Cluster $CLUSTER_NAME"
+    echo "Connect to the cluster $CLUSTER_NAME"
     echo "*********************"
     echo ""
 
@@ -36,7 +36,7 @@ function login_to_cluster () {
 
     echo ""
     echo "*********************"
-    echo "Login to cluster $CLUSTER_NAME"
+    echo "Login to the cluster $CLUSTER_NAME"
     echo "*********************"
     echo ""
     
@@ -56,7 +56,7 @@ function uninstall_helm_chart () {
 
     echo ""
     echo "*********************"
-    echo "uninstall Helm chart"
+    echo "Uninstall Helm chart"
     echo "*********************"
     echo ""
 
