@@ -42,6 +42,34 @@ spec:
             secretKeyRef:
               name: question-answering-secrets
               key: DISCOVERY_API_KEY
+        {{- if .Values.elastic.ELASTIC_SEARCH_URL }}
+        - name: ELASTIC_SEARCH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: question-answering-confmap
+              key: ELASTIC_SEARCH_URL
+        {{- end }}
+        {{- if .Values.elastic.ELASTIC_SEARCH_INDEX }}
+        - name: ELASTIC_SEARCH_INDEX
+          valueFrom:
+            configMapKeyRef:
+              name: question-answering-confmap
+              key: ELASTIC_SEARCH_INDEX
+        {{- end }}
+        {{- if .Values.elastic.ELASTIC_SEARCH_PASSWORD }}
+        - name: ELASTIC_SEARCH_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: question-answering-confmap
+              key: ELASTIC_SEARCH_PASSWORD
+        {{- end }}
+        {{- if .Values.elastic.ELASTIC_SEARCH_USER }}
+        - name: ELASTIC_SEARCH_USER 
+          valueFrom:
+            configMapKeyRef:
+              name: question-answering-confmap
+              key: ELASTIC_SEARCH_USER 
+        {{- end }}
         {{- if .Values.discovery.DISCOVERY_URL }}
         - name: DISCOVERY_URL
           valueFrom:
