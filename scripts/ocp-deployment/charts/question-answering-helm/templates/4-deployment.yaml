@@ -98,11 +98,13 @@ spec:
               name: question-answering-confmap
               key: DISCOVERY_COLLECTION_ID
         {{- end }}
+        {{- if .Values.prime_qa.PRIME_QA_URL }}
         - name: PRIME_QA_URL
           valueFrom:
             configMapKeyRef:
               name: question-answering-confmap
               key: PRIME_QA_URL
+        {{- end }}
         {{- if .Values.reranker.RERANKER_URL }}
         - name: RERANKER_URL
           valueFrom:
