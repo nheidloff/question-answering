@@ -18,11 +18,11 @@ public class HighlightSerializer extends StdSerializer<Highlight> {
         super(t);
     }
 
-    // not invoked
-    // https://stackoverflow.com/questions/76228719/jackson-serializer-not-invoked-in-quarkus
     @Override
     public void serialize(Highlight value, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException, JsonProcessingException {
-        //System.out.println("nik serialize");
-        jsonGenerator.writeStringField("niklas", "test");   
+        System.out.println("nik serialize");
+        String[] strings = new String[0];
+        
+        jsonGenerator.writeArray(strings, 0, strings.length);
     }
 }

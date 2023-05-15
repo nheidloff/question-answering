@@ -168,6 +168,7 @@ curl -X POST \
 */
     public com.ibm.question_answering.elasticsearch.Input createInput(String query) {
         com.ibm.question_answering.elasticsearch.Input output = new com.ibm.question_answering.elasticsearch.Input();
+        output.highlight = new Highlight();
         output.size = this.maxResults;
         ArrayList<String> fields = new ArrayList<String>();
         if (field1 != null) {
