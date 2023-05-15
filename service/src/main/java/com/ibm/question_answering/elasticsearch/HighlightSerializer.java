@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 @Singleton
 public class HighlightSerializer extends StdSerializer<Highlight> {
     
+    String highlightField = System.getenv("ELASTIC_SEARCH_HIGHLIGHT_FIELD");
+
     public HighlightSerializer() {
         this(null);
     }
@@ -20,9 +22,25 @@ public class HighlightSerializer extends StdSerializer<Highlight> {
 
     @Override
     public void serialize(Highlight value, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException, JsonProcessingException {
-        System.out.println("nik serialize");
-        String[] strings = new String[0];
-        
-        jsonGenerator.writeArray(strings, 0, strings.length);
+        if ((highlightField != null) && (!highlightField.equals(""))) {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeFieldName("fields");
+            jsonGenerator.writeStartArray("fields", 1);
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeFieldName(highlightField);
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeStringField("type", "unified");
+            jsonGenerator.writeStringField("require_field_match", "true");
+            jsonGenerator.writeNumberField("fragment_size", 300);
+            jsonGenerator.writeNumberField("number_of_fragments", 2);
+            jsonGenerator.writeEndObject();
+            jsonGenerator.writeEndObject();
+            jsonGenerator.writeEndArray();
+            jsonGenerator.writeEndObject();
+        }
+        else {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeEndObject();
+        }
     }
 }

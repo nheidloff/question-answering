@@ -22,12 +22,12 @@ public class AskElasticService {
     private String index;
     final static String ERROR_ELASTIC_SEARCH_INDEX_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_INDEX not defined";
 
-    final String ELASTIC_SEARCH_USER_NOT_SET = "NOT_SET";   
+    final public static String ELASTIC_SEARCH_USER_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "ELASTIC_SEARCH_USER", defaultValue = ELASTIC_SEARCH_USER_NOT_SET) 
     private String user;
     final static String ERROR_ELASTIC_SEARCH_USER_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_USER not defined";
 
-    final String ELASTIC_SEARCH_PASSWORD_NOT_SET = "NOT_SET";   
+    final public static String ELASTIC_SEARCH_PASSWORD_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "ELASTIC_SEARCH_PASSWORD", defaultValue = ELASTIC_SEARCH_PASSWORD_NOT_SET) 
     private String password;
     final static String ERROR_ELASTIC_SEARCH_PASSWORD_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_PASSWORD not defined";

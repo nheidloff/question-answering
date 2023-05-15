@@ -274,7 +274,6 @@ public class AnswerResource {
         utilities.checkAuthorization(apikey);
         metrics.start(uriInfo, utilities.getQuery(data));
         Answer output = queryDiscovery.query(utilities.getQuery(data));
-        metrics.end();
         return output;
     }
 
