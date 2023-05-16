@@ -15,6 +15,20 @@ The automation does the following deployment for you:
 
 5. It saves all configurations it has used in a log folder.
 
+6. You can restore a deployment from existing information:
+
+* Repository URL
+* Commit ID
+* ".env" file with the working configuration 
+
+```sh
+export RESTORE_COMMAND=restore
+export COMMIT_ID=XXXXXXX
+export REPOSITORY_URL=https://github.com/nheidloff/question-answering
+export ENVIORNMENT_FILENAME=my-restore.env
+sh deploy-to-openshift.sh $RESTORE_COMMAND $COMMIT_ID $REPOSITORY_URL $ENVIORNMENT_FILENAME
+```
+
 ## Usage
 
 This is a short guide on how to use the automation.
