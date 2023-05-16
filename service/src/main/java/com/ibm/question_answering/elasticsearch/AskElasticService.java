@@ -42,6 +42,7 @@ public class AskElasticService {
     String filterValue2;
     String filterValue3;
     String highlightField;
+    String resultUrl;
     int maxResults;
     int MAX_RESULTS_DEFAULT = 5;
 
@@ -111,6 +112,10 @@ public class AskElasticService {
             catch (NumberFormatException ex){
             }
         }
+        envVar = System.getenv("ELASTIC_SEARCH_RESULT_URL");
+        if ((envVar != null) && (!envVar.equals(""))) {
+            resultUrl = envVar;   
+        } 
     }
 
     @Inject
@@ -175,16 +180,19 @@ public class AskElasticService {
                             output.matching_results = hits.size();
                             for (int index = 0; index < hits.size(); index++) {
                                 result = new com.ibm.question_answering.api.Result();
-                                result.document_id = hits.get(index)._source.fileId;
-                                result.title = hits.get(index)._source.fileTitle;
+                                result.document_id = hits.get(index)._source.id;
+                                result.url = buildUrl(hits.get(index)._source);
+                                result.title = hits.get(index)._source.title;
                                 result.text = new com.ibm.question_answering.discovery.Text();
-                                result.text.text = hits.get(index).highlight.text;
-                                if (result.text.text != null) {
-                                    for (int indexText = 0; indexText < result.text.text.length; indexText++) {
-                                        String oneLine = result.text.text[indexText];
-                                        oneLine = oneLine.replaceAll("<em>", "");
-                                        oneLine = oneLine.replaceAll("</em>", "");
-                                        result.text.text[indexText] = oneLine;
+                                if (hits.get(index).highlight != null) {
+                                    result.text.text = hits.get(index).highlight.text;
+                                    if (result.text.text != null) {
+                                        for (int indexText = 0; indexText < result.text.text.length; indexText++) {
+                                            String oneLine = result.text.text[indexText];
+                                            oneLine = oneLine.replaceAll("<em>", "");
+                                            oneLine = oneLine.replaceAll("</em>", "");
+                                            result.text.text[indexText] = oneLine;
+                                        }
                                     }
                                 }
                                 results.add(result);
@@ -193,6 +201,23 @@ public class AskElasticService {
                         }
                     }
                 }
+            }
+        }
+        return output;
+    }
+
+    private String buildUrl(Document result) {
+        String output = this.resultUrl;
+        String urlPart1 = System.getenv("ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1");
+        String urlPart2 = System.getenv("ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2");
+        String urlPlaceholderPart1 = "ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1";
+        String urlPlaceholderPart2 = "ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2";
+        if (this.resultUrl != null) {
+            if ((urlPart1 != null) && (!urlPart1.equals(""))) {
+                output = output.replaceAll(urlPlaceholderPart1, result.urlField1);
+            }
+            if ((urlPart2 != null) && (!urlPart2.equals(""))) {
+                output = output.replaceAll(urlPlaceholderPart2, result.urlField2);
             }
         }
         return output;
