@@ -54,7 +54,12 @@ public class QueryDiscoveryReRankerMaaS {
             document.text = RelevantOutput.getDiscoveryResultAsText(discoveryAnswer, index);
             document.document_id = discoveryAnswer.results.get(index).document_id;
             document.title = discoveryAnswer.results.get(index).title;
-            documentsAndScoresInput[index] = new DocumentScore(document, discoveryAnswer.results.get(index).result_metadata.confidence);            
+            double score = 0.0;
+            try {
+                score = discoveryAnswer.results.get(index).result_metadata.confidence;
+            } catch (Exception e) {
+            }
+            documentsAndScoresInput[index] = new DocumentScore(document, score);            
         }
         DocumentScore[][] documentsAndScoresArray = askReRankerService.executeAndReturnRawAnswer(query, documentsAndScoresInput);
         if ((documentsAndScoresArray == null) || (documentsAndScoresArray.length < 1)) {
@@ -78,7 +83,7 @@ public class QueryDiscoveryReRankerMaaS {
         return output;
     }
 
-    public AnswerDocument[] convertToAnswerDocuments(DocumentScore[] documentsAndScores, com.ibm.question_answering.api.Answer discoveryAnswer, int amountDocumentsLimit) {
+    public static AnswerDocument[] convertToAnswerDocuments(DocumentScore[] documentsAndScores, com.ibm.question_answering.api.Answer discoveryAnswer, int amountDocumentsLimit) {
         AnswerDocument[] output = null;
         if (documentsAndScores != null) {
             int amount = documentsAndScores.length;
@@ -104,7 +109,7 @@ public class QueryDiscoveryReRankerMaaS {
         return output;
     }
 
-    public String getDocumentUrl(String documentId, com.ibm.question_answering.api.Answer discoveryAnswer) {
+    public static String getDocumentUrl(String documentId, com.ibm.question_answering.api.Answer discoveryAnswer) {
         String output = "";
         for (int index = 0; index < discoveryAnswer.results.size(); index++) {
             if (discoveryAnswer.results.get(index).document_id.equals(documentId)) {

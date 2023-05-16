@@ -63,6 +63,9 @@ public class AnswerResource {
     QueryElasticMaaS queryElasticMaaS;
 
     @Inject
+    QueryElasticReRankerMaaS queryElasticReRankerMaaS;
+
+    @Inject
     QueryMaaS queryMaaS;
 
     @Inject
@@ -94,26 +97,15 @@ public class AnswerResource {
         )
     })
     @Operation(
-            summary = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer",
-            description = "Reads documents from Discovery, re-ranks results and uses MaaS to return answer"
+            summary = "Reads documents from Elastic, re-ranks results and uses MaaS to return answer",
+            description = "Reads documents from Elastic, re-ranks results and uses MaaS to return answer"
     )
     public Answer query(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, 
         @Parameter(description = "query", 
             required = true,
             example = "{\"query\": \"text:When and for how much did IBM acquire Red Hat?\"}") Data data) {
         
-        //System.out.println(uriInfo.getRequestUri().toString());
-        //System.out.println(correctAPIKey);
-        //System.out.println("apikey: " + getAPIKey(apikey));
-        //System.out.println("query: " + getQuery(data));
-
-        metrics.start(uriInfo, utilities.getQuery(data));
-        utilities.checkAuthorization(apikey);
-        Answer output;
-        output = queryDiscoveryReRankerMaaS.query(utilities.getQuery(data));
-        output = utilities.removeRedundantDocuments(output);
-        metrics.end();
-        return output; 
+        return this.queryElasticReRankerAndMaaS(uriInfo, apikey, data);
     }
 
     @POST
@@ -183,6 +175,23 @@ public class AnswerResource {
         utilities.checkAuthorization(apikey);
         Answer output;
         output = queryElasticMaaS.query(utilities.getQuery(data));
+        metrics.end();
+        return output;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/query-elastic-reranker-maas")
+    @SecurityRequirement(name = "apikey")
+    @Operation(
+        summary = "Returns answer from ElasticSearch, ReRanker and MaaS",
+        description = "Returns answer from ElasticSearch, ReRanker and MaaS"
+    )
+    public Answer queryElasticReRankerAndMaaS(@Context UriInfo uriInfo, @RestHeader("Authorization") String apikey, Data data) {
+        metrics.start(uriInfo, utilities.getQuery(data));
+        utilities.checkAuthorization(apikey);
+        Answer output;
+        output = queryElasticReRankerMaaS.query(utilities.getQuery(data));
         metrics.end();
         return output;
     }
