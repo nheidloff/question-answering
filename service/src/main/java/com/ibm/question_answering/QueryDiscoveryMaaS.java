@@ -76,7 +76,6 @@ public class QueryDiscoveryMaaS {
             return MockAnswers.getEmptyAnswer();
         }
         Answer output = askMaaS.execute(query, answerDocuments);
-
         metrics.maaSStopped(output);
         return output;
     }

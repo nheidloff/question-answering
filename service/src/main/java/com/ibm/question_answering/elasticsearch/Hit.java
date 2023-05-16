@@ -4,4 +4,5 @@ public class Hit {
     public String _id;
     public float _score;
     public Document _source;
+    public HighlightResult highlight;  
 }
