@@ -407,12 +407,12 @@ fi
 if [ "$RESTORE" == "true" ]; then
     build_and_push_container_restore
 fi
-#create_custom_docker_config_file
-#connect_to_cluster
-#login_to_cluster
-#install_helm_chart
-#wait_for_pod
-#verify_service
-#log_deployment_configuration
+create_custom_docker_config_file
+connect_to_cluster
+login_to_cluster
+install_helm_chart
+wait_for_pod
+verify_service
+log_deployment_configuration
 #uninstall_helm_chart
 
