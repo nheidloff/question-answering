@@ -102,7 +102,7 @@ public class AskElasticService {
         if ((envVar != null) && (!envVar.equals(""))) {
             highlightField = envVar;   
         }
-        envVar = System.getenv("ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS");
+        envVar = System.getenv("ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS");      
         if ((envVar != null) && (!envVar.equals(""))) {
             this.maxResults = MAX_RESULTS_DEFAULT;
             try{
@@ -121,8 +121,9 @@ public class AskElasticService {
    
     public com.ibm.question_answering.api.Answer search(String query) {
         readAndCheckEnvironmentVariables();
-
+        metrics.elasticStarted(this.maxResults);
         com.ibm.question_answering.api.Answer output = convertToAnswer(elasticResource.search(createInput(query)));
+        metrics.elasticStopped(output);
         return output;
     }
 

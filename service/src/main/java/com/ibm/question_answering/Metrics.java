@@ -46,7 +46,8 @@ public class Metrics {
         "DISCOVERY_MAX_OUTPUT_DOCUMENTS",
         "PROMPT_TEMPLATE",
         "DISCOVERY_CHARACTERS",
-        "DISCOVERY_FIND_ANSWERS"
+        "DISCOVERY_FIND_ANSWERS",
+        "ELASTIC_MAX_OUTPUT_DOCUMENTS"
     };
 
     final String[] headersRuns = {
@@ -105,13 +106,38 @@ public class Metrics {
         "SIZE_DISCOVERY_RESULTS",
         "SIZE_RERANKER_INPUTS",
         "SIZE_RERANKER_RESULTS",
-        "PROMPT"
+        "PROMPT",
+        "RESULT_ELASTIC_PASSAGE1",
+        "RESULT_ELASTIC_PASSAGE1_ID",
+        "RESULT_ELASTIC_PASSAGE2",
+        "RESULT_ELASTIC_PASSAGE2_ID",
+        "RESULT_ELASTIC_PASSAGE3",
+        "RESULT_ELASTIC_PASSAGE3_ID",
+        "RESULT_ELASTIC_PASSAGE4",
+        "RESULT_ELASTIC_PASSAGE4_ID",
+        "RESULT_ELASTIC_PASSAGE5",
+        "RESULT_ELASTIC_PASSAGE5_ID",
+        "RESULT_ELASTIC_PASSAGE6",
+        "RESULT_ELASTIC_PASSAGE6_ID",
+        "RESULT_ELASTIC_PASSAGE7",
+        "RESULT_ELASTIC_PASSAGE7_ID",
+        "RESULT_ELASTIC_PASSAGE8",
+        "RESULT_ELASTIC_PASSAGE8_ID",
+        "RESULT_ELASTIC_PASSAGE9",
+        "RESULT_ELASTIC_PASSAGE9_ID",
+        "RESULT_ELASTIC_PASSAGE10",
+        "RESULT_ELASTIC_PASSAGE10_ID",
+        "TIMESTAMP_ELASTIC_START",
+        "TIMESTAMP_ELASTIC_END",
+        "SIZE_ELASTIC_RESULTS"
     };
 
     String endpoint;
     String answer;
     String[] resultDiscovery;
     String[] resultDiscoveryChunkIds;
+    String[] resultElastic;
+    String[] resultElasticChunkIds;
     String[] resultReRanker;
     String[] resultReRankerChunkIds;
     String query;
@@ -130,13 +156,17 @@ public class Metrics {
     String tsEnd;
     String tsDiscoveryStart;
     String tsDiscoveryEnd;
+    String tsElasticStart;
+    String tsElasticEnd;
     String tsMaaSStart;
     String tsMaaSEnd;
     String sizeDiscoveryResults;
     String sizeDiscoverySentResults;
+    String sizeElasticSentResults;
     String sizeReRankerInputs;
     String sizeReRankerResults;
     String discoveryMaxDocuments;
+    String elasticMaxDocuments;
     String promptTemplate;
     String discoveryCharacters;
     String discoveryFindAnswers;
@@ -150,6 +180,7 @@ public class Metrics {
     String directoryAndfileNameLastRun;
     boolean reRankerUsed = false;
     boolean discoveryUsed = false;
+    boolean elasticUsed = false;
 
     public void end() {
         this.tsEnd = getTimestamp();
@@ -246,8 +277,34 @@ public class Metrics {
                 data.add(this.sizeReRankerInputs);
                 data.add(this.sizeReRankerResults);                
                 data.add(prompt.replaceAll(System.getProperty("line.separator"), "\\\\n"));
-                csvPrinterRuns.printRecord(data);
-    
+                if (this.elasticUsed == true) {
+                    for (int index = 0; index < 10; index++) {
+                        data.add(this.resultElastic[index]);
+                        data.add(this.resultElasticChunkIds[index]);
+                    }
+                }
+                else {
+                    for (int index = 0; index < 10; index++) {
+                        data.add("");
+                        data.add("");
+                    }
+                }
+                if (this.elasticUsed == true) {
+                    data.add(this.tsElasticStart);
+                    data.add(this.tsElasticEnd);
+                }
+                else {
+                    data.add("");
+                    data.add("");
+                }
+                if (this.elasticUsed == true) {
+                    data.add(this.sizeElasticSentResults);
+                }
+                else {
+                    data.add("0");
+                }
+
+                csvPrinterRuns.printRecord(data);    
                 csvPrinterRuns.flush();
                 csvPrinterRuns.close();
             } catch (Exception e) {
@@ -282,6 +339,7 @@ public class Metrics {
                 data.add(this.promptTemplate);
                 data.add(this.discoveryCharacters);
                 data.add(this.discoveryFindAnswers);
+                data.add(this.elasticMaxDocuments);
 
                 csvPrinterMetadata.printRecord(data);
                 csvPrinterMetadata.flush();
@@ -325,6 +383,12 @@ public class Metrics {
         this.discoveryUsed = true;
     }
 
+    public void elasticStarted(int maxDocuments) {
+        this.tsElasticStart = getTimestamp();
+        this.elasticMaxDocuments = String.valueOf(maxDocuments);
+        this.elasticUsed = true;
+    }
+
     public void discoveryStopped(com.ibm.question_answering.api.Answer answer) {
         this.tsDiscoveryEnd = getTimestamp();
         if (answer != null) {
@@ -347,6 +411,36 @@ public class Metrics {
                 }
                 this.resultDiscovery[index] = resultString;
                 this.resultDiscoveryChunkIds[index] = resultStringChuckId;
+            }
+        }
+    }
+
+    public void elasticStopped(com.ibm.question_answering.api.Answer answer) {
+        this.tsElasticEnd = getTimestamp();
+        if (answer != null) {
+            this.sizeElasticSentResults = String.valueOf(answer.results.size());
+            this.resultElastic = new String[10];
+            this.resultElasticChunkIds = new String[10];
+
+            int amountResults = answer.results.size();
+            if (amountResults > 10) {
+                amountResults = 10;
+            }
+            
+            for (int index = 0; index < amountResults; index++) {
+                String resultString = "";
+                String resultStringChuckId = "";
+                if (index <= answer.results.size()) {
+                    for (int indexText = 0; indexText < answer.results.get(index).text.text.length; indexText++) {
+                        resultString = resultString + answer.results.get(index).text.text[indexText];
+                        if (indexText < answer.results.get(index).text.text.length - 1) {
+                            resultString = resultString + System.getProperty("line.separator");
+                        } 
+                    }
+                    resultStringChuckId = answer.results.get(index).document_id;
+                }
+                this.resultElastic[index] = resultString;
+                this.resultElasticChunkIds[index] = resultStringChuckId;
             }
         }
     }
@@ -421,15 +515,35 @@ public class Metrics {
                 writer.write("\n");            
                 writer.write("*Duration in Milliseconds:* " + getDuration(this.tsDiscoveryStart, this.tsDiscoveryEnd) + "\n");
                 writer.write("\n");
-                writer.write("*Result 1 chunckid or document_id:* " + this.resultDiscoveryChunkIds[0] + "\n");
+                writer.write("*Result 1 document_id:* " + this.resultDiscoveryChunkIds[0] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 1</summary>" + this.resultDiscovery[0] + "</details>\n\n");
-                writer.write("*Result 2 chunckid or document_id:* " + this.resultDiscoveryChunkIds[1] + "\n");
+                writer.write("*Result 2 document_id:* " + this.resultDiscoveryChunkIds[1] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 2</summary>" + this.resultDiscovery[1] + "</details>\n\n");
-                writer.write("*Result 3 chunckid or document_id:* " + this.resultDiscoveryChunkIds[3] + "\n");
+                writer.write("*Result 3 document_id:* " + this.resultDiscoveryChunkIds[3] + "\n");
                 writer.write("\n");
                 writer.write("<details><summary>Result 3</summary>" + this.resultDiscovery[2] + "</details>\n\n");
+                writer.write("\n");
+            }
+            if (this.elasticUsed == true) {
+                writer.write("### ElasticSearch" + "\n");
+                writer.write("\n");
+                writer.write("*Results (returned):* " + this.sizeElasticSentResults + "\n");
+                writer.write("\n");
+                writer.write("*Results (max):* " + this.elasticMaxDocuments + "\n");
+                writer.write("\n");            
+                writer.write("*Duration in Milliseconds:* " + getDuration(this.tsElasticStart, this.tsElasticEnd) + "\n");
+                writer.write("\n");
+                writer.write("*Result 1 chunckid or document_id:* " + this.resultElasticChunkIds[0] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 1</summary>" + this.resultElastic[0] + "</details>\n\n");
+                writer.write("*Result 2 chunckid or document_id:* " + this.resultElasticChunkIds[1] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 2</summary>" + this.resultElastic[1] + "</details>\n\n");
+                writer.write("*Result 3 chunckid or document_id:* " + this.resultElasticChunkIds[3] + "\n");
+                writer.write("\n");
+                writer.write("<details><summary>Result 3</summary>" + this.resultElastic[2] + "</details>\n\n");
                 writer.write("\n");
             }
             if (this.reRankerUsed == true) {

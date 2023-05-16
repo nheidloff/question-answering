@@ -183,8 +183,7 @@ public class AnswerResource {
         utilities.checkAuthorization(apikey);
         Answer output;
         output = queryElasticMaaS.query(utilities.getQuery(data));
-        //TODO output = utilities.removeRedundantDocuments(output);
-        //TODOmetrics.end();
+        metrics.end();
         return output;
     }
 
