@@ -53,10 +53,6 @@ public class FilterSerializer extends StdSerializer<Filter> {
 
         }
 
-        System.out.println("niklas filterName1 " + filterName1);
-        System.out.println("niklas filterName2 " + filterName2);
-        System.out.println("niklasfilterName3 " + filterName3);
-
         if (filterName3 != null) {
             jsonGenerator.writeStartArray();
                 jsonGenerator.writeStartObject();

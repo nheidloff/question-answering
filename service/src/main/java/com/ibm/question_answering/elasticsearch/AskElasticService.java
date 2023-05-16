@@ -157,27 +157,35 @@ public class AskElasticService {
     }
 
     public com.ibm.question_answering.api.Answer convertToAnswer(Response response) {
-        List<Document> documents;
+        List<Hit> hits;
         com.ibm.question_answering.api.Answer output = new com.ibm.question_answering.api.Answer(false, 0, null);
         com.ibm.question_answering.api.Result result;
         ArrayList<Result> results = new ArrayList<Result>();
         if (response != null) {
             if (response.hits != null) {
                 if (response.hits.hits != null) {
-                    documents = new ArrayList<>();
+                    hits = new ArrayList<>();
                     for (int indexHits = 0; indexHits < response.hits.hits.length; indexHits++) {
-                        documents.add(response.hits.hits[indexHits]._source);
+                        hits.add(response.hits.hits[indexHits]);
                     }
                 
-                    if (documents != null) {
-                        if (documents.size() > 0) {
-                            output.matching_results = documents.size();
-                            for (int index = 0; index < documents.size(); index++) {
+                    if (hits != null) {
+                        if (hits.size() > 0) {
+                            output.matching_results = hits.size();
+                            for (int index = 0; index < hits.size(); index++) {
                                 result = new com.ibm.question_answering.api.Result();
-                                result.document_id = documents.get(index).fileId;
-                                result.title = documents.get(index).fileTitle;
+                                result.document_id = hits.get(index)._source.fileId;
+                                result.title = hits.get(index)._source.fileTitle;
                                 result.text = new com.ibm.question_answering.discovery.Text();
-                                result.text.text = documents.get(index).plainTextContent;
+                                result.text.text = hits.get(index).highlight.text;
+                                if (result.text.text != null) {
+                                    for (int indexText = 0; indexText < result.text.text.length; indexText++) {
+                                        String oneLine = result.text.text[indexText];
+                                        oneLine = oneLine.replaceAll("<em>", "");
+                                        oneLine = oneLine.replaceAll("</em>", "");
+                                        result.text.text[indexText] = oneLine;
+                                    }
+                                }
                                 results.add(result);
                             }
                             output.results = results;
