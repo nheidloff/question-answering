@@ -15,10 +15,31 @@ export COMMIT_ID=""
 export LOG_FOLDER=""
 export ROUTE=""
 
+# Restore and deploy by an existing commit ID
+export RESTORE_REPO_COMMIT_ID=""
+export RESTORE_REPO_URL=""
+export RESTORE_REPO_ENV_NAME=""
+export ARG_RESTORE=${1:-no_restore}
+export RESTORE="false"
+
 # **********************************************************************************
 # Functions definition
 # **********************************************************************************
 
+function check_parameters () {
+    if [ "$ARG_RESTORE" == "no_restore" ]; then
+        export RESTORE="false"
+    else
+        export RESTORE="true"
+        export RESTORE_REPO_COMMIT_ID=${2:-no_commit_id}
+        export RESTORE_REPO_URL=${3:-no_repo_url_id}
+        export RESTORE_REPO_ENV_NAME=${4:-no_env_file_name}
+        echo "Restore configuration: "
+        echo "Commit ID: $RESTORE_REPO_COMMIT_ID"
+        echo "Repo URL: $RESTORE_REPO_URL"
+        echo "Env filename: $RESTORE_REPO_ENV_NAME"
+    fi
+}
 
 function check_docker () {
     cd  $HOME_PATH
@@ -93,6 +114,12 @@ function install_helm_chart () {
     echo "Install Helm chart ./question-answering-helm/"
     echo "*********************"
     echo ""
+
+    if [[ "${RESTORE}" == "true" ]]; then
+        echo "Loading environment: $RESTORE_REPO_ENV_NAME"
+        # QA Service - variables
+        source "$HOME_PATH"/../../service/$RESTORE_REPO_ENV_NAME
+    fi
     
     "/bin/sh" ./generate-values-file.sh > ./charts/question-answering-helm/values.yaml
 
@@ -174,6 +201,63 @@ function uninstall_helm_chart () {
     helm uninstall question-answering-helm
     
     cd $HOME_PATH
+}
+
+function build_and_push_container_restore () {
+    
+    export COMMIT_ID=$RESTORE_REPO_COMMIT_ID
+    export CI_TAG=$COMMIT_ID
+    export IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
+    
+    # restore
+    TEMP_RESTORE_FOLDER=$HOME_PATH/tmp_repo_restore
+    mkdir $TEMP_RESTORE_FOLDER
+    cd $TEMP_RESTORE_FOLDER
+    
+    # Restore the repo
+    git clone $RESTORE_REPO_URL
+    cd question-answering
+    git checkout $COMMIT_ID
+
+    # Copy the needed .env file
+    cd $HOME_PATH
+    SOURCE_PATH=$HOME_PATH/../../service
+    DESTINATION_PATH=$TEMP_RESTORE_FOLDER/question-answering/service
+    cp $SOURCE_PATH/$RESTORE_REPO_ENV_NAME $DESTINATION_PATH/.env
+
+    # Build from restore code
+    echo "Name: $IMAGE_URL"
+    echo "****** BUILD *********"
+    cd "$TEMP_RESTORE_FOLDER"/question-answering/service
+    docker build -f "$TEMP_RESTORE_FOLDER"/question-answering/service/src/main/docker/"$QA_DOCKERFILE_NAME" -t "$IMAGE_URL" .
+    
+    cd "$HOME_PATH"
+    
+    # Login to container with IBM Cloud registy  
+    ibmcloud cr login
+
+    ERROR=$(ibmcloud target -g $CR_RESOURCE_GROUP 2>&1)
+    RESULT=$(echo $ERROR | grep 'FAILED' | awk '{print $1;}')
+    VERIFY="FAILED"
+    if [ "$RESULT" == "$VERIFY" ]; then
+        echo "Can't set to resource group: ($CR_RESOURCE_GROUP) but I move on."
+    fi
+
+    ibmcloud cr region-set $CR_REGION
+
+    # Create a new namespace, if the namespace doesn't exists
+    CURR_CONTAINER_NAMESPACE=$(ibmcloud cr namespace-list -v | grep $CR_REPOSITORY | awk '{print $1;}')
+    if [ "$CR_REPOSITORY" != "$CURR_CONTAINER_NAMESPACE" ]; then
+        ibmcloud cr namespace-add $CR_REPOSITORY
+    fi
+
+    # Login to IBM Cloud registy with Docker
+    docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION  
+    docker push "$IMAGE_URL"
+    
+    ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
+
+    rm -rf $TEMP_RESTORE_FOLDER
 }
 
 function build_and_push_container () {
@@ -275,8 +359,6 @@ function verify_service () {
 function log_deployment_configuration(){
     cd  $HOME_PATH 
 
-
-
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
     export LOG_FOLDER=$HOME_PATH/logs/$FOLDERNAME
     mkdir $LOG_FOLDER
@@ -285,15 +367,21 @@ function log_deployment_configuration(){
     echo "Save configurations in '$LOG_FOLDER'"
     echo "************************************"
     
-    # remove all comments of the envirement configuration and save in all
-    
+    # remove all comments of the envirement configuration and save in all    
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/../.env > $LOG_FOLDER/ibm-cloud.env
     sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $LOG_FOLDER/ocp-deployment.env
     sed '/^#/d' $HOME_PATH/charts/question-answering-helm/values.yaml > $LOG_FOLDER/helm-values.yaml
     sed '/^#/d' $HOME_PATH/generate-values-file.sh > $LOG_FOLDER/helm-generate-values-file.sh
     
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../../service/.env  > $LOG_FOLDER/tmp1-service.env
+    if [[ "${RESTORE}" == "true" ]]; then
+        echo "Saving restore environment configuration: $RESTORE_REPO_ENV_NAME"
+        # QA Service - variables
+        sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../../service/"$RESTORE_REPO_ENV_NAME"  > $LOG_FOLDER/tmp1-service.env
+    else
+        sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../../service/.env  > $LOG_FOLDER/tmp1-service.env
+    fi
+
     sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env    
     sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
     sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/service.env
@@ -301,7 +389,7 @@ function log_deployment_configuration(){
     rm $LOG_FOLDER/tmp2-service.env
     rm $LOG_FOLDER/tmp3-service.env
 
-    # create new files
+    # Save configs
     REPO_URL=$(git config --get remote.origin.url)
     printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $LOG_FOLDER/code.txt
     printf "query-url=%s\n" $ROUTE > $LOG_FOLDER/deployment-info.txt
@@ -314,7 +402,13 @@ function log_deployment_configuration(){
 
 check_docker
 login_to_ibm_cloud
-build_and_push_container
+check_parameters
+if [ "$RESTORE" == "false" ]; then
+    build_and_push_container
+fi
+if [ "$RESTORE" == "true" ]; then
+    build_and_push_container_restore
+fi
 create_custom_docker_config_file
 connect_to_cluster
 login_to_cluster
@@ -322,5 +416,5 @@ install_helm_chart
 wait_for_pod
 verify_service
 log_deployment_configuration
-#uninstall_helm_chart
+uninstall_helm_chart
 
