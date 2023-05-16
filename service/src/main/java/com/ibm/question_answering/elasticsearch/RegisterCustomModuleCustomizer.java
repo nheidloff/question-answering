@@ -16,6 +16,8 @@ public class RegisterCustomModuleCustomizer implements ObjectMapperCustomizer {
     public void customize(ObjectMapper mapper) {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Highlight.class, new HighlightSerializer());
+        module.addSerializer(Filter.class, new FilterSerializer());
+        module.addDeserializer(HighlightResult.class, new HighlightResultDeserializer());
         mapper.registerModule(module);
     }
 }

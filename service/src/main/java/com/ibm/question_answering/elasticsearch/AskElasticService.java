@@ -22,12 +22,12 @@ public class AskElasticService {
     private String index;
     final static String ERROR_ELASTIC_SEARCH_INDEX_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_INDEX not defined";
 
-    final String ELASTIC_SEARCH_USER_NOT_SET = "NOT_SET";   
+    final public static String ELASTIC_SEARCH_USER_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "ELASTIC_SEARCH_USER", defaultValue = ELASTIC_SEARCH_USER_NOT_SET) 
     private String user;
     final static String ERROR_ELASTIC_SEARCH_USER_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_USER not defined";
 
-    final String ELASTIC_SEARCH_PASSWORD_NOT_SET = "NOT_SET";   
+    final public static String ELASTIC_SEARCH_PASSWORD_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "ELASTIC_SEARCH_PASSWORD", defaultValue = ELASTIC_SEARCH_PASSWORD_NOT_SET) 
     private String password;
     final static String ERROR_ELASTIC_SEARCH_PASSWORD_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_PASSWORD not defined";
@@ -102,7 +102,7 @@ public class AskElasticService {
         if ((envVar != null) && (!envVar.equals(""))) {
             highlightField = envVar;   
         }
-        envVar = System.getenv("ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS");
+        envVar = System.getenv("ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS");      
         if ((envVar != null) && (!envVar.equals(""))) {
             this.maxResults = MAX_RESULTS_DEFAULT;
             try{
@@ -121,53 +121,15 @@ public class AskElasticService {
    
     public com.ibm.question_answering.api.Answer search(String query) {
         readAndCheckEnvironmentVariables();
-
+        metrics.elasticStarted(this.maxResults);
         com.ibm.question_answering.api.Answer output = convertToAnswer(elasticResource.search(createInput(query)));
+        metrics.elasticStopped(output);
         return output;
     }
 
-    // The following method 'createInput' needs to create the following input for ElasticSearch
-    // Note that the field name 'plainTextContent' is a variable which is why custom serialization needs to be used
-    // https://stackoverflow.com/questions/76228719/jackson-serializer-not-invoked-in-quarkus
-/* 
-curl -X POST \
--u $ELASTIC_SEARCH_USER:$ELASTIC_SEARCH_PASSWORD \
-"$ELASTIC_SEARCH_URL$ELASTIC_SEARCH_INDEX/_search" \
--H "Content-Type: application/json" \
--d '
-{
-    "size" : 10,
-    "highlight": {
-        "fields": [
-        {
-            "plainTextContent": {
-                "type": "unified",
-                "require_field_match": "true",
-                "fragment_size": 300,
-                "number_of_fragments":2
-            }
-        }
-        ]
-    },
-    "query": {
-        "bool": {
-            "must": {
-                "multi_match": {
-                    "query": "some search query",
-                    "fields": [
-                        "fileTitle",
-                        "plainTextContent"
-                    ],
-                    "type": "cross_fields"
-                }
-            }
-        }
-    }
-}
-'
-*/
     public com.ibm.question_answering.elasticsearch.Input createInput(String query) {
         com.ibm.question_answering.elasticsearch.Input output = new com.ibm.question_answering.elasticsearch.Input();
+        output.highlight = new Highlight();
         output.size = this.maxResults;
         ArrayList<String> fields = new ArrayList<String>();
         if (field1 != null) {
@@ -188,6 +150,7 @@ curl -X POST \
         must.multi_match = multiMatch;
         Bool bool = new Bool();
         bool.must = must;
+        bool.filter = new Filter();
         Query queryInput = new Query();
         queryInput.bool = bool;
         output.query = queryInput;
@@ -195,27 +158,35 @@ curl -X POST \
     }
 
     public com.ibm.question_answering.api.Answer convertToAnswer(Response response) {
-        List<Document> documents;
+        List<Hit> hits;
         com.ibm.question_answering.api.Answer output = new com.ibm.question_answering.api.Answer(false, 0, null);
         com.ibm.question_answering.api.Result result;
         ArrayList<Result> results = new ArrayList<Result>();
         if (response != null) {
             if (response.hits != null) {
                 if (response.hits.hits != null) {
-                    documents = new ArrayList<>();
+                    hits = new ArrayList<>();
                     for (int indexHits = 0; indexHits < response.hits.hits.length; indexHits++) {
-                        documents.add(response.hits.hits[indexHits]._source);
+                        hits.add(response.hits.hits[indexHits]);
                     }
                 
-                    if (documents != null) {
-                        if (documents.size() > 0) {
-                            output.matching_results = documents.size();
-                            for (int index = 0; index < documents.size(); index++) {
+                    if (hits != null) {
+                        if (hits.size() > 0) {
+                            output.matching_results = hits.size();
+                            for (int index = 0; index < hits.size(); index++) {
                                 result = new com.ibm.question_answering.api.Result();
-                                result.document_id = documents.get(index).fileId;
-                                result.title = documents.get(index).fileTitle;
+                                result.document_id = hits.get(index)._source.fileId;
+                                result.title = hits.get(index)._source.fileTitle;
                                 result.text = new com.ibm.question_answering.discovery.Text();
-                                result.text.text = documents.get(index).plainTextContent;
+                                result.text.text = hits.get(index).highlight.text;
+                                if (result.text.text != null) {
+                                    for (int indexText = 0; indexText < result.text.text.length; indexText++) {
+                                        String oneLine = result.text.text[indexText];
+                                        oneLine = oneLine.replaceAll("<em>", "");
+                                        oneLine = oneLine.replaceAll("</em>", "");
+                                        result.text.text[indexText] = oneLine;
+                                    }
+                                }
                                 results.add(result);
                             }
                             output.results = results;

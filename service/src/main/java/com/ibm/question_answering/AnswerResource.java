@@ -183,8 +183,7 @@ public class AnswerResource {
         utilities.checkAuthorization(apikey);
         Answer output;
         output = queryElasticMaaS.query(utilities.getQuery(data));
-        //TODO output = utilities.removeRedundantDocuments(output);
-        //TODOmetrics.end();
+        metrics.end();
         return output;
     }
 
@@ -274,7 +273,6 @@ public class AnswerResource {
         utilities.checkAuthorization(apikey);
         metrics.start(uriInfo, utilities.getQuery(data));
         Answer output = queryDiscovery.query(utilities.getQuery(data));
-        metrics.end();
         return output;
     }
 

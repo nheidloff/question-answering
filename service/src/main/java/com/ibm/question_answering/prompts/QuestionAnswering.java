@@ -73,6 +73,26 @@ Agent:""";
         return getPrompt(query, context);
     }
 
+    public String getPrompt(String query, com.ibm.question_answering.api.Answer answer) {
+        String context = "";
+        if ((answer != null) && (answer.results != null)) {
+            int amountDocuments = answer.results.size();            
+            for (int index = 0; index < answer.results.size(); index++) {
+                //context = context + answer.results.get(index).title + System.getProperty("line.separator");                            
+                for (int indexText = 0; indexText < answer.results.get(index).text.text.length; indexText++) {
+                    context = context + answer.results.get(index).text.text[indexText];
+                    if (indexText < answer.results.get(index).text.text.length - 1) {
+                        context = context + System.getProperty("line.separator");
+                    } 
+                }
+                if (index < amountDocuments - 1) {
+                    context = context + System.getProperty("line.separator") + System.getProperty("line.separator");
+                }                
+            }            
+        }
+        return getPrompt(query, context);
+    }
+
     public String getPrompt(String query, String[] documents) {
         String context = "";
         int amountDocuments = documents.length;

@@ -96,11 +96,40 @@ public class AskModelAsAService {
         return answerDocuments;
     }
 
+    private com.ibm.question_answering.api.Answer limitAnswerDocuments(com.ibm.question_answering.api.Answer answer) {
+        if (maxResultsOptionalString.isPresent()) {
+            try {
+                maxResults = Integer.parseInt(maxResultsOptionalString.get());
+            } catch (Exception e) {}
+        }  
+        int llmMaxInputDocuments = MAAS_LLM_MAX_INPUT_DOCUMENTS;
+        if (llmMaxInputDocumentsOptionalString.isPresent()) {
+            try {
+                llmMaxInputDocuments = Integer.parseInt(llmMaxInputDocumentsOptionalString.get());
+            } catch (Exception e) {}
+        }
+        metrics.setMaaSMaxAmountDocuments(llmMaxInputDocuments);
+        if (llmMaxInputDocuments < answer.results.size()) {
+            com.ibm.question_answering.api.Answer answerOrg = answer;
+            answer = new com.ibm.question_answering.api.Answer(false, llmMaxInputDocuments, null);
+            System.arraycopy(answerOrg.results, 0, answer.results, 0, llmMaxInputDocuments);
+        }
+        return answer;
+    }
+
     public com.ibm.question_answering.api.Answer execute(String query, AnswerDocument[] answerDocuments) {      
         answerDocuments = this.limitAnswerDocuments(answerDocuments);
         String prompt = questionAnswering.getPrompt(query, answerDocuments);
         com.ibm.question_answering.api.Answer output = execute(prompt);
         output = cleanUpAnswer(output, answerDocuments);
+        return output;
+    }
+
+    public com.ibm.question_answering.api.Answer execute(String query, com.ibm.question_answering.api.Answer answer) {      
+        answer = this.limitAnswerDocuments(answer);
+        String prompt = questionAnswering.getPrompt(query, answer);
+        com.ibm.question_answering.api.Answer output = execute(prompt);
+        output = cleanUpAnswer(output, answer);
         return output;
     }
 
@@ -246,6 +275,34 @@ public class AskModelAsAService {
         if (lastIndexOfDot != -1) {
             output = answer.substring(0, lastIndexOfDot + 1);
             output = output.trim();
+        }
+        return output;
+    }
+    
+    public com.ibm.question_answering.api.Answer cleanUpAnswer(com.ibm.question_answering.api.Answer maasAnswer, com.ibm.question_answering.api.Answer searchAnswer) {
+        com.ibm.question_answering.api.Answer output = maasAnswer;
+        
+        if (searchAnswer != null) {
+            output.matching_results = searchAnswer.results.size();
+            ArrayList<Result> results = new ArrayList<Result>();
+            results.add(output.results.get(0));
+            for (int index = 0; index < searchAnswer.results.size(); index++) {
+                results.add(searchAnswer.results.get(index));
+            }
+            output.results = results;
+        }
+
+        int results = output.results.size();
+        if (maxResults + 1 < results) {
+            for (int index = results - 1; index > maxResults; index--) {
+                output.results.remove(index);
+            }
+        }
+        
+        for (int index = 0; index < output.results.size(); index++) {
+            if (output.results.get(index).document_passages != null) {
+                output.results.get(index).document_passages =  null;
+            }
         }
         return output;
     }

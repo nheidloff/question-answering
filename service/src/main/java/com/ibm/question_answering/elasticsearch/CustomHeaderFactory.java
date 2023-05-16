@@ -10,10 +10,10 @@ import javax.ws.rs.core.MultivaluedMap;
 @ApplicationScoped
 public class CustomHeaderFactory implements ClientHeadersFactory {
 
-    @ConfigProperty(name = "ELASTIC_SEARCH_USER", defaultValue = "") 
+    @ConfigProperty(name = "ELASTIC_SEARCH_USER", defaultValue = AskElasticService.ELASTIC_SEARCH_USER_NOT_SET) 
     private String user;
 
-    @ConfigProperty(name = "ELASTIC_SEARCH_PASSWORD", defaultValue = "") 
+    @ConfigProperty(name = "ELASTIC_SEARCH_PASSWORD", defaultValue = AskElasticService.ELASTIC_SEARCH_PASSWORD_NOT_SET) 
     private String password;
 
     @Override
