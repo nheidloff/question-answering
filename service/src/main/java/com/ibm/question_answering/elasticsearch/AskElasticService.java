@@ -126,46 +126,6 @@ public class AskElasticService {
         return output;
     }
 
-    // The following method 'createInput' needs to create the following input for ElasticSearch
-    // Note that the field name 'plainTextContent' is a variable which is why custom serialization needs to be used
-    // https://stackoverflow.com/questions/76228719/jackson-serializer-not-invoked-in-quarkus
-/* 
-curl -X POST \
--u $ELASTIC_SEARCH_USER:$ELASTIC_SEARCH_PASSWORD \
-"$ELASTIC_SEARCH_URL$ELASTIC_SEARCH_INDEX/_search" \
--H "Content-Type: application/json" \
--d '
-{
-    "size" : 10,
-    "highlight": {
-        "fields": [
-        {
-            "plainTextContent": {
-                "type": "unified",
-                "require_field_match": "true",
-                "fragment_size": 300,
-                "number_of_fragments":2
-            }
-        }
-        ]
-    },
-    "query": {
-        "bool": {
-            "must": {
-                "multi_match": {
-                    "query": "some search query",
-                    "fields": [
-                        "fileTitle",
-                        "plainTextContent"
-                    ],
-                    "type": "cross_fields"
-                }
-            }
-        }
-    }
-}
-'
-*/
     public com.ibm.question_answering.elasticsearch.Input createInput(String query) {
         com.ibm.question_answering.elasticsearch.Input output = new com.ibm.question_answering.elasticsearch.Input();
         output.highlight = new Highlight();
@@ -189,6 +149,7 @@ curl -X POST \
         must.multi_match = multiMatch;
         Bool bool = new Bool();
         bool.must = must;
+        bool.filter = new Filter();
         Query queryInput = new Query();
         queryInput.bool = bool;
         output.query = queryInput;
