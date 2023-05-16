@@ -652,7 +652,9 @@ def main(args):
                                 very_golden_answer = row[1]
                                 if (end_experiment == True):
                                         break
-                                print(f"Row: {row} Length: {len(row)}")
+                                d_value = "Row:" + str(row) + "Length:" + str(len(row))
+                                debug_show_value(d_value)
+ 
                                 if (len(very_golden_answer) != 0):
                                         question      = row[0]
                                         golden_answer = row[1]

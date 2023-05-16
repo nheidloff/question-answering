@@ -104,3 +104,5 @@ scripts/ocp-deployment/logs/*
 !scripts/ocp-deployment/logs/README.md
 service/.env_gpu
 service/.env_working_cpu_configuration
+metrics/experiment-runner/.env_local_elastic_search
+service/.env_elastic_search_configuration
