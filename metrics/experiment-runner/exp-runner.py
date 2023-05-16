@@ -553,7 +553,7 @@ def invoke_qa(question):
 
 # ******************************************
 # Add results from the qa service metrics to output excel
-def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file):
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
         print(f"metrics_results: {len(metrics_results)} \n")
@@ -572,7 +572,7 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file):
                   
                 worksheet = workbook['experiment_bleu_result']
                 worksheet.cell(row=(2), column=1).value = str(sacrebleu)
-                worksheet.cell(row=(2), column=2).value = str(rouge.mid.fmeasure)
+                worksheet.cell(row=(2), column=2).value = str_rouge
 
         workbook.save(workbook_name_file)
         return True
@@ -757,7 +757,7 @@ def main(args):
 
                   # 3. Add results from the qa service metrics to output excel
                   if (qa_service_on_cloud == 'False'):
-                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file)
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
 
                   # 4. Show results
                 

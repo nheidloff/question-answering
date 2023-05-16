@@ -1,0 +1,81 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: question-answering-confmap
+  namespace: question-answering
+data:
+  {{- if .Values.elastic.ELASTIC_SEARCH_URL }}
+  ELASTIC_SEARCH_URL: "{{ .Values.elastic.ELASTIC_SEARCH_URL }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_INDEX }}
+  ELASTIC_SEARCH_INDEX: "{{ .Values.elastic.ELASTIC_SEARCH_INDEX }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_USER }}
+  ELASTIC_SEARCH_USER: "{{ .Values.elastic.ELASTIC_SEARCH_USER }}"
+  {{- end }}
+  {{- if .Values.elastic.ELASTIC_SEARCH_PASSWORD }}
+  ELASTIC_SEARCH_PASSWORD: "{{ .Values.elastic.ELASTIC_SEARCH_PASSWORD }}"
+  {{- end }}
+  {{- if .Values.discovery.DISCOVERY_URL }}
+  DISCOVERY_URL: "{{ .Values.discovery.DISCOVERY_URL }}"
+  {{- end }}
+  {{- if .Values.discovery.DISCOVERY_INSTANCE }}
+  DISCOVERY_INSTANCE: "{{ .Values.discovery.DISCOVERY_INSTANCE }}"
+  {{- end }}
+  {{- if .Values.discovery.DISCOVERY_PROJECT }}
+  DISCOVERY_PROJECT: "{{ .Values.discovery.DISCOVERY_PROJECT }}"
+  {{- end }}
+  {{- if .Values.discovery.DISCOVERY_COLLECTION_ID }}
+  DISCOVERY_COLLECTION_ID: "{{ .Values.discovery.DISCOVERY_COLLECTION_ID }}"
+  {{- end }}
+  {{- if .Values.prime_qa.PRIME_QA_URL  }}
+  PRIME_QA_URL: "{{ .Values.prime_qa.PRIME_QA_URL }}"
+  {{- end }}
+  {{- if .Values.reranker.RERANKER_URL }}
+  RERANKER_URL: "{{ .Values.reranker.RERANKER_URL }}"
+  {{- end }}
+  {{- if .Values.maas.MAAS_URL }}
+  MAAS_URL: "{{ .Values.maas.MAAS_URL }}"
+  {{- end }}
+  {{- if .Values.proxy.PROXY_URL }}
+  PROXY_URL: "{{ .Values.proxy.PROXY_URL }}"
+  {{- end }}
+  {{- if .Values.experiment.SESSION_ID }}
+  EXPERIMENT_METRICS_SESSION: "{{ .Values.experiment.SESSION_ID }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_LLM_NAME }}
+  EXPERIMENT_LLM_NAME: "{{ .Values.experiment.EXPERIMENT_LLM_NAME }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_LLM_MIN_NEW_TOKENS }}
+  EXPERIMENT_LLM_MIN_NEW_TOKENS: "{{ .Values.experiment.EXPERIMENT_LLM_MIN_NEW_TOKENS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_LLM_MAX_NEW_TOKENS }}
+  EXPERIMENT_LLM_MAX_NEW_TOKENS: "{{ .Values.experiment.EXPERIMENT_LLM_MAX_NEW_TOKENS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS }}
+  EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS: "{{ .Values.experiment.EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_LLM_PROMPT }}
+  EXPERIMENT_LLM_PROMPT: "{{ .Values.experiment.EXPERIMENT_LLM_PROMPT }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS }}
+  EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS: "{{ .Values.experiment.EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_RERANKER_MODEL }}
+  EXPERIMENT_RERANKER_MODEL: "{{ .Values.experiment.EXPERIMENT_RERANKER_MODEL }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_RERANKER_ID }}
+  EXPERIMENT_RERANKER_ID: "{{ .Values.experiment.EXPERIMENT_RERANKER_ID }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS }}
+  EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS: "{{ .Values.experiment.EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_DISCOVERY_CHARACTERS }}
+  EXPERIMENT_DISCOVERY_CHARACTERS: "{{ .Values.experiment.EXPERIMENT_DISCOVERY_CHARACTERS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_DISCOVERY_FIND_ANSWERS }}
+  EXPERIMENT_DISCOVERY_FIND_ANSWERS: "{{ .Values.experiment.EXPERIMENT_DISCOVERY_FIND_ANSWERS }}"
+  {{- end }}
+  {{- if .Values.experiment.EXPERIMENT_METRICS_DIRECTORY }}
+  EXPERIMENT_METRICS_DIRECTORY: "{{ .Values.experiment.EXPERIMENT_METRICS_DIRECTORY }}"
+  {{- end }}

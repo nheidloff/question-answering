@@ -1,0 +1,11 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: question-answering-route
+  namespace: question-answering
+spec:
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: question-answering-service

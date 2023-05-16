@@ -31,7 +31,7 @@ echo "    Open application terminals"
 echo "************************************"
 echo "- QA Service"
 open -a Terminal ${qa_service}
-sleep 15
+sleep 40
 echo "- Experiment runner"
 open -a Terminal ${exp_runner}
 

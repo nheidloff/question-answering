@@ -1,0 +1,9 @@
+{
+    "auths": {
+        "CR": {
+            "username": "iamapikey",
+            "password": "IBM_CLOUD_API_KEY",
+            "email": "iamapikey"
+        }
+    }
+}
