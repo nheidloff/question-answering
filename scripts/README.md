@@ -141,10 +141,18 @@ Attaching to experimentrunner, maasmock, qaservice
 
 ### 3.3 Start experiment
 
+1. Start a new terminal
 
+2. Access the running container
 
 ```sh
 CONTAINER=$(docker ps | grep experimentrunner | awk '{print $7;}')
 docker exec -it experimentrunner sh
-docker compose -f ./docker_compose.yaml stop
 ```
+
+3. Inside the container execute the start command
+
+```sh
+sh start.sh
+```
+
