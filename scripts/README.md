@@ -24,12 +24,66 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 | 3 | [deploy-to-code-engine.sh](./deploy-to-code-engine.sh)<br />[codeengine_experiment.sh](./start-experiment-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
 | 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
+# Running different combinations of the automated start of `question-answering service` and `experiment-runner`
 
-## 1. Automated start of QA - pipeline service and experiment-runner as applications
+## 1.  Start applications
 
-The experiment-runner is a Python command line application and the QA pipeline service is a Quarkus server application.
+The experiment-runner is a Python command line application and the `question-answering service` is a Quarkus server application.
 
-The bash script `start-apps.sh` automates the start of both applications
+The bash script `start-apps.sh` automates the start of both applications locally.
+
+### 1.1 Create an experiment-runner `.env` file
+
+Ensure you have created the needed environment variables file and adjusted it to your needs. 
+
+```sh
+cd ./metrics/experiment-runner
+cat ./env_template > .env
+```
+
+### 1.2 Create a QA pipeline service `.env` file
+
+Ensure you have created the needed environment variables file and adjusted it to your needs. 
+
+```sh
+cd ./service/experiment-runner
+cat ./env_template > .env
+```
+
+### 1.3 Start the automation
+
+The bash automation `start_apps.sh` starts the automation for [experiment-runner](./local_exp_runner.sh) and the [QA pipeline service](./local_qa_service.sh).
+
+It also creates an `~/.env_profile` file to save global variables.
+
+```sh
+sh start_apps.sh
+```
+
+* Example output:
+
+```sh
+************************************
+Environment configuration
+************************************
+- HOME_PATH :          /YOUR_PATH/scripts
+- SESSION_ID:          1681741227
+************************************
+Environment configuration save in '~/.env_profile'
+************************************
+************************************
+- Enable bash automation for execution
+************************************
+************************************
+- Open terminals
+************************************
+- QA Service
+- Experiment runner
+```
+
+## 2.  Start containers
+
+The start containers
 
 ### 1.1 Create an experiment-runner `.env` file
 
