@@ -24,12 +24,13 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 | 3 | [deploy-to-code-engine.sh](./deploy-to-code-engine.sh)<br />[codeengine_experiment.sh](./start-experiment-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
 | 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
+# Running different combinations of the automated start of `question-answering service` and `experiment-runner`
 
-## 1. Automated start of QA - pipeline service and experiment-runner as applications
+## 1.  Start applications
 
-The experiment-runner is a Python command line application and the QA pipeline service is a Quarkus server application.
+The experiment-runner is a Python command line application and the `question-answering service` is a Quarkus server application.
 
-The bash script `start-apps.sh` automates the start of both applications
+The bash script `start-apps.sh` automates the start of both applications locally.
 
 ### 1.1 Create an experiment-runner `.env` file
 
@@ -79,3 +80,79 @@ Environment configuration save in '~/.env_profile'
 - QA Service
 - Experiment runner
 ```
+
+## 2.  Start containers
+
+The start of three containers.
+
+* Experiment-runner
+* Question-answering servie
+* MaaS mock
+
+### 2.1 Create an experiment-runner `.env` file
+
+Ensure you have created the needed environment variables file and adjusted it to your needs. 
+
+```sh
+cd ./metrics/experiment-runner
+cat ./env_template > .env
+```
+
+### 2.2 Create a QA pipeline service `.env` file
+
+Ensure you have created the needed environment variables file and adjusted it to your needs. 
+
+```sh
+cd ./service/experiment-runner
+cat ./env_template > .env
+```
+
+### 3.3 Start the automation
+
+The bash automation `start_containers.sh` the execution of Docker.
+
+It also creates an `~/.env_profile` file to save global variables.
+
+```sh
+sh start_containers.sh
+```
+
+* Example output:
+
+```sh
+************************************
+ Build and start containers with Docker compose 
+- 'QA-Service'
+- 'Experiment-runner'
+- 'Maas-mock'
+************************************
+Home path:    /YOUR_PATH/question-answering/scripts
+Session ID:   1684308505
+/bin/sh: /YOUR_PATH/git-question-answering/scripts/env_profile_generate.sh: No such file or directory
+/YOUR_PATH/git-question-answering/metrics/input
+Docker Compose version v2.17.2
+**************** BUILD ******************
+....
+**************** START ******************
+...
+Attaching to experimentrunner, maasmock, qaservice
+...
+```
+
+### 3.3 Start experiment
+
+1. Start a new terminal
+
+2. Access the running container
+
+```sh
+CONTAINER=$(docker ps | grep experimentrunner | awk '{print $7;}')
+docker exec -it experimentrunner sh
+```
+
+3. Inside the container execute the start command
+
+```sh
+sh start.sh
+```
+

@@ -16,10 +16,10 @@ export LOG_FOLDER=""
 export ROUTE=""
 
 # Restore and deploy by an existing commit ID
-export RESTORE_REPO_COMMIT_ID=""
-export RESTORE_REPO_URL=""
-export RESTORE_REPO_ENV_NAME=""
-export ARG_RESTORE=${1:-no_restore}
+export ARG_RESTORE=${1:-"no_restore"}
+export RESTORE_REPO_COMMIT_ID=${2:-"no_commit_id"}
+export RESTORE_REPO_URL=${3:-"no_repo_url_id"}
+export RESTORE_REPO_ENV_NAME=${4:-"no_env_file_name"}
 export RESTORE="false"
 
 # **********************************************************************************
@@ -27,14 +27,12 @@ export RESTORE="false"
 # **********************************************************************************
 
 function check_parameters () {
+    echo "Restore: $ARG_RESTORE"
     if [ "$ARG_RESTORE" == "no_restore" ]; then
         export RESTORE="false"
     else
         export RESTORE="true"
-        export RESTORE_REPO_COMMIT_ID=${2:-no_commit_id}
-        export RESTORE_REPO_URL=${3:-no_repo_url_id}
-        export RESTORE_REPO_ENV_NAME=${4:-no_env_file_name}
-        echo "Restore configuration: "
+        echo "Restore configuration: $RESTORE"
         echo "Commit ID: $RESTORE_REPO_COMMIT_ID"
         echo "Repo URL: $RESTORE_REPO_URL"
         echo "Env filename: $RESTORE_REPO_ENV_NAME"
@@ -416,5 +414,5 @@ install_helm_chart
 wait_for_pod
 verify_service
 log_deployment_configuration
-uninstall_helm_chart
+#uninstall_helm_chart
 
