@@ -96,7 +96,7 @@ public class AskModelAsAService {
         return answerDocuments;
     }
 
-    private com.ibm.question_answering.api.Answer limitAnswerDocuments(com.ibm.question_answering.api.Answer answer) {
+    private com.ibm.question_answering.api.Answer limitAnswerDocuments(com.ibm.question_answering.api.Answer answer) {        
         if (maxResultsOptionalString.isPresent()) {
             try {
                 maxResults = Integer.parseInt(maxResultsOptionalString.get());
@@ -112,7 +112,10 @@ public class AskModelAsAService {
         if (llmMaxInputDocuments < answer.results.size()) {
             com.ibm.question_answering.api.Answer answerOrg = answer;
             answer = new com.ibm.question_answering.api.Answer(false, llmMaxInputDocuments, null);
-            System.arraycopy(answerOrg.results, 0, answer.results, 0, llmMaxInputDocuments);
+            answer.results = new ArrayList<Result>();
+            for (int index = 0; index < llmMaxInputDocuments; index++) {
+                answer.results.add(answerOrg.results.get(index));
+            }
         }
         return answer;
     }
