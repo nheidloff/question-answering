@@ -24,7 +24,7 @@ export HOME_PATH=$(pwd)
 export SESSION_ID=$(date +%s)
 echo "Home path:    $HOME_PATH"
 echo "Session ID:   $SESSION_ID"
-"/bin/sh" "${HOME_PATH}"/generate_env_profile.sh > ~/.env_profile
+"/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
 
 # 2. load application environment configurations
 source $(pwd)/../service/.env

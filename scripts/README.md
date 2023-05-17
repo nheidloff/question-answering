@@ -83,9 +83,13 @@ Environment configuration save in '~/.env_profile'
 
 ## 2.  Start containers
 
-The start containers
+The start of three containers.
 
-### 1.1 Create an experiment-runner `.env` file
+* Experiment-runner
+* Question-answering servie
+* MaaS mock
+
+### 2.1 Create an experiment-runner `.env` file
 
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
@@ -94,7 +98,7 @@ cd ./metrics/experiment-runner
 cat ./env_template > .env
 ```
 
-### 1.2 Create a QA pipeline service `.env` file
+### 2.2 Create a QA pipeline service `.env` file
 
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
@@ -103,33 +107,44 @@ cd ./service/experiment-runner
 cat ./env_template > .env
 ```
 
-### 1.3 Start the automation
+### 3.3 Start the automation
 
-The bash automation `start_apps.sh` starts the automation for [experiment-runner](./local_exp_runner.sh) and the [QA pipeline service](./local_qa_service.sh).
+The bash automation `start_containers.sh` the execution of Docker.
 
 It also creates an `~/.env_profile` file to save global variables.
 
 ```sh
-sh start_apps.sh
+sh start_containers.sh
 ```
 
 * Example output:
 
 ```sh
 ************************************
-Environment configuration
+ Build and start containers with Docker compose 
+- 'QA-Service'
+- 'Experiment-runner'
+- 'Maas-mock'
 ************************************
-- HOME_PATH :          /YOUR_PATH/scripts
-- SESSION_ID:          1681741227
-************************************
-Environment configuration save in '~/.env_profile'
-************************************
-************************************
-- Enable bash automation for execution
-************************************
-************************************
-- Open terminals
-************************************
-- QA Service
-- Experiment runner
+Home path:    /YOUR_PATH/question-answering/scripts
+Session ID:   1684308505
+/bin/sh: /YOUR_PATH/git-question-answering/scripts/env_profile_generate.sh: No such file or directory
+/YOUR_PATH/git-question-answering/metrics/input
+Docker Compose version v2.17.2
+**************** BUILD ******************
+....
+**************** START ******************
+...
+Attaching to experimentrunner, maasmock, qaservice
+...
+```
+
+### 3.3 Start experiment
+
+
+
+```sh
+CONTAINER=$(docker ps | grep experimentrunner | awk '{print $7;}')
+docker exec -it experimentrunner sh
+docker compose -f ./docker_compose.yaml stop
 ```
