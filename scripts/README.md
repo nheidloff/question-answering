@@ -156,3 +156,19 @@ docker exec -it experimentrunner sh
 sh start.sh
 ```
 
+```sh
+...
+******* invoke REST API ********
+--- Request 0 ---
+Status  : 200
+Question: XXXX?
+Answer  : XXX.
+--- Request 1 ---
+...
+******* outputs for session: 1684309468 ********
+Excel output file : /app/outputs/1684309468-output.xlsx
+
+******* Bleu result based on 101 responses ********
+Bleu: XXX RougeL: XXX
+```
+
