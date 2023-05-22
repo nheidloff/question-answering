@@ -4,9 +4,9 @@
 export HOME_PATH=$(pwd)
 
 # IBM Cloud - variables
-source "$HOME_PATH"/.env
+source "$HOME_PATH"/../.env
 # QA Service - variables
-source "$HOME_PATH"/../service/.env
+source "$HOME_PATH"/../../service/.env
 
 # Optional to change
 export CODEENGINE_CR_ACCESS_NAME=$CR
@@ -79,8 +79,8 @@ function build_and_push_container () {
     export CODEENGINE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
     echo "Name: $CODEENGINE_APP_IMAGE_URL"
     echo "****** BUILD *********"
-    cd "$HOME_PATH"/../service
-    docker build -f "$HOME_PATH"/../service/src/main/docker/"$QA_DOCKERFILE_NAME" -t "$CODEENGINE_APP_IMAGE_URL" .
+    cd "$HOME_PATH"/../../service
+    docker build -f "$HOME_PATH"/../../service/src/main/docker/"$QA_DOCKERFILE_NAME" -t "$CODEENGINE_APP_IMAGE_URL" .
     cd "$HOME_PATH"
     
     # Login to container with IBM Cloud registy  
@@ -216,25 +216,25 @@ function log_deployment_configuration_all(){
     echo "************************************"
     cd  $HOME_PATH
     FOLDERNAME="$(date +%Y-%m-%d-%T)-git-$COMMIT_ID"
-    mkdir $HOME_PATH/../deployment-log/all/$FOLDERNAME
+    mkdir $HOME_PATH/../../deployment-log/all/$FOLDERNAME
     
     # remove all comments of the envirement configuration and save in all
     # experiment-runner
-    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/ibm-cloud.env
-    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/experiment-runner.env
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/ibm-cloud.env
+    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/experiment-runner.env
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env
-    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env  > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env    
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp3-service.env
-    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp3-service.env > $HOME_PATH/../deployment-log/all/$FOLDERNAME/service.env
-    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp1-service.env
-    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp2-service.env
-    rm $HOME_PATH/../deployment-log/all/$FOLDERNAME/tmp3-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env  > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp2-service.env    
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp2-service.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp3-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp3-service.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/service.env
+    rm $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env
+    rm $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp2-service.env
+    rm $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp3-service.env
 
     # create new files
     REPO_URL=$(git config --get remote.origin.url)
-    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/code.txt
-    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../deployment-log/all/$FOLDERNAME/deployment-info.txt
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/code.txt
+    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/deployment-info.txt
 
 }
 
@@ -247,18 +247,18 @@ function log_deployment_configuration_last(){
     
     # remove all comments of the envirement configuration and save in all
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../deployment-log/last/tmp1-service.env
-    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../deployment-log/last/tmp1-service.env  > $HOME_PATH/../deployment-log/last/tmp2-service.env    
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../deployment-log/last/tmp2-service.env > $HOME_PATH/../deployment-log/last/tmp3-service.env
-    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../deployment-log/last/tmp3-service.env > $HOME_PATH/../deployment-log/last/service.env
-    rm $HOME_PATH/../deployment-log/last/tmp1-service.env
-    rm $HOME_PATH/../deployment-log/last/tmp2-service.env
-    rm $HOME_PATH/../deployment-log/last/tmp3-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../../deployment-log/last/tmp1-service.env
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp1-service.env  > $HOME_PATH/../../deployment-log/last/tmp2-service.env    
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp2-service.env > $HOME_PATH/../../deployment-log/last/tmp3-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp3-service.env > $HOME_PATH/../../deployment-log/last/service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp1-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp2-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp3-service.env
 
     # create new files
     REPO_URL=$(git config --get remote.origin.url)
-    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../deployment-log/last/code.txt
-    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../deployment-log/last/deployment-info.txt
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $HOME_PATH/../../deployment-log/last/code.txt
+    printf "query-url=%s\n" $CODEENGINE_APP_NAME_URL > $HOME_PATH/../../deployment-log/last/deployment-info.txt
 
 }
 
@@ -269,7 +269,7 @@ function set_global_env () {
     echo "Home path:    $HOME_PATH"
     echo "Session ID:   $SESSION_ID"
     echo "Code Engine URL: $QA_SERVICE_API_URL"
-    "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
+    "/bin/sh" "${HOME_PATH}"/../env_profile_generate.sh > ~/.env_profile
 }
 
 #**********************************************************************************

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # **************** Global variables
-source ./.env
+source ./../.env
 
 export CODEENGINE_CR_ACCESS_NAME=$CR
 export CODEENGINE_CR_SERVER_NAME=$CR
