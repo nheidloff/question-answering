@@ -12,6 +12,12 @@ import com.ibm.question_answering.primeqa.AskPrimeQA;
 import com.ibm.question_answering.prompts.QuestionAnswering;
 import com.ibm.question_answering.proxy.ProxyExceptionMapper;
 import com.ibm.question_answering.proxy.ProxyServiceResource;
+import com.ibm.question_answering.tgis.Parameters;
+import com.ibm.question_answering.tgis.Request;
+import com.ibm.question_answering.tgis.Sampling;
+import com.ibm.question_answering.tgis.Stopping;
+import com.ibm.question_answering.tgis.TgisServiceResource;
+
 import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
@@ -31,6 +37,9 @@ public class AskModelAsAService {
     ModelAsAServiceResource maasResource;
 
     @Inject
+    TgisServiceResource tgisResource;
+
+    @Inject
     ProxyServiceResource proxyResource;
 
     final String PROXY_API_KEY_NOT_SET = "NOT_SET"; 
@@ -40,6 +49,9 @@ public class AskModelAsAService {
     final String PROXY_URL_NOT_SET = "NOT_SET"; 
     private String proxyUrl = System.getenv("PROXY_URL");
     final static String ERROR_PROXY_URL_NOT_SET = ProxyExceptionMapper.ERROR_PROXY_PREFIX + "PROXY_URL not defined";
+
+    String tgisUrl = System.getenv("TGIS");
+    private boolean useTegis = false;
 
     final String MAAS_URL_NOT_SET = "NOT_SET";   
     @ConfigProperty(name = "MAAS_URL", defaultValue = MAAS_URL_NOT_SET) 
@@ -137,6 +149,11 @@ public class AskModelAsAService {
     }
 
     private void readAndCheckEnvironmentVariables() {
+        if ((tgisUrl != null) && (!tgisUrl.equals(""))) {
+            if (tgisUrl.equalsIgnoreCase("true")) {
+                useTegis = true;
+            }
+        }
         if ((proxyApiKey != null) && (!proxyApiKey.equals(""))) {
             if (!proxyApiKey.equalsIgnoreCase(PROXY_API_KEY_NOT_SET)) {
                 useProxy = true;
@@ -173,7 +190,6 @@ public class AskModelAsAService {
         answerDocuments = this.limitAnswerDocuments(answerDocuments);
         String prompt = questionAnswering.getPrompt(query, answerDocuments);
         return executeAsStream(prompt);
-        // TODO output = cleanUpAnswer(output, answerDocuments);
     }
 
     public Multi<com.ibm.question_answering.maas.Answer> executeAsStream(String prompt) {
@@ -183,6 +199,7 @@ public class AskModelAsAService {
         parameters.stream = true;
 
         Multi<Answer> response = null;
+        // TODO throw error for tgis
         if (useProxy == false) {
             response = maasResource.askAsStream(new Input(llmName, getInputs(prompt), parameters));
         }
@@ -211,15 +228,29 @@ public class AskModelAsAService {
         metrics.maaSStarted(llmMinNewTokens, llmMaxNewTokens, llmName, prompt);       
         
         Answer response;
-        if (useProxy == false) {
-            response = maasResource.ask(new Input(llmName, getInputs(prompt), getParameters()));
+        if (useTegis == true) {
+            com.ibm.question_answering.tgis.Input input = new com.ibm.question_answering.tgis.Input();
+            input.modelId = llmName;
+            input.requests = new Request[1];
+            input.requests[0] = new Request();
+            input.requests[0].text = prompt;
+            input.params = new Parameters();
+            input.params.sampling = new Sampling();
+            input.params.stopping = new Stopping();
+            input.params.stopping.minNewTokens = llmMinNewTokens;
+            input.params.stopping.maxNewTokens = llmMaxNewTokens;
+            response = tgisResource.ask(input);
         }
         else {
-            com.ibm.question_answering.proxy.Input proxyInput = new com.ibm.question_answering.proxy.Input(apiKey, url, 
-                new com.ibm.question_answering.maas.Input(llmName, getInputs(prompt), getParameters()));
-            response = proxyResource.ask(proxyInput);
-        }      
-        
+            if (useProxy == false) {
+                response = maasResource.ask(new Input(llmName, getInputs(prompt), getParameters()));
+            }
+            else {
+                com.ibm.question_answering.proxy.Input proxyInput = new com.ibm.question_answering.proxy.Input(apiKey, url, 
+                    new com.ibm.question_answering.maas.Input(llmName, getInputs(prompt), getParameters()));
+                response = proxyResource.ask(proxyInput);
+            }  
+        }    
         return convertToAPIAnswer(response);
     }
 
