@@ -73,38 +73,46 @@ function setup_ce_project() {
 }
 
 function build_and_push_container () {
-  
+    
+    # 1. Get commit id
     export COMMIT_ID=$(git rev-parse HEAD)
     export CI_TAG=$COMMIT_ID
+
+    # 2. Create container image URL
     export CODEENGINE_APP_IMAGE_URL="$CR/$CR_REPOSITORY/$CI_NAME:$CI_TAG"
     echo "Name: $CODEENGINE_APP_IMAGE_URL"
+
+    # 3. Build container image
     echo "****** BUILD *********"
     cd "$HOME_PATH"/../../service
     docker build -f "$HOME_PATH"/../../service/src/main/docker/"$QA_DOCKERFILE_NAME" -t "$CODEENGINE_APP_IMAGE_URL" .
     cd "$HOME_PATH"
     
-    # Login to container with IBM Cloud registy  
+    # 4. Login to  IBM Cloud Container Registry
     ibmcloud cr login
 
+    # 5. In case the IBM Cloud resource group for the IBM Container Registry is different, the automation changes the IBM Cloud target for the resource group.
     ERROR=$(ibmcloud target -g $CR_RESOURCE_GROUP 2>&1)
     RESULT=$(echo $ERROR | grep 'FAILED' | awk '{print $1;}')
     VERIFY="FAILED"
     if [ "$RESULT" == "$VERIFY" ]; then
-        echo "Can't set to resource group: ($CR_RESOURCE_GROUP) but I move on."
+        echo "Can't set to resource group: ($CR_RESOURCE_GROUP) I move on with the existing resource group."
     fi
 
+    # 6. Set to the right container registry region
     ibmcloud cr region-set $CR_REGION
 
-    # Create a new namespace, if the namespace doesn't exists
+    # 7. Create a new namespace; if the namespace doesn't exists
     CURR_CONTAINER_NAMESPACE=$(ibmcloud cr namespace-list -v | grep $CR_REPOSITORY | awk '{print $1;}')
     if [ "$CR_REPOSITORY" != "$CURR_CONTAINER_NAMESPACE" ]; then
         ibmcloud cr namespace-add $CR_REPOSITORY
     fi
 
-    # Login to IBM Cloud registy with Docker
+    # 8. Log in to IBM Cloud Registry with the Docker login command
     docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION 
     docker push "$CODEENGINE_APP_IMAGE_URL"
-    
+
+    # 9. Set back to the right IBM Cloud resource group, in case the resource group was changed
     ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
 
 }

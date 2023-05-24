@@ -1,7 +1,6 @@
 # Open Shift deployment
 
-The automated deployment fully deploys the [`question answering service`](./../../service/) to an IBM Cloud Red Hat OpenShift cluster in a Virtual Private Cloud environment.
-The automation uses bash scripting and a [`Helm Chart`](./charts/question-answering-helm/).
+The automated deployment fully deploys the [`question answering service`](./../../service/) to an IBM Cloud Red Hat OpenShift cluster in a Virtual Private Cloud environment. The automation uses bash scripting and a [`Helm Chart`](./charts/question-answering-helm/).
 
 The automation does this deployment for you:
 
@@ -72,3 +71,16 @@ sh deploy-to-openshift.sh
     ```
 
 3. Inspect the created logs for your deployment configuration in `scripts/ocp-deployment/logs` .
+
+```sh
+logs
+├── 2023-05-16-13:53:25-git-56fe86c0474720f9fb39f9619baa8e735de5b022
+│   ├── code.txt
+│   ├── deployment-info.txt
+│   ├── helm-generate-values-file.sh
+│   ├── helm-values.yaml
+│   ├── ibm-cloud.env
+│   ├── ocp-deployment.env
+│   └── service.env
+└── README.md
+```
