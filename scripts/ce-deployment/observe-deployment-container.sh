@@ -70,12 +70,14 @@ function kube_pod_log(){
     echo "************************************"
     echo " Kubernetes $CODEENGINE_APP_NAME: log"
     echo "************************************"
-
+    
+    # 1. Find the pod for the application
     FIND=$CODEENGINE_APP_NAME
     APP_POD=$(kubectl get pod -n $CODEENGINE_PROJECT_NAMESPACE | grep $FIND | awk '{print $1}')
     echo "************************************"
     echo "Show log for the pod: $APP_POD"
     echo "************************************"
+    # 2. Show the logs for this pod
     kubectl logs -f $APP_POD
 }
 
