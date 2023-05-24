@@ -22,7 +22,7 @@ function login_to_ibm_cloud () {
     
     echo ""
     echo "*********************"
-    echo "loginIBMCloud"
+    echo "Log in to IBM Cloud"
     echo "*********************"
     echo ""
 
@@ -31,19 +31,24 @@ function login_to_ibm_cloud () {
     ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
 }
 
-function setup_ce_project() {
+function connect_ce_project() {
   echo "**********************************"
   echo " Using following project: $CODEENGINE_PROJECT_NAME" 
   echo "**********************************"
 
+  # 1. Connect to IBM Cloud Code Engine project
   ibmcloud ce project select -n $CODEENGINE_PROJECT_NAME
   
-  #to use the kubectl commands
+  # 2. Get the kubecfg to connect to the related cluster
   ibmcloud ce project select -n $CODEENGINE_PROJECT_NAME --kubecfg
-  
+
+  # 3. Get the project namespace
   CODEENGINE_PROJECT_NAMESPACE=$(ibmcloud ce project get --name $CODEENGINE_PROJECT_NAME --output json | grep "namespace" | awk '{print $2;}' | sed 's/"//g' | sed 's/,//g')
   echo "Code Engine project namespace: $CODEENGINE_PROJECT_NAMESPACE"
+
+  # 4. List all running pods
   kubectl get pods -n $CODEENGINE_PROJECT_NAMESPACE
+
 }
 
 # **** Kubernetes CLI ****
@@ -79,6 +84,6 @@ function kube_pod_log(){
 # *********************************************************************************
 
 login_to_ibm_cloud
-setup_ce_project
+connect_ce_project
 kube_information
 kube_pod_log
