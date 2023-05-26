@@ -7,7 +7,8 @@ aiohttp
 sacrebleu 
 python-dotenv 
 pyinstaller 
-openpyxl 
-absl 
+openpyxl
 nltk 
 rouge_score
+Flask
+flask_restful

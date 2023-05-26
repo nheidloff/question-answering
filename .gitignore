@@ -106,3 +106,4 @@ service/.env_gpu
 service/.env_working_cpu_configuration
 metrics/experiment-runner/.env_local_elastic_search
 service/.env_elastic_search_configuration
+metrics/experiment-runner/ex-runner-env-3.11/
