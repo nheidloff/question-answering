@@ -7,6 +7,9 @@
 ## 2. Setup environment
 
 ```sh
+python3.11 -m venv ex-runner-env-3.11
+source ./ex-runner-env-3.11/bin/activate
+python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 pip install --upgrade --force-reinstall -r requirements.txt
 ```
@@ -14,7 +17,7 @@ pip install --upgrade --force-reinstall -r requirements.txt
 or 
 
 ```sh
-python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp sacrebleu python-dotenv pyinstaller evaluate openpyxl nltk rouge_score
+python3 -m pip install requests pandas datasets huggingface_hub fsspec aiohttp sacrebleu python-dotenv pyinstaller evaluate openpyxl nltk rouge_score Flask flask_restful
 ```
 
 ## 3. Create an `.env` file
@@ -31,6 +34,7 @@ cat ./env_template > .env
 ### 4.1. Execute as command line application
 
 ```sh
+source ./ex-runner-env-3.11/bin/activate
 python3 exp-runner.py
 ```
 

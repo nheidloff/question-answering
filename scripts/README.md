@@ -21,8 +21,8 @@ _Note:_ The following combinations are possible when `Model as a Service` is ava
 | --- | --- | --- | --- | --- |
 | 1 | [start-apps.sh](./start-apps.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_1_example) |  Example [`.env_template file`](../service/.env_template) |  |
 | 2 | [start-containers.sh](./start-containers.sh)<br />[stop-containers.sh](./stop-containers.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_2_example) | Example [`.env_template file`](../service/.env_template) |  |
-| 3 | [deploy-to-code-engine.sh](./deploy-to-code-engine.sh)<br />[codeengine_experiment.sh](./start-experiment-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
-| 4 |  [codeengine_deploy.sh](./codeengine_deploy.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
+| 3 | [deploy-to-code-engine.sh](./ce-deployment/deploy-to-code-engine.sh)<br />[codeengine_experiment.sh](./start-experiment-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_3_example) | Example [`.env_template file`](../service/.env_template) |  |
+| 4 |  [deploy-to-code-engine.sh](./ce-deployment/deploy-to-code-engine.sh) | Example [`.env_template file`](../metrics/experiment-runner/example_templates/.env_combination_4_example)  | Example [`.env_template file`](../service/.env_template) |  |
 
 # Running different combinations of the automated start of `question-answering service` and `experiment-runner`
 
@@ -154,5 +154,21 @@ docker exec -it experimentrunner sh
 
 ```sh
 sh start.sh
+```
+
+```sh
+...
+******* invoke REST API ********
+--- Request 0 ---
+Status  : 200
+Question: XXXX?
+Answer  : XXX.
+--- Request 1 ---
+...
+******* outputs for session: 1684309468 ********
+Excel output file : /app/outputs/1684309468-output.xlsx
+
+******* Bleu result based on 101 responses ********
+Bleu: XXX RougeL: XXX
 ```
 
