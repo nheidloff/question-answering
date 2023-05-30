@@ -31,8 +31,8 @@ public class HighlightSerializer extends StdSerializer<Highlight> {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeStringField("type", "unified");
             jsonGenerator.writeStringField("require_field_match", "true");
-            jsonGenerator.writeNumberField("fragment_size", 300);
-            jsonGenerator.writeNumberField("number_of_fragments", 2);
+            jsonGenerator.writeNumberField("fragment_size", 800);
+            jsonGenerator.writeNumberField("number_of_fragments", 1);
             jsonGenerator.writeEndObject();
             jsonGenerator.writeEndObject();
             jsonGenerator.writeEndArray();
