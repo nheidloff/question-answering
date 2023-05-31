@@ -403,12 +403,12 @@ def create_output_workbook (workbook_name):
         worksheet['S1'] = 'reranker_passage_2_id'
         worksheet['T1'] = 'reranker_passage_3'
         worksheet['U1'] = 'reranker_passage_3_id'
-        worksheet['V1'] = 'reranker_passage_1'
-        worksheet['W1'] = 'reranker_passage_1_id'
-        worksheet['X1'] = 'reranker_passage_2'
-        worksheet['Y1'] = 'reranker_passage_2_id'
-        worksheet['Z1'] = 'reranker_passage_3'
-        worksheet['AA1'] = 'reranker_passage_3_id'
+        worksheet['V1'] = 'elastic_search_passage_1'
+        worksheet['W1'] = 'elastic_search_passage_1_id'
+        worksheet['X1'] = 'elastic_search_passage_2'
+        worksheet['Y1'] = 'elastic_search_passage_2_id'
+        worksheet['Z1'] = 'elastic_search_passage_3'
+        worksheet['AA1'] = 'elastic_search_passage_3_id'
 
         # Save the workbook as a new Excel file
         workbook.save(workbook_name)
