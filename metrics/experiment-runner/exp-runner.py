@@ -12,6 +12,7 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
+from openpyxl.styles import Alignment
 import regex
 import sys
 
@@ -56,14 +57,15 @@ else:
 
 # -----------------------
 # Loaded from env file
-# qa service
+
+# qa service related
 endpoint = os.environ.get("endpoint")
 api_url = os.environ.get("api_url")
 username=os.environ.get("username")
 password=os.environ.get("password")
 verify_answer=os.environ.get("verify_answer")
 
-# input
+# input for ground truth
 input_excel_filename = os.environ.get("input_excel_filename")
 input_folder_name = os.environ.get("input_folder_name")
 input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_service_metrics")
@@ -245,14 +247,14 @@ def get_score_groundtruth(excel_input_file, prefix_passage_id):
         
             return new_header, new_rows
 
-def load_score_ranker(csv_filepath):
-        d_value = "QA -service experiment file: " + csv_filepath
+def load_score_reranker(csv_filepath):
+        d_value = "QA -service experiment file - RERANKER: " + csv_filepath
         debug_show_value(d_value)
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
-        d_value = "QA -service experiment file Header: " + str(header)
+        d_value = "QA -service experiment file Header - RERANKER: " + str(header)
         debug_show_value(d_value)
 
         # Reranker extract
@@ -389,12 +391,24 @@ def create_output_workbook (workbook_name):
         worksheet['G1'] = 'passage_2_id'
         worksheet['H1'] = 'passage_3'
         worksheet['I1'] = 'passage_3_id'
-        worksheet['J1'] = 'answer_passage_1'
-        worksheet['K1'] = 'answer_passage_1_id'
-        worksheet['L1'] = 'answer_passage_2'
-        worksheet['M1'] = 'answer_passage_2_id'
-        worksheet['N1'] = 'answer_passage_3'
-        worksheet['O1'] = 'answer_passage_3_id'
+        worksheet['J1'] = 'discovery_passage_1'
+        worksheet['K1'] = 'discovery_passage_1_id'
+        worksheet['L1'] = 'discovery_passage_2'
+        worksheet['M1'] = 'discovery_passage_2_id'
+        worksheet['N1'] = 'discovery_passage_3'
+        worksheet['O1'] = 'discovery_passage_3_id'
+        worksheet['P1'] = 'reranker_passage_1'
+        worksheet['Q1'] = 'reranker_passage_1_id'
+        worksheet['R1'] = 'reranker_passage_2'
+        worksheet['S1'] = 'reranker_passage_2_id'
+        worksheet['T1'] = 'reranker_passage_3'
+        worksheet['U1'] = 'reranker_passage_3_id'
+        worksheet['V1'] = 'elastic_search_passage_1'
+        worksheet['W1'] = 'elastic_search_passage_1_id'
+        worksheet['X1'] = 'elastic_search_passage_2'
+        worksheet['Y1'] = 'elastic_search_passage_2_id'
+        worksheet['Z1'] = 'elastic_search_passage_3'
+        worksheet['AA1'] = 'elastic_search_passage_3_id'
 
         # Save the workbook as a new Excel file
         workbook.save(workbook_name)
@@ -446,21 +460,38 @@ def load_input_excel(excel_input):
     return new_header, new_rows, True
 
 # ******************************************
-# load qa service metrics from csv file
+# load qa service metrics from run.csv file for: 
+# - Discovery
+# - Reranker
+# - Elastic search
 def load_qa_service_metrics(csv_filepath):
-        d_value = "QA -service experiment file: " + csv_filepath
+        d_value = "QA -service experiment 'run.csv' file: " + csv_filepath
         debug_show_value(d_value)
         file = open(csv_filepath)
         csvreader = csv.reader(file)
         header = []
         header = next(csvreader)
-        d_value = "QA -service experiment file Header: " + str(header)
+        d_value = "QA -service experiment 'run.csv' file Header: " + str(header)
         debug_show_value(d_value)
 
         # Reranker extract
+        # Discovery extract
+        # Elastic search extract
         i = 0
         for column in header:
                 # print(f"Column: {column} : {i}")
+                if str(column) == "RESULT_DISCOVERY_PASSAGE1":
+                        discovery_p_1 = i
+                if str(column) == "RESULT_DISCOVERY_PASSAGE2":
+                        discovery_p_2 = i
+                if str(column) == "RESULT_DISCOVERY_PASSAGE3":
+                        discovery_p_3 = i
+                if str(column) == "RESULT_DISCOVERY_PASSAGE1_ID":
+                        discovery_p_1_id = i
+                if str(column) == "RESULT_DISCOVERY_PASSAGE2_ID":
+                        discovery_p_2_id = i
+                if str(column) == "RESULT_DISCOVERY_PASSAGE2_ID":
+                        discovery_p_3_id = i
                 if str(column) == "RESULT_RERANKER_PASSAGE1":
                         ranker_p_1 = i
                 if str(column) == "RESULT_RERANKER_PASSAGE2":
@@ -473,11 +504,40 @@ def load_qa_service_metrics(csv_filepath):
                         ranker_p_2_id = i   
                 if str(column) == "RESULT_RERANKER_PASSAGE3_ID":
                         ranker_p_3_id = i
+                if str(column) == "RESULT_ELASTIC_PASSAGE1":
+                        elastic_p_1 = i
+                if str(column) == "RESULT_ELASTIC_PASSAGE2":
+                        elastic_p_2 = i
+                if str(column) == "RESULT_ELASTIC_PASSAGE3":
+                        elastic_p_3 = i
+                if str(column) == "RESULT_ELASTIC_PASSAGE1_ID":
+                        elastic_p_1_id = i   
+                if str(column) == "RESULT_ELASTIC_PASSAGE2_ID":
+                        elastic_p_2_id = i   
+                if str(column) == "RESULT_ELASTIC_PASSAGE3_ID":
+                        elastic_p_3_id = i
                 i = i + 1                         
 
         qa_service_metrics = []
         for row in csvreader: 
-                values = [ str(row[ranker_p_1]) , str(row[ranker_p_1_id]) , str(row[ranker_p_2]) , str(row[ranker_p_2_id]) , str(row[ranker_p_3]), str(row[ranker_p_3_id]) ]
+                values = [ str(row[discovery_p_1]) , 
+                           str(row[discovery_p_1_id]) , 
+                           str(row[discovery_p_2]) , 
+                           str(row[discovery_p_2_id]) , 
+                           str(row[discovery_p_3]), 
+                           str(row[discovery_p_3_id]),
+                           str(row[ranker_p_1]) , 
+                           str(row[ranker_p_1_id]) , 
+                           str(row[ranker_p_2]) , 
+                           str(row[ranker_p_2_id]) , 
+                           str(row[ranker_p_3]), 
+                           str(row[ranker_p_3_id]),
+                           str(row[elastic_p_1]) , 
+                           str(row[elastic_p_1_id]) , 
+                           str(row[elastic_p_2]) , 
+                           str(row[elastic_p_2_id]) , 
+                           str(row[elastic_p_3]), 
+                           str(row[elastic_p_3_id]) ]
                 # print(f"Values:\n {values}")          
                 qa_service_metrics.append(values)
         file.close()
@@ -556,7 +616,8 @@ def invoke_qa(question):
 def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-        print(f"metrics_results: {len(metrics_results)} \n")
+        d_value = "Metrics_results: " + str(len(metrics_results))
+        debug_show_value(d_value)
         workbook = openpyxl.load_workbook(workbook_name_file)
         
         j = 1
@@ -568,12 +629,34 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str
                 worksheet.cell(row=(j+1), column=13).value = row[3]
                 worksheet.cell(row=(j+1), column=14).value = row[4]
                 worksheet.cell(row=(j+1), column=15).value = row[5]
+                worksheet.cell(row=(j+1), column=10).value = row[6]
+                worksheet.cell(row=(j+1), column=11).value = row[7]
+                worksheet.cell(row=(j+1), column=12).value = row[8]
+                worksheet.cell(row=(j+1), column=13).value = row[9]
+                worksheet.cell(row=(j+1), column=14).value = row[10]
+                worksheet.cell(row=(j+1), column=15).value = row[11]
+                worksheet.cell(row=(j+1), column=10).value = row[12]
+                worksheet.cell(row=(j+1), column=11).value = row[13]
+                worksheet.cell(row=(j+1), column=12).value = row[14]
+                worksheet.cell(row=(j+1), column=13).value = row[15]
+                worksheet.cell(row=(j+1), column=14).value = row[16]
+                worksheet.cell(row=(j+1), column=15).value = row[17]
                 j = j + 1
                   
                 worksheet = workbook['experiment_bleu_result']
                 worksheet.cell(row=(2), column=1).value = str(sacrebleu)
                 worksheet.cell(row=(2), column=2).value = str_rouge
-
+        
+        worksheet = workbook['experiment_data']
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                         cell.alignment = Alignment(wrapText=True,vertical='top')
+        
+        worksheet = workbook['experiment_bleu_result']
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                        cell.alignment = Alignment(wrap_text=True,vertical='top') 
+        
         workbook.save(workbook_name_file)
         return True
         
@@ -740,7 +823,7 @@ def main(args):
         if (end_experiment == False):
 
                   #header, ground_truth_rows = get_score_groundtruth(excel_input_filepath,prefix_passage_id)
-                  #score_ranker = load_score_ranker(qa_metrics_run_file)
+                  #score_ranker = load_score_reranker(qa_metrics_run_file)
                   #score_matcher(csv_input_filepath, qa_metrics_run_file)
 
                   # 2. Create experiment-runner blue result output         
@@ -758,6 +841,8 @@ def main(args):
                   rouge = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
+                  d_value = "Qa_service_on_cloud: " + str(qa_service_on_cloud)
+                  debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
                         add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
 

@@ -4,6 +4,40 @@
 
 * [Hugging Face](https://huggingface.co/spaces/evaluate-metric/sacrebleu)
 
+## 1. Architecture Overview
+
+The `'experiment-runner'` invokes the `'question answering'` service based on ground truth input.
+
+The `'experiment-runner'` creates an output Excel file that contains return values from the `'question answering'` invocation and reads `run.csv` output file.
+
+At the moment an experiment will be executed locally.
+
+* Numbers in the diagram:
+
+    * `Question-answering` service:
+
+    The left-hand side numbering shows the order of the invocation of the models.
+
+    1. Watson Discovery
+
+    2. Reranker BERT
+
+    3. MaaS
+
+    * `Experiment-runner` service:
+
+    The ride-hand side numbering shows the order of steps of the `experiment-runner`.
+
+     1. Load the ground truth
+
+     2. Invoke REST API
+
+     3. Read output logs
+
+     4. Write the experiment results
+
+![](../../screenshots/qa-experiment-runner-extract.png)
+
 ## 2. Setup environment
 
 ```sh
