@@ -12,7 +12,7 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
-from openpyxl.styles import alignment
+from openpyxl.styles import Alignment
 import regex
 import sys
 
@@ -650,7 +650,7 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str
         worksheet = workbook['experiment_data']
         for row in worksheet.iter_rows():  
                 for cell in row:      
-                        cell.alignment = alignment(wrap_text=True,vertical='top') 
+                         cell.alignment = Alignment(wrapText=True,vertical='top')
         
         worksheet = workbook['experiment_bleu_result']
         for row in worksheet.iter_rows():  
@@ -841,6 +841,8 @@ def main(args):
                   rouge = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
+                  d_value = "Qa_service_on_cloud: " + str(qa_service_on_cloud)
+                  debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
                         add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
 

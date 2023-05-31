@@ -40,12 +40,12 @@ if [[ "${GLOBAL_SESSION_ID}" == "${verify}" ]]; then
     mvn quarkus:dev
 else
     echo "Session ID: ${GLOBAL_SESSION_ID}"
-    export EXPERIMENT_METRICS_SESSION=${GLOBAL_SESSION_ID}
     cd ${CURRENT_PATH}/../metrics/output
     export METRICS_DIR=$(pwd)
     echo "METRICS_DIR: ${METRICS_DIR}"
     cd ${CURRENT_PATH}
     export EXPERIMENT_METRICS_DIRECTORY=${METRICS_DIR}
+    export EXPERIMENT_METRICS_SESSION=${GLOBAL_SESSION_ID}
     echo "**************************"
     echo "Start QA- Service"
     echo "**************************"

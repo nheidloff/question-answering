@@ -81,6 +81,7 @@ services:
       - output_folder_name=outputs 
       - number_of_retries=$number_of_retries
       - container_run=True
+      - qa_service_on_cloud=False
       - app_debug_channel=$app_debug_channel
     volumes:
       - ${OUTPUT_MOUNTPOINT}:/app/outputs:rw
