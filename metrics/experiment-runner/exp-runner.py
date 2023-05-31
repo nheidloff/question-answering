@@ -12,8 +12,7 @@ from datasets import load_metric
 import sacrebleu
 import logging
 import openpyxl
-from openpyxl.styles import alignment, font
-from openpyxl.cell import cell
+from openpyxl.styles import alignment
 import regex
 import sys
 
@@ -617,7 +616,8 @@ def invoke_qa(question):
 def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-        print(f"metrics_results: {len(metrics_results)} \n")
+        d_value = "Metrics_results: " + str(len(metrics_results))
+        debug_show_value(d_value)
         workbook = openpyxl.load_workbook(workbook_name_file)
         
         j = 1

@@ -39,6 +39,7 @@ if [[ "${GLOBAL_SESSION_ID}" == "${verify}" ]]; then
 else
     echo "Session ID: ${GLOBAL_SESSION_ID}"
     export EXPERIMENT_METRICS_SESSION=${GLOBAL_SESSION_ID}
+    export EXPERIMENT_METRICS_DIRECTORY=$(pwd)/../metrics/output
     echo "**************************"
     echo "Start QA- Service"
     echo "**************************"
