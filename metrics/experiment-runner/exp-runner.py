@@ -655,7 +655,7 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str
         worksheet = workbook['experiment_bleu_result']
         for row in worksheet.iter_rows():  
                 for cell in row:      
-                        cell.alignment = alignment(wrap_text=True,vertical='top') 
+                        cell.alignment = Alignment(wrap_text=True,vertical='top') 
         
         workbook.save(workbook_name_file)
         return True
