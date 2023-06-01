@@ -479,7 +479,9 @@ def load_qa_service_metrics(csv_filepath):
         # Elastic search extract
         i = 0
         for column in header:
-                # print(f"Column: {column} : {i}")
+               
+                d_value = "Column: " + str(column) + " : " + str(i)
+                debug_show_value(d_value)
                 if str(column) == "RESULT_DISCOVERY_PASSAGE1":
                         discovery_p_1 = i
                 if str(column) == "RESULT_DISCOVERY_PASSAGE2":
@@ -538,7 +540,9 @@ def load_qa_service_metrics(csv_filepath):
                            str(row[elastic_p_2_id]) , 
                            str(row[elastic_p_3]), 
                            str(row[elastic_p_3_id]) ]
-                # print(f"Values:\n {values}")          
+                
+                d_value = "Values:\n " + str(values)
+                debug_show_value(d_value)        
                 qa_service_metrics.append(values)
         file.close()
         return qa_service_metrics
@@ -616,31 +620,37 @@ def invoke_qa(question):
 def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-        d_value = "Metrics_results: " + str(len(metrics_results))
+        d_value = "Metrics_results: \n" + str(len(metrics_results))
         debug_show_value(d_value)
+        d_value = "Metrics_results: \n" + str(metrics_results)
+        debug_show_value(d_value)
+
         workbook = openpyxl.load_workbook(workbook_name_file)
         
         j = 1
         for row in metrics_results:
                 worksheet = workbook['experiment_data']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
                 worksheet.cell(row=(j+1), column=10).value = row[0]
                 worksheet.cell(row=(j+1), column=11).value = row[1]
                 worksheet.cell(row=(j+1), column=12).value = row[2]
                 worksheet.cell(row=(j+1), column=13).value = row[3]
                 worksheet.cell(row=(j+1), column=14).value = row[4]
                 worksheet.cell(row=(j+1), column=15).value = row[5]
-                worksheet.cell(row=(j+1), column=10).value = row[6]
-                worksheet.cell(row=(j+1), column=11).value = row[7]
-                worksheet.cell(row=(j+1), column=12).value = row[8]
-                worksheet.cell(row=(j+1), column=13).value = row[9]
-                worksheet.cell(row=(j+1), column=14).value = row[10]
-                worksheet.cell(row=(j+1), column=15).value = row[11]
-                worksheet.cell(row=(j+1), column=10).value = row[12]
-                worksheet.cell(row=(j+1), column=11).value = row[13]
-                worksheet.cell(row=(j+1), column=12).value = row[14]
-                worksheet.cell(row=(j+1), column=13).value = row[15]
-                worksheet.cell(row=(j+1), column=14).value = row[16]
-                worksheet.cell(row=(j+1), column=15).value = row[17]
+                worksheet.cell(row=(j+1), column=16).value = row[6]
+                worksheet.cell(row=(j+1), column=17).value = row[7]
+                worksheet.cell(row=(j+1), column=18).value = row[8]
+                worksheet.cell(row=(j+1), column=19).value = row[9]
+                worksheet.cell(row=(j+1), column=20).value = row[10]
+                worksheet.cell(row=(j+1), column=21).value = row[11]
+                worksheet.cell(row=(j+1), column=22).value = row[12]
+                worksheet.cell(row=(j+1), column=23).value = row[13]
+                worksheet.cell(row=(j+1), column=24).value = row[14]
+                worksheet.cell(row=(j+1), column=25).value = row[15]
+                worksheet.cell(row=(j+1), column=26).value = row[16]
+                worksheet.cell(row=(j+1), column=27).value = row[17]
                 j = j + 1
                   
                 worksheet = workbook['experiment_bleu_result']
@@ -841,7 +851,7 @@ def main(args):
                   rouge = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
-                  d_value = "Qa_service_on_cloud: " + str(qa_service_on_cloud)
+                  d_value = "Qa_service_on_cloud: \n" + str(qa_service_on_cloud)
                   debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
                         add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))

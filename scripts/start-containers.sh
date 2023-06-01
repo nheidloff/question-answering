@@ -1,11 +1,14 @@
 #!/bin/bash
 
-echo "************************************"
-echo " Build and start containers with Docker compose " 
-echo "- 'QA-Service'"
-echo "- 'Experiment-runner'"
-echo "- 'Maas-mock'"
-echo "************************************"
+# **************** Global variables
+export HOME_PATH=$(pwd)
+export SESSION_ID=$(date +%s)
+export COMMIT_ID=""
+export LOG_FOLDER=""
+
+# **********************************************************************************
+# Functions definition
+# **********************************************************************************
 
 function check_docker () {
     ERROR=$(docker ps 2>&1)
@@ -17,11 +20,48 @@ function check_docker () {
     fi
 }
 
+function log_environment_configuration(){
+    cd  $HOME_PATH
+
+    export COMMIT_ID=$(git rev-parse HEAD)
+    export LOG_FOLDER=$HOME_PATH/../metrics/output
+
+    echo "************************************"
+    echo "Save configurations in '$LOG_FOLDER'"
+    echo "************************************"
+     
+    # service
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../service/.env  > $LOG_FOLDER/tmp1-service.env
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env    
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/${SESSION_ID}-service.env
+    rm $LOG_FOLDER/tmp1-service.env
+    rm $LOG_FOLDER/tmp2-service.env
+    rm $LOG_FOLDER/tmp3-service.env
+
+    # experiment runner
+    sed '/^#/d;s/\password=.*/password=/' "$HOME_PATH"/../metrics/experiment-runner/.env  > $LOG_FOLDER/${SESSION_ID}-experiment-runner.env
+    
+    # Save configs
+    REPO_URL=$(git config --get remote.origin.url)
+    printf "commit-id=%s\nrepo-url=%s\n" $COMMIT_ID $REPO_URL > $LOG_FOLDER/${SESSION_ID}_code.md
+}
+
+#**********************************************************************************
+# Execution
+# *********************************************************************************
+
+echo "************************************"
+echo " Build and start containers with Docker compose " 
+echo "- 'QA-Service'"
+echo "- 'Experiment-runner'"
+echo "- 'Maas-mock'"
+echo "************************************"
+
 check_docker
+log_environment_configuration
 
 # 1. set needed common environment
-export HOME_PATH=$(pwd)
-export SESSION_ID=$(date +%s)
 echo "Home path:    $HOME_PATH"
 echo "Session ID:   $SESSION_ID"
 "/bin/sh" "${HOME_PATH}"/env_profile_generate.sh > ~/.env_profile
