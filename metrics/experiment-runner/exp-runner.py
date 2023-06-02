@@ -372,16 +372,26 @@ def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
         worksheet_blue = workbook.create_sheet("experiment_bleu_result")
+        worksheet_performance = workbook.create_sheet("experiment_performance")
+
         if 'Sheet1' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet1'])
         if 'Sheet' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet'])
         
-        worksheet.title = "experiment_data"
+        # bleu_result   
         worksheet_blue.title = "experiment_bleu_result"
         worksheet_blue['A1'] = 'bleu'
         worksheet_blue['B1'] = 'RougeL'
 
+        # performance 
+        worksheet_performance.title = "experiment_performance"
+        worksheet_performance['A1'] = "Timestamp start"
+        worksheet_performance['B1'] = "Timestamp end"
+        worksheet_performance['C1'] = "Duration"
+
+        # data
+        worksheet.title = "experiment_data"
         worksheet['A1'] = 'question'
         worksheet['B1'] = 'answer'
         worksheet['C1'] = 'golden_anwser'
@@ -548,6 +558,56 @@ def load_qa_service_metrics(csv_filepath):
         return qa_service_metrics
 
 # ******************************************
+# load qa service performance from run.csv file for: 
+# - TIMESTAMP_START
+# - TIMESTAMP_STOP
+def load_qa_service_performance(csv_filepath):
+        d_value = "QA -service experiment 'run.csv' file: " + csv_filepath
+        debug_show_value(d_value)
+        file = open(csv_filepath)
+        csvreader = csv.reader(file)
+        header = []
+        header = next(csvreader)
+        d_value = "QA -service experiment 'run.csv' file Header: " + str(header)
+        debug_show_value(d_value)
+
+        # - TIMESTAMP_START
+        # - TIMESTAMP_STOP
+        i = 0
+        timestamp_start = 0
+        timestamp_end = 0
+        for column in header:
+               
+                if str(column) == "TIMESTAMP_START":
+                        d_value = "Column: " + str(column) + " : " + str(i)
+                        debug_show_value(d_value)
+                        timestamp_start = i
+                if str(column) == "TIMESTAMP_END":
+                        d_value = "Column: " + str(column) + " : " + str(i)
+                        debug_show_value(d_value)
+                        timestamp_end = i
+                i = i + 1                         
+
+        qa_service_performance = []
+        
+        for row in csvreader: 
+                d_value = "Column: " + str(row)
+                debug_show_value(d_value)
+                
+                duration =  int(row[timestamp_end]) - int(row[timestamp_start])
+                values = [ str(row[timestamp_start]) , 
+                           str(row[timestamp_end]),
+                           str(duration)    ]               
+                
+                d_value = "qa_service_performance - Values:\n " + str(values)
+                debug_show_value(d_value)        
+                qa_service_performance.append(values)
+
+        file.close()
+        
+        return qa_service_performance
+
+# ******************************************
 # Invoke the REST API endpoint 
 # of the qa service in code engine
 def invoke_qa(question):
@@ -669,7 +729,47 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str
         
         workbook.save(workbook_name_file)
         return True
+
+# ******************************************
+# Add performance from the qa service metrics to output excel
+def add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file):
+
+        performance_results = load_qa_service_performance(qa_metrics_run_file)
+        d_value = "Performance_results: \n" + str(len(performance_results))
+        debug_show_value(d_value)
+        d_value = "Performance_results: \n" + str(performance_results)
+        debug_show_value(d_value)
+
+        workbook = openpyxl.load_workbook(workbook_name_file)
         
+        j = 1
+        calculation = "=SUM("
+        for row in performance_results:
+                worksheet = workbook['experiment_performance']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
+                worksheet.cell(row=(j+1), column=1).value = int(row[0])
+                worksheet.cell(row=(j+1), column=2).value = int(row[1])
+                worksheet.cell(row=(j+1), column=3).value = int(row[2])
+                calculation += "C" + str(j) + ";"
+                d_value = "Calculation: \n" + calculation
+                debug_show_value(d_value)
+                j = j + 1
+                
+        worksheet['D1']="Average"
+        worksheet['D2']= calculation + ")/" + str(j-1)
+        d_value = "Performance_results: \n" + worksheet['D2']
+        debug_show_value(d_value)   
+        worksheet = workbook['experiment_performance']
+
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                         cell.alignment = Alignment(wrapText=True,vertical='top')
+               
+        workbook.save(workbook_name_file)
+        return True
+
 # ******************************************
 # Execution
 def main(args):
@@ -855,6 +955,7 @@ def main(args):
                   debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
                         add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
+                        # add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
 
                   # 4. Show results
                 
