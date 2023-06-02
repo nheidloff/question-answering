@@ -194,6 +194,7 @@ public class AskElasticService {
                                             result.text.text[indexText] = oneLine;
                                         }
                                     }
+                                    result = addFirstWords(result, hits.get(index));
                                 }
                                 results.add(result);
                             }
@@ -204,6 +205,67 @@ public class AskElasticService {
             }
         }
         return output;
+    }
+
+    private Result addFirstWords(Result result, Hit hit) {
+        int amountWords = 0;
+        int maxAmountWords = 100;
+        if (result != null) {
+            if (result.text != null) {
+                if (result.text.text != null) {
+                    for (int indexText = 0; indexText < result.text.text.length; indexText++) {
+                        String oneLine = result.text.text[indexText];
+                        amountWords = amountWords + getAmountWords(oneLine);
+                    }
+                } 
+            } 
+            String fullText = getFullText(hit._source.text);
+            String firstWords = getFirstWords(amountWords, maxAmountWords, fullText);
+            String[] allText = new String[result.text.text.length + 1];
+            for (int index = 0; index < result.text.text.length; index++) {
+                allText[index] = result.text.text[index];
+            }
+            allText[result.text.text.length] = firstWords;
+            result.text.text = allText;
+        }
+        return result;
+    }
+
+    private String getFirstWords(int amountWords, int maxAmountWords, String fullText) {
+        String output = "";
+        if (fullText != null ) {
+            boolean more = true;
+            while (more) {
+                if (amountWords >= maxAmountWords) {
+                    more = false;
+                }
+                else {
+                    int indexOfSpace = fullText.indexOf(" ");
+                    if (indexOfSpace == -1) {
+                        more = false;
+                    }
+                    else {
+                        output = output + " " + fullText.substring(0, indexOfSpace);
+                        amountWords++;
+                        fullText = fullText.substring(indexOfSpace, fullText.length()).trim();
+                    }
+                }
+            }
+        }
+        return output.trim();
+    }
+
+    private int getAmountWords(String text) {
+        long count = text.chars().filter(character -> character == ' ').count();
+        return (int)count +  1;
+    }
+
+    private String getFullText(String[] fullTextArray) {
+        String output = "";
+        for (int indexText = 0; indexText < fullTextArray.length; indexText++) {
+            output = output + " " + fullTextArray[indexText];
+        }
+        return output.trim();
     }
 
     private String buildUrl(Document result) {

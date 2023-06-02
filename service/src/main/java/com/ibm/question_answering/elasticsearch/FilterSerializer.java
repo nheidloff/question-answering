@@ -102,8 +102,8 @@ public class FilterSerializer extends StdSerializer<Filter> {
             jsonGenerator.writeEndArray();
         } 
         else {
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeEndObject();
+            jsonGenerator.writeStartArray();
+            jsonGenerator.writeEndArray();
         }
     }
 }
