@@ -207,7 +207,9 @@ def get_input_qa_service_metrics_container_path():
 # - NA (evidence)
 # - I do not have information regarding
 # - Unfortunately, no relevant information is found.
-
+# Defined by: 
+#  Tabs: 'experiment_data' and 'experiment_filtered_data'
+#  Filters: "NA", "I do not have information regarding", "Unfortunately, no relevant information is found."
 def extract_unknown_response (excel_output_file):
 
     global logger
@@ -248,8 +250,8 @@ def extract_unknown_response (excel_output_file):
                         question      = row[0]
                         anwer         = row[1]
                         golden_answer = row[2]
+                        new_rows.append([question, anwer, golden_answer])
 
-        new_rows.append([question, anwer, golden_answer])
     new_header = [ "question", "anwer", "golden_answer"]
 
     # 2. Save the new values in a new list
@@ -861,7 +863,6 @@ def invoke_qa(question):
                         answer_text_list = []
                         return answer_text, answer_text_len,  answer_text_list, False
 
-
 # ******************************************
 # Execution
 def main(args):
@@ -1031,7 +1032,8 @@ def main(args):
                   # 2. Create experiment-runner blue result output  
                   # 2.1 First calc 
                   # - with experiment_data  
-                  d_value = "********** Blue 1 start ***********"
+                  d_value = "********** Bleu 1 start ***********"
+                  debug_show_value(d_value)
        
                   header, rows = bleu_run(workbook_name_file,'experiment_data')
                   header = bleu_from_list_to_dict(header)
@@ -1042,13 +1044,13 @@ def main(args):
                   d_value = "Rows for bleu: " + str(rows)
                   debug_show_value(d_value)
 
-                  responses = [row[header['response']] for row in rows]
+                  responses_1 = [row[header['response']] for row in rows]
                   d_value = "Responses: " + str(responses)
                   debug_show_value(d_value)
-                  golds = [[row[header['golden_anwser']]] for row in rows]
+                  golds_1 = [[row[header['golden_anwser']]] for row in rows]
                    
                   metric = load_metric("sacrebleu")
-                  metric.add_batch(predictions=responses, references=golds)
+                  metric.add_batch(predictions=responses_1, references=golds_1)
                   sacrebleu_1 = metric.compute()["score"]
 
                   metric = load_metric("rouge")
@@ -1057,9 +1059,9 @@ def main(args):
                   
                   # Second calc: 
                   # - with experiment_filtered_data
-                  d_value = "********** Blue 2 start ***********"
-                  
+                  d_value = "********** Bleu 2 start ***********"
                   debug_show_value(d_value)
+
                   header, rows = bleu_run(workbook_name_file,'experiment_filtered_data')
                   header = bleu_from_list_to_dict(header)
                   d_value = "Header for bleu: " + str(header)
@@ -1097,9 +1099,12 @@ def main(args):
                 
                   print (f"******* outputs for session: {output_session_id} ********")
                   print (f"Excel output file : {workbook_name_file}\n")
-                  count = len(responses) - 1
-                  print (f"******* Bleu result based on {count} responses ********")
+                  count_1 = len(responses_1) - 1
+                  count_2 = len(responses_2) - 1
+                  print (f"******* Bleu result based on {count_1} responses ********")
                   print ('Bleu: ' + str(sacrebleu_1), 'RougeL: ' + str(rouge_1.mid.fmeasure))
+                  print (f"******* Bleu result based on {count_2} responses ********")
+                  print ('Bleu: ' + str(sacrebleu_2), 'RougeL: ' + str(rouge_2.mid.fmeasure))
         
         else:
                   print (f"******* Experiment failed *************")
