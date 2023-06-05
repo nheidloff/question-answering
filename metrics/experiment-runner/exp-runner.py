@@ -1045,7 +1045,7 @@ def main(args):
                   debug_show_value(d_value)
 
                   responses_1 = [row[header['response']] for row in rows]
-                  d_value = "Responses: " + str(responses)
+                  d_value = "Responses: " + str(responses_1)
                   debug_show_value(d_value)
                   golds_1 = [[row[header['golden_anwser']]] for row in rows]
                    
@@ -1054,11 +1054,14 @@ def main(args):
                   sacrebleu_1 = metric.compute()["score"]
 
                   metric = load_metric("rouge")
-                  metric.add_batch(predictions=responses, references=golds)
+                  metric.add_batch(predictions=responses_1, references=golds_1)
                   rouge_1 = metric.compute()["rougeL"]
                   
                   # Second calc: 
                   # - with experiment_filtered_data
+                  if (qa_service_on_cloud == 'False'):
+                        extract_unknown_response(workbook_name_file)
+                        
                   d_value = "********** Bleu 2 start ***********"
                   debug_show_value(d_value)
 
@@ -1069,17 +1072,17 @@ def main(args):
                   d_value = "Rows for bleu: " + str(rows)
                   debug_show_value(d_value)
 
-                  responses = [row[header['response']] for row in rows]
-                  d_value = "Responses: " + str(responses)
+                  responses_2 = [row[header['response']] for row in rows]
+                  d_value = "Responses: " + str(responses_2)
                   debug_show_value(d_value)
-                  golds = [[row[header['golden_anwser']]] for row in rows]
+                  golds_2 = [[row[header['golden_anwser']]] for row in rows]
                    
                   metric = load_metric("sacrebleu")
-                  metric.add_batch(predictions=responses, references=golds)
+                  metric.add_batch(predictions=responses_2, references=golds_2)
                   sacrebleu_2 = metric.compute()["score"]
 
                   metric = load_metric("rouge")
-                  metric.add_batch(predictions=responses, references=golds)
+                  metric.add_batch(predictions=responses_2, references=golds_2)
                   rouge_2 = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
