@@ -253,7 +253,7 @@ def extract_unknown_response (excel_output_file):
     new_header = [ "question", "anwer", "golden_answer"]
 
     # 2. Save the new values in a new list
-    j = 0
+    j = 1
     for row in new_rows:
                 worksheet = workbook['experiment_filtered_data']
                 d_value = "Row: \n" + str(row)
@@ -631,7 +631,7 @@ def add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
                 j = j + 1
                 
         worksheet['D1']="Average"
-        worksheet['D2']= str(average)
+        worksheet['D2']= average
         d_value = "Performance_results: \n" + str(worksheet['D2'])
         debug_show_value(d_value)   
         worksheet = workbook['experiment_performance']
@@ -1021,7 +1021,9 @@ def main(args):
                   #score_ranker = load_score_reranker(qa_metrics_run_file)
                   #score_matcher(csv_input_filepath, qa_metrics_run_file)
 
-                  # 2. Create experiment-runner blue result output         
+                  # 2. Create experiment-runner blue result output  
+                  # 2.1 First calc 
+                  # - with experiment_data   
                   header, rows = bleu_run(workbook_name_file,'experiment_data')
                   header = bleu_from_list_to_dict(header)
                   d_value = "Header for bleu: " + str(header)
@@ -1034,17 +1036,42 @@ def main(args):
                    
                   metric = load_metric("sacrebleu")
                   metric.add_batch(predictions=responses, references=golds)
-                  sacrebleu = metric.compute()["score"]
+                  sacrebleu_1 = metric.compute()["score"]
 
                   metric = load_metric("rouge")
                   metric.add_batch(predictions=responses, references=golds)
-                  rouge = metric.compute()["rougeL"]
+                  rouge_1 = metric.compute()["rougeL"]
+                  
+                  # Second calc: 
+                  # - with experiment_filtered_data
+                  header, rows = bleu_run(workbook_name_file,'experiment_filtered_data')
+                  header = bleu_from_list_to_dict(header)
+                  d_value = "Header for bleu: " + str(header)
+                  debug_show_value(d_value)
+
+                  responses = [row[header['response']] for row in rows]
+                  d_value = "Responses: " + str(responses)
+                  debug_show_value(d_value)
+                  golds = [[row[header['golden_anwser']]] for row in rows]
+                   
+                  metric = load_metric("sacrebleu")
+                  metric.add_batch(predictions=responses, references=golds)
+                  sacrebleu_2 = metric.compute()["score"]
+
+                  metric = load_metric("rouge")
+                  metric.add_batch(predictions=responses, references=golds)
+                  rouge_2 = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
                   d_value = "Qa_service_on_cloud: \n" + str(qa_service_on_cloud)
                   debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
-                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(sacrebleu), str(rouge.mid.fmeasure))
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, 
+                                                        workbook_name_file, 
+                                                        str(sacrebleu_1), 
+                                                        str(rouge_1.mid.fmeasure),
+                                                        str(sacrebleu_2), 
+                                                        str(rouge_2.mid.fmeasure))
                         add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
                         extract_unknown_response(workbook_name_file)
 
@@ -1054,7 +1081,7 @@ def main(args):
                   print (f"Excel output file : {workbook_name_file}\n")
                   count = len(responses) - 1
                   print (f"******* Bleu result based on {count} responses ********")
-                  print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
+                  print ('Bleu: ' + str(sacrebleu_1), 'RougeL: ' + str(rouge_1.mid.fmeasure))
         
         else:
                   print (f"******* Experiment failed *************")
