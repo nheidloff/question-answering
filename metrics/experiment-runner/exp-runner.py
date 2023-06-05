@@ -287,7 +287,7 @@ def extract_unknown_response (excel_output_file):
 
     # 3. Save the bad data values
     j = 1
-    for row in new_rows:
+    for row in found_not_valid_values:
                 worksheet = workbook['experiment_bad_data']
                 d_value = "Row: \n" + str(row)
                 debug_show_value(d_value)
