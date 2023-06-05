@@ -54,7 +54,6 @@ if (os.environ.get("prefix_passage_id") == None):
 else:
         prefix_passage_id = os.environ.get("prefix_passage_id")
 
-
 # -----------------------
 # Loaded from env file
 
@@ -129,8 +128,9 @@ def debug_show_env_settings():
 def debug_show_value (value):
         global app_debug_channel
         if (app_debug_channel == "True"):
-                print("********** app DEBUG ***************")
+                print("********** app DEBUG start ***************")
                 print(value)
+                print("********** app DEBUG end ***************")
                 return True
         else:
                 return False
@@ -202,6 +202,112 @@ def get_input_qa_service_metrics_container_path():
         
         return new_directory
 
+# ******************************************
+# Extract data from output excel and create new data tab 
+# - NA (evidence)
+# - I do not have information regarding
+# - Unfortunately, no relevant information is found.
+#
+# Defined by: 
+#  Tabs: 'experiment_data' and 'experiment_filtered_data'
+#  Filters: '(iv).', 'NA evidence', 'I do not have information regarding', 'Unfortunately, no relevant information is found'
+def extract_unknown_response (excel_output_file):
+
+    global logger
+    workbook = openpyxl.load_workbook(excel_output_file)
+    worksheet = workbook['experiment_data']
+    d_value = ""
+    rows = []
+    not_valid_values = [ '(iv).', 'NA evidence', 'I do not have information regarding', 'Unfortunately, no relevant information is found' ]
+    found_not_valid_values = []
+    
+    for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
+        d_value = "Load Excel output file: " + str(excel_output_file)
+        debug_show_value(d_value)
+        
+        # End if the row contains data like this:
+        # # ('None', 'None' ... )
+        if not any(row):
+                new_header=[]
+                new_rows=[]
+                message = "ERROR: Input data, please verify your output data."
+                print(message)
+                logger.error(message)
+                return new_header, new_rows, False
+
+        if rdx:          
+            rows.append(list(row))
+        else:
+            header = row
+            new_rows = []
+
+    # 1. Extract data which doesn't contain wrong values
+    for row in rows:
+        
+        for verify_value in not_valid_values:
+                if verify_value in str(row[2]):
+                        d_value = "Will not be added to the new result: " + str(row[2])
+                        debug_show_value(d_value)
+                        add_to_value = False
+                        
+                        question      = row[0]
+                        anwer         = row[1]
+                        golden_answer = row[2]
+                        
+                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
+                        break
+                else:
+                        question      = row[0]
+                        anwer         = row[1]
+                        golden_answer = row[2]
+                        add_to_value = True
+
+        if (add_to_value == True):
+                new_rows.append([question, anwer, golden_answer])
+
+    new_header = [ "question", "anwer", "golden_answer"]
+
+    # 2. Save the filtered values
+    j = 1
+    for row in new_rows:
+                worksheet = workbook['experiment_filtered_data']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
+                worksheet.cell(row=(j+1), column=1).value = str(row[0])
+                worksheet.cell(row=(j+1), column=2).value = str(row[1])
+                worksheet.cell(row=(j+1), column=3).value = str(row[2])
+                j = j + 1
+    
+    worksheet = workbook['experiment_filtered_data']
+
+    for row in worksheet.iter_rows():
+        for cell in row:
+                cell.alignment = Alignment(wrapText=True,vertical='top')
+
+    # 3. Save the bad data values
+    j = 1
+    for row in found_not_valid_values:
+                worksheet = workbook['experiment_bad_data']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
+                worksheet.cell(row=(j+1), column=1).value = str(row[0])
+                worksheet.cell(row=(j+1), column=2).value = str(row[1])
+                worksheet.cell(row=(j+1), column=3).value = str(row[2])
+                worksheet.cell(row=(j+1), column=4).value = str(row[3])
+                j = j + 1
+    
+    worksheet = workbook['experiment_bad_data']
+
+    for row in worksheet.iter_rows():
+        for cell in row:
+                cell.alignment = Alignment(wrapText=True,vertical='top')
+    
+    workbook.save(excel_output_file)
+
+    return new_header, new_rows, found_not_valid_values, True
+   
 # ******************************************
 # Score prepare eval data functions
 def extract_prefix(input_string, prefix):
@@ -322,18 +428,18 @@ def convert_groundtruth_excel_to_csv(groundtruth_xlsx,groundtruth_csv):
 # ******************************************
 # Bleu prepare eval data functions 
 
-def bleu_run(input_filename):
-    header, rows = bleu_get_data(input_filename)
+def bleu_run(input_filename, tab):
+    header, rows = bleu_get_data(input_filename, tab)
     header = list(header.keys())
     return header, rows
 
-def bleu_get_data(input_filename):
+def bleu_get_data(input_filename, tab):
     rows = list()
     header = ['question', 'response', 'golden_anwser']
 
     try:
         workbook = openpyxl.load_workbook(input_filename)
-        ws = workbook['experiment_data']
+        ws = workbook[tab]
     except:
         print(f"Error: Could not open {input_filename}\n")
     
@@ -372,13 +478,28 @@ def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
         worksheet_blue = workbook.create_sheet("experiment_bleu_result")
+        worksheet_experiment_filtered_data = workbook.create_sheet("experiment_filtered_data")
+        worksheet_experiment_bad_data = workbook.create_sheet("experiment_bad_data")
         worksheet_performance = workbook.create_sheet("experiment_performance")
 
         if 'Sheet1' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet1'])
         if 'Sheet' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet'])
+
+        # filtered data  
+        worksheet_experiment_filtered_data.title = "experiment_filtered_data"
+        worksheet_experiment_filtered_data['A1'] = 'question'
+        worksheet_experiment_filtered_data['B1'] = 'answer'
+        worksheet_experiment_filtered_data['C1'] = 'golden_anwser'
         
+        # bad data
+        worksheet_experiment_bad_data.title = "experiment_bad_data"
+        worksheet_experiment_bad_data['A1'] = 'question'
+        worksheet_experiment_bad_data['B1'] = 'answer'
+        worksheet_experiment_bad_data['C1'] = 'golden_anwser'
+        worksheet_experiment_bad_data['D1'] = 'bad phrase'
+
         # bleu_result   
         worksheet_blue.title = "experiment_bleu_result"
         worksheet_blue['A1'] = 'bleu'
@@ -430,10 +551,15 @@ def load_input_excel(excel_input):
     global logger
     wb = openpyxl.load_workbook(excel_input)
     ws = wb.active
-    print(f"Input: {excel_input}")
+
+    d_value = "Excel input file: " + str(excel_input)
+    debug_show_value(d_value)
+    
     rows = []
     for rdx, row in enumerate(ws.iter_rows(values_only=True)):
-        print(f"Input: {row}")
+        d_value = "Excel input values: " + str(row)
+        debug_show_value(d_value)
+
         # End if the row contains data like this:
         # ('None', 'None' ... )
         if not any(row):
@@ -468,6 +594,96 @@ def load_input_excel(excel_input):
     new_header = [ "question", "golden_answer", "passage_1", "passage_1_id", "passage_2", "passage_2_id", "passage_3", "passage_3_id"]
     
     return new_header, new_rows, True
+
+# ******************************************
+# load qa service performance from run.csv file for: 
+# - TIMESTAMP_START
+# - TIMESTAMP_STOP
+def load_qa_service_performance(csv_filepath):
+        d_value = "QA -service experiment 'run.csv' file: " + csv_filepath
+        debug_show_value(d_value)
+        file = open(csv_filepath)
+        csvreader = csv.reader(file)
+        header = []
+        header = next(csvreader)
+        d_value = "QA -service experiment 'run.csv' file Header: " + str(header)
+        debug_show_value(d_value)
+
+        # - TIMESTAMP_START
+        # - TIMESTAMP_STOP
+        i = 0
+        timestamp_start = 0
+        timestamp_end = 0
+        for column in header:
+               
+                if str(column) == "TIMESTAMP_START":
+                        d_value = "Column: " + str(column) + " : " + str(i)
+                        debug_show_value(d_value)
+                        timestamp_start = i
+                if str(column) == "TIMESTAMP_END":
+                        d_value = "Column: " + str(column) + " : " + str(i)
+                        debug_show_value(d_value)
+                        timestamp_end = i
+                i = i + 1                         
+
+        qa_service_performance = []
+        total = 0
+        count = 1
+        for row in csvreader: 
+                count = count  + 1
+                d_value = "Column: " + str(row)
+                debug_show_value(d_value)
+                
+                duration =  int(row[timestamp_end]) - int(row[timestamp_start])
+                values = [ str(row[timestamp_start]) , 
+                           str(row[timestamp_end]),
+                           str(duration)    ]               
+                
+                d_value = "qa_service_performance - Values:\n " + str(values)
+                debug_show_value(d_value)
+                total = total + duration    
+                qa_service_performance.append(values)
+        
+        average = int(total) / count
+        file.close()
+        
+        return qa_service_performance, average
+
+# ******************************************
+# Add performance from the qa service metrics to output excel
+def add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file):
+
+        performance_results, average = load_qa_service_performance(qa_metrics_run_file)
+        d_value = "Performance_results: \n" + str(len(performance_results))
+        debug_show_value(d_value)
+        d_value = "Performance_results: \n" + str(performance_results)
+        debug_show_value(d_value)
+
+        workbook = openpyxl.load_workbook(workbook_name_file)
+        
+        j = 1
+        for row in performance_results:
+                worksheet = workbook['experiment_performance']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
+                worksheet.cell(row=(j+1), column=1).value = int(row[0])
+                worksheet.cell(row=(j+1), column=2).value = int(row[1])
+                worksheet.cell(row=(j+1), column=3).value = int(row[2])
+                j = j + 1
+                
+        worksheet['D1']="Average"
+        worksheet['D2']= average
+        d_value = "Performance_results: \n" + str(worksheet['D2'])
+        debug_show_value(d_value)   
+        worksheet = workbook['experiment_performance']
+
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                         cell.alignment = Alignment(wrapText=True,vertical='top')
+               
+        workbook.save(workbook_name_file)
+        return True
 
 # ******************************************
 # load qa service metrics from run.csv file for: 
@@ -558,54 +774,66 @@ def load_qa_service_metrics(csv_filepath):
         return qa_service_metrics
 
 # ******************************************
-# load qa service performance from run.csv file for: 
-# - TIMESTAMP_START
-# - TIMESTAMP_STOP
-def load_qa_service_performance(csv_filepath):
-        d_value = "QA -service experiment 'run.csv' file: " + csv_filepath
+# Add results from the qa service metrics to output excel
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, sacrebleu_1, str_rouge_1, sacrebleu_2, str_rouge_2 ):
+
+        metrics_results = load_qa_service_metrics(qa_metrics_run_file)
+        d_value = "Metrics_results: \n" + str(len(metrics_results))
         debug_show_value(d_value)
-        file = open(csv_filepath)
-        csvreader = csv.reader(file)
-        header = []
-        header = next(csvreader)
-        d_value = "QA -service experiment 'run.csv' file Header: " + str(header)
+        d_value = "Metrics_results: \n" + str(metrics_results)
         debug_show_value(d_value)
 
-        # - TIMESTAMP_START
-        # - TIMESTAMP_STOP
-        i = 0
-        timestamp_start = 0
-        timestamp_end = 0
-        for column in header:
-               
-                if str(column) == "TIMESTAMP_START":
-                        d_value = "Column: " + str(column) + " : " + str(i)
-                        debug_show_value(d_value)
-                        timestamp_start = i
-                if str(column) == "TIMESTAMP_END":
-                        d_value = "Column: " + str(column) + " : " + str(i)
-                        debug_show_value(d_value)
-                        timestamp_end = i
-                i = i + 1                         
-
-        qa_service_performance = []
+        workbook = openpyxl.load_workbook(workbook_name_file)
         
-        for row in csvreader: 
-                d_value = "Column: " + str(row)
+        j = 1
+        for row in metrics_results:
+                worksheet = workbook['experiment_data']
+                d_value = "Row: \n" + str(row)
                 debug_show_value(d_value)
-                
-                duration =  int(row[timestamp_end]) - int(row[timestamp_start])
-                values = [ str(row[timestamp_start]) , 
-                           str(row[timestamp_end]),
-                           str(duration)    ]               
-                
-                d_value = "qa_service_performance - Values:\n " + str(values)
-                debug_show_value(d_value)        
-                qa_service_performance.append(values)
 
-        file.close()
+                worksheet.cell(row=(j+1), column=10).value = row[0]
+                worksheet.cell(row=(j+1), column=11).value = row[1]
+                worksheet.cell(row=(j+1), column=12).value = row[2]
+                worksheet.cell(row=(j+1), column=13).value = row[3]
+                worksheet.cell(row=(j+1), column=14).value = row[4]
+                worksheet.cell(row=(j+1), column=15).value = row[5]
+                worksheet.cell(row=(j+1), column=16).value = row[6]
+                worksheet.cell(row=(j+1), column=17).value = row[7]
+                worksheet.cell(row=(j+1), column=18).value = row[8]
+                worksheet.cell(row=(j+1), column=19).value = row[9]
+                worksheet.cell(row=(j+1), column=20).value = row[10]
+                worksheet.cell(row=(j+1), column=21).value = row[11]
+                worksheet.cell(row=(j+1), column=22).value = row[12]
+                worksheet.cell(row=(j+1), column=23).value = row[13]
+                worksheet.cell(row=(j+1), column=24).value = row[14]
+                worksheet.cell(row=(j+1), column=25).value = row[15]
+                worksheet.cell(row=(j+1), column=26).value = row[16]
+                worksheet.cell(row=(j+1), column=27).value = row[17]
+                j = j + 1
+                  
+                worksheet = workbook['experiment_bleu_result']
+                worksheet.cell(row=(2), column=1).value = str(sacrebleu_1)
+                worksheet.cell(row=(2), column=2).value = str_rouge_1
+                worksheet.cell(row=(2), column=3).value = 'all data'
+
+
+                worksheet = workbook['experiment_bleu_result']
+                worksheet.cell(row=(3), column=1).value = str(sacrebleu_2)
+                worksheet.cell(row=(3), column=2).value = str_rouge_2
+                worksheet.cell(row=(3), column=3).value = 'filtered data'
         
-        return qa_service_performance
+        worksheet = workbook['experiment_data']
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                         cell.alignment = Alignment(wrapText=True,vertical='top')
+        
+        worksheet = workbook['experiment_bleu_result']
+        for row in worksheet.iter_rows():  
+                for cell in row:      
+                        cell.alignment = Alignment(wrap_text=True,vertical='top') 
+        
+        workbook.save(workbook_name_file)
+        return True
 
 # ******************************************
 # Invoke the REST API endpoint 
@@ -674,101 +902,6 @@ def invoke_qa(question):
                         answer_text_len = 0
                         answer_text_list = []
                         return answer_text, answer_text_len,  answer_text_list, False
-
-# ******************************************
-# Add results from the qa service metrics to output excel
-def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
-
-        metrics_results = load_qa_service_metrics(qa_metrics_run_file)
-        d_value = "Metrics_results: \n" + str(len(metrics_results))
-        debug_show_value(d_value)
-        d_value = "Metrics_results: \n" + str(metrics_results)
-        debug_show_value(d_value)
-
-        workbook = openpyxl.load_workbook(workbook_name_file)
-        
-        j = 1
-        for row in metrics_results:
-                worksheet = workbook['experiment_data']
-                d_value = "Row: \n" + str(row)
-                debug_show_value(d_value)
-
-                worksheet.cell(row=(j+1), column=10).value = row[0]
-                worksheet.cell(row=(j+1), column=11).value = row[1]
-                worksheet.cell(row=(j+1), column=12).value = row[2]
-                worksheet.cell(row=(j+1), column=13).value = row[3]
-                worksheet.cell(row=(j+1), column=14).value = row[4]
-                worksheet.cell(row=(j+1), column=15).value = row[5]
-                worksheet.cell(row=(j+1), column=16).value = row[6]
-                worksheet.cell(row=(j+1), column=17).value = row[7]
-                worksheet.cell(row=(j+1), column=18).value = row[8]
-                worksheet.cell(row=(j+1), column=19).value = row[9]
-                worksheet.cell(row=(j+1), column=20).value = row[10]
-                worksheet.cell(row=(j+1), column=21).value = row[11]
-                worksheet.cell(row=(j+1), column=22).value = row[12]
-                worksheet.cell(row=(j+1), column=23).value = row[13]
-                worksheet.cell(row=(j+1), column=24).value = row[14]
-                worksheet.cell(row=(j+1), column=25).value = row[15]
-                worksheet.cell(row=(j+1), column=26).value = row[16]
-                worksheet.cell(row=(j+1), column=27).value = row[17]
-                j = j + 1
-                  
-                worksheet = workbook['experiment_bleu_result']
-                worksheet.cell(row=(2), column=1).value = str(sacrebleu)
-                worksheet.cell(row=(2), column=2).value = str_rouge
-        
-        worksheet = workbook['experiment_data']
-        for row in worksheet.iter_rows():  
-                for cell in row:      
-                         cell.alignment = Alignment(wrapText=True,vertical='top')
-        
-        worksheet = workbook['experiment_bleu_result']
-        for row in worksheet.iter_rows():  
-                for cell in row:      
-                        cell.alignment = Alignment(wrap_text=True,vertical='top') 
-        
-        workbook.save(workbook_name_file)
-        return True
-
-# ******************************************
-# Add performance from the qa service metrics to output excel
-def add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file):
-
-        performance_results = load_qa_service_performance(qa_metrics_run_file)
-        d_value = "Performance_results: \n" + str(len(performance_results))
-        debug_show_value(d_value)
-        d_value = "Performance_results: \n" + str(performance_results)
-        debug_show_value(d_value)
-
-        workbook = openpyxl.load_workbook(workbook_name_file)
-        
-        j = 1
-        calculation = "=SUM("
-        for row in performance_results:
-                worksheet = workbook['experiment_performance']
-                d_value = "Row: \n" + str(row)
-                debug_show_value(d_value)
-
-                worksheet.cell(row=(j+1), column=1).value = int(row[0])
-                worksheet.cell(row=(j+1), column=2).value = int(row[1])
-                worksheet.cell(row=(j+1), column=3).value = int(row[2])
-                calculation += "C" + str(j) + ";"
-                d_value = "Calculation: \n" + calculation
-                debug_show_value(d_value)
-                j = j + 1
-                
-        worksheet['D1']="Average"
-        worksheet['D2']= calculation + ")/" + str(j-1)
-        d_value = "Performance_results: \n" + worksheet['D2']
-        debug_show_value(d_value)   
-        worksheet = workbook['experiment_performance']
-
-        for row in worksheet.iter_rows():  
-                for cell in row:      
-                         cell.alignment = Alignment(wrapText=True,vertical='top')
-               
-        workbook.save(workbook_name_file)
-        return True
 
 # ******************************************
 # Execution
@@ -936,34 +1069,84 @@ def main(args):
                   #score_ranker = load_score_reranker(qa_metrics_run_file)
                   #score_matcher(csv_input_filepath, qa_metrics_run_file)
 
-                  # 2. Create experiment-runner blue result output         
-                  header, rows = bleu_run(workbook_name_file)
+                  # 2. Create experiment-runner blue result output  
+                  # 2.1 First calc 
+                  # - with experiment_data  
+                  d_value = "********** Bleu 1 start ***********"
+                  debug_show_value(d_value)
+       
+                  header, rows = bleu_run(workbook_name_file,'experiment_data')
                   header = bleu_from_list_to_dict(header)
-                  responses = [row[header['response']] for row in rows]
-                  golds = [[row[header['golden_anwser']]] for row in rows]
+                  
+                  debug_show_value(d_value)
+                  d_value = "Header for bleu: " + str(header)
+                  debug_show_value(d_value)
+                  d_value = "Rows for bleu: " + str(rows)
+                  debug_show_value(d_value)
+
+                  responses_1 = [row[header['response']] for row in rows]
+                  d_value = "Responses: " + str(responses_1)
+                  debug_show_value(d_value)
+                  golds_1 = [[row[header['golden_anwser']]] for row in rows]
                    
                   metric = load_metric("sacrebleu")
-                  metric.add_batch(predictions=responses, references=golds)
-                  sacrebleu = metric.compute()["score"]
+                  metric.add_batch(predictions=responses_1, references=golds_1)
+                  sacrebleu_1 = metric.compute()["score"]
 
                   metric = load_metric("rouge")
-                  metric.add_batch(predictions=responses, references=golds)
-                  rouge = metric.compute()["rougeL"]
+                  metric.add_batch(predictions=responses_1, references=golds_1)
+                  rouge_1 = metric.compute()["rougeL"]
+                  
+                  # Second calc: 
+                  # - with experiment_filtered_data
+                  if (qa_service_on_cloud == 'False'):
+                        new_header, new_rows, found_not_valid_values, extract_result = extract_unknown_response(workbook_name_file)
+
+                  d_value = "********** Bleu 2 start ***********"
+                  debug_show_value(d_value)
+
+                  header, rows = bleu_run(workbook_name_file,'experiment_filtered_data')
+                  header = bleu_from_list_to_dict(header)
+                  d_value = "Header for bleu: " + str(header)
+                  debug_show_value(d_value)
+                  d_value = "Rows for bleu: " + str(rows)
+                  debug_show_value(d_value)
+
+                  responses_2 = [row[header['response']] for row in rows]
+                  d_value = "Responses: " + str(responses_2)
+                  debug_show_value(d_value)
+                  golds_2 = [[row[header['golden_anwser']]] for row in rows]
+                   
+                  metric = load_metric("sacrebleu")
+                  metric.add_batch(predictions=responses_2, references=golds_2)
+                  sacrebleu_2 = metric.compute()["score"]
+
+                  metric = load_metric("rouge")
+                  metric.add_batch(predictions=responses_2, references=golds_2)
+                  rouge_2 = metric.compute()["rougeL"]
 
                   # 3. Add results from the qa service metrics to output excel
                   d_value = "Qa_service_on_cloud: \n" + str(qa_service_on_cloud)
                   debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
-                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
-                        # add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, 
+                                                        workbook_name_file, 
+                                                        str(sacrebleu_1), 
+                                                        str(rouge_1.mid.fmeasure),
+                                                        str(sacrebleu_2), 
+                                                        str(rouge_2.mid.fmeasure))
+                        add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
 
                   # 4. Show results
                 
                   print (f"******* outputs for session: {output_session_id} ********")
                   print (f"Excel output file : {workbook_name_file}\n")
-                  count = len(responses) - 1
-                  print (f"******* Bleu result based on {count} responses ********")
-                  print ('Bleu: ' + str(sacrebleu), 'RougeL: ' + str(rouge.mid.fmeasure))
+                  count_1 = len(responses_1) - 1
+                  count_2 = len(responses_2) - 1
+                  print (f"******* Bleu result based on {count_1} responses ********")
+                  print ('Bleu: ' + str(sacrebleu_1), 'RougeL: ' + str(rouge_1.mid.fmeasure))
+                  print (f"******* Filtered bleu result based on {count_2} responses ********")
+                  print ('Bleu: ' + str(sacrebleu_2), 'RougeL: ' + str(rouge_2.mid.fmeasure))
         
         else:
                   print (f"******* Experiment failed *************")

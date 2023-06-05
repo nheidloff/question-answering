@@ -1,19 +1,19 @@
 version: "2.15.1"
 services:
-  elasticsearch:
-    image: docker.io/elastic/elasticsearch:7.16.3
-    container_name: elasticsearch
-    ports:
-      - 9200:9200
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+#  elasticsearch:
+#    image: docker.io/elastic/elasticsearch:7.16.3
+#    container_name: elasticsearch
+#    ports:
+#      - 9200:9200
+#    environment:
+#      - discovery.type=single-node
+#      - ES_JAVA_OPTS=-Xms512m -Xmx512m
   question-answering:
     build: 
       context: ${QA_SERVICE_DOCKER_CONTEXT}
       dockerfile: ${QA_SERVICE_DOCKER_CONTEXT}/src/main/docker/Dockerfile.jvm
-    depends_on:
-      - elasticsearch
+#    depends_on:
+#      - elasticsearch
     image: qa_service:v1.0.0
     container_name: qaservice
     ports:
@@ -73,7 +73,7 @@ services:
     depends_on:
       - question-answering
       - maas-mock
-      - elasticsearch
+#     - elasticsearch
     image: experiment_runner:v1.0.0
     container_name: experimentrunner
     ports:

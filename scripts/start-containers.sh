@@ -56,6 +56,7 @@ echo " Build and start containers with Docker compose "
 echo "- 'QA-Service'"
 echo "- 'Experiment-runner'"
 echo "- 'Maas-mock'"
+#echo "- 'Local Elasticsearch'"
 echo "************************************"
 
 check_docker

@@ -36,6 +36,14 @@ At the moment an experiment will be executed locally.
 
      4. Write the experiment results
 
+        The tabs are:
+
+        * 'Experiment data'
+        * 'Experiment bleu result'
+        * 'Experiment filtered data'
+        * 'Experiment performance'
+
+
 ![](../../screenshots/qa-experiment-runner-extract.png)
 
 ## 2. Setup environment
