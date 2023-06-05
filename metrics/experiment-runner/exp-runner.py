@@ -579,7 +579,9 @@ def load_qa_service_performance(csv_filepath):
 
         qa_service_performance = []
         total = 0
+        count = 1
         for row in csvreader: 
+                count = count  + 1
                 d_value = "Column: " + str(row)
                 debug_show_value(d_value)
                 
@@ -593,7 +595,7 @@ def load_qa_service_performance(csv_filepath):
                 total = total + duration    
                 qa_service_performance.append(values)
         
-        average = int(total) / len(csvreader)
+        average = int(total) / count
         file.close()
         
         return qa_service_performance, average
