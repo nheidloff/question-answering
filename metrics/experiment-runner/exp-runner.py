@@ -495,10 +495,10 @@ def create_output_workbook (workbook_name):
         
         # bad data
         worksheet_experiment_bad_data.title = "experiment_bad_data"
-        worksheet_experiment_filtered_data['A1'] = 'question'
-        worksheet_experiment_filtered_data['B1'] = 'answer'
-        worksheet_experiment_filtered_data['C1'] = 'golden_anwser'
-        worksheet_experiment_filtered_data['D1'] = 'bad phrase'
+        worksheet_experiment_bad_data['A1'] = 'question'
+        worksheet_experiment_bad_data['B1'] = 'answer'
+        worksheet_experiment_bad_data['C1'] = 'golden_anwser'
+        worksheet_experiment_bad_data['D1'] = 'bad phrase'
 
         # bleu_result   
         worksheet_blue.title = "experiment_bleu_result"
