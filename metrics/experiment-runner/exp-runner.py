@@ -1030,10 +1030,16 @@ def main(args):
 
                   # 2. Create experiment-runner blue result output  
                   # 2.1 First calc 
-                  # - with experiment_data   
+                  # - with experiment_data  
+                  d_value = "********** Blue 1 start ***********"
+       
                   header, rows = bleu_run(workbook_name_file,'experiment_data')
                   header = bleu_from_list_to_dict(header)
+                  
+                  debug_show_value(d_value)
                   d_value = "Header for bleu: " + str(header)
+                  debug_show_value(d_value)
+                  d_value = "Rows for bleu: " + str(rows)
                   debug_show_value(d_value)
 
                   responses = [row[header['response']] for row in rows]
@@ -1051,9 +1057,14 @@ def main(args):
                   
                   # Second calc: 
                   # - with experiment_filtered_data
+                  d_value = "********** Blue 2 start ***********"
+                  
+                  debug_show_value(d_value)
                   header, rows = bleu_run(workbook_name_file,'experiment_filtered_data')
                   header = bleu_from_list_to_dict(header)
                   d_value = "Header for bleu: " + str(header)
+                  debug_show_value(d_value)
+                  d_value = "Rows for bleu: " + str(rows)
                   debug_show_value(d_value)
 
                   responses = [row[header['response']] for row in rows]
