@@ -246,11 +246,16 @@ def extract_unknown_response (excel_output_file):
                 if verify_value in str(row[2]):
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
+                        add_to_value = False
+                        break
                 else:
                         question      = row[0]
                         anwer         = row[1]
                         golden_answer = row[2]
-                        new_rows.append([question, anwer, golden_answer])
+                        add_to_value = True
+                        
+        if (add_to_value == True):
+                new_rows.append([question, anwer, golden_answer])
 
     new_header = [ "question", "anwer", "golden_answer"]
 
@@ -1061,7 +1066,7 @@ def main(args):
                   # - with experiment_filtered_data
                   if (qa_service_on_cloud == 'False'):
                         extract_unknown_response(workbook_name_file)
-                        
+
                   d_value = "********** Bleu 2 start ***********"
                   debug_show_value(d_value)
 
