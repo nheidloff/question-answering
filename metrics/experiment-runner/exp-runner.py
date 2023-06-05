@@ -207,6 +207,7 @@ def get_input_qa_service_metrics_container_path():
 # - NA (evidence)
 # - I do not have information regarding
 # - Unfortunately, no relevant information is found.
+#
 # Defined by: 
 #  Tabs: 'experiment_data' and 'experiment_filtered_data'
 #  Filters: "NA", "I do not have information regarding", "Unfortunately, no relevant information is found."
@@ -218,6 +219,7 @@ def extract_unknown_response (excel_output_file):
     d_value = ""
     rows = []
     not_valid_values = [ "NA", "I do not have information regarding", "Unfortunately, no relevant information is found." ]
+    found_not_valid_values = []
     
     for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
         d_value = "Load Excel output file: " + str(excel_output_file)
@@ -247,13 +249,19 @@ def extract_unknown_response (excel_output_file):
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
                         add_to_value = False
+                        
+                        question      = row[0]
+                        anwer         = row[1]
+                        golden_answer = row[2]
+                        
+                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
                         break
                 else:
                         question      = row[0]
                         anwer         = row[1]
                         golden_answer = row[2]
                         add_to_value = True
-                        
+
         if (add_to_value == True):
                 new_rows.append([question, anwer, golden_answer])
 
@@ -279,7 +287,7 @@ def extract_unknown_response (excel_output_file):
     
     workbook.save(excel_output_file)
 
-    return new_header, new_rows, True
+    return new_header, new_rows, found_not_valid_values, True
    
 # ******************************************
 # Score prepare eval data functions
@@ -1101,7 +1109,6 @@ def main(args):
                                                         str(sacrebleu_2), 
                                                         str(rouge_2.mid.fmeasure))
                         add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
-                        extract_unknown_response(workbook_name_file)
 
                   # 4. Show results
                 
