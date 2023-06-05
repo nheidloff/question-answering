@@ -256,7 +256,7 @@ def extract_unknown_response (excel_output_file):
                         anwer         = row[1]
                         golden_answer = row[2]
                         
-                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
+                        found_not_valid_values.append([question, anwer, golden_answer, not_valid_value])
                         break
 
                 if verify_value in str(row[1]):
