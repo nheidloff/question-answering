@@ -508,7 +508,7 @@ def load_input_excel(excel_input):
     
     rows = []
     for rdx, row in enumerate(ws.iter_rows(values_only=True)):
-        d_value = "Excel input values: " + str(excel_input)
+        d_value = "Excel input values: " + str(row)
         debug_show_value(d_value)
 
         # End if the row contains data like this:
@@ -625,7 +625,7 @@ def add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
                 
         worksheet['D1']="Average"
         worksheet['D2']= str(average)
-        d_value = "Performance_results: \n" + worksheet['D2']
+        d_value = "Performance_results: \n" + str(worksheet['D2'])
         debug_show_value(d_value)   
         worksheet = workbook['experiment_performance']
 
