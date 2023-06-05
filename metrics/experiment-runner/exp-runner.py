@@ -1145,7 +1145,7 @@ def main(args):
                   count_2 = len(responses_2) - 1
                   print (f"******* Bleu result based on {count_1} responses ********")
                   print ('Bleu: ' + str(sacrebleu_1), 'RougeL: ' + str(rouge_1.mid.fmeasure))
-                  print (f"******* Bleu result based on {count_2} responses ********")
+                  print (f"******* Filtered bleu result based on {count_2} responses ********")
                   print ('Bleu: ' + str(sacrebleu_2), 'RougeL: ' + str(rouge_2.mid.fmeasure))
         
         else:
