@@ -210,7 +210,7 @@ def get_input_qa_service_metrics_container_path():
 #
 # Defined by: 
 #  Tabs: 'experiment_data' and 'experiment_filtered_data'
-#  Filters: "NA", "I do not have information regarding", "Unfortunately, no relevant information is found."
+#  Filters: '(iv).', 'NA evidence', 'I do not have information regarding', 'Unfortunately, no relevant information is found'
 def extract_unknown_response (excel_output_file):
 
     global logger
@@ -218,7 +218,7 @@ def extract_unknown_response (excel_output_file):
     worksheet = workbook['experiment_data']
     d_value = ""
     rows = []
-    not_valid_values = [ "NA", "I do not have information regarding", "Unfortunately, no relevant information is found." ]
+    not_valid_values = [ '(iv).', 'NA evidence', 'I do not have information regarding', 'Unfortunately, no relevant information is found' ]
     found_not_valid_values = []
     
     for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
