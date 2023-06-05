@@ -267,7 +267,7 @@ def extract_unknown_response (excel_output_file):
 
     new_header = [ "question", "anwer", "golden_answer"]
 
-    # 2. Save the new values in a new list
+    # 2. Save the filtered values
     j = 1
     for row in new_rows:
                 worksheet = workbook['experiment_filtered_data']
@@ -280,6 +280,25 @@ def extract_unknown_response (excel_output_file):
                 j = j + 1
     
     worksheet = workbook['experiment_filtered_data']
+
+    for row in worksheet.iter_rows():
+        for cell in row:
+                cell.alignment = Alignment(wrapText=True,vertical='top')
+
+    # 3. Save the bad data values
+    j = 1
+    for row in new_rows:
+                worksheet = workbook['experiment_bad_data']
+                d_value = "Row: \n" + str(row)
+                debug_show_value(d_value)
+
+                worksheet.cell(row=(j+1), column=1).value = str(row[0])
+                worksheet.cell(row=(j+1), column=2).value = str(row[1])
+                worksheet.cell(row=(j+1), column=3).value = str(row[2])
+                worksheet.cell(row=(j+1), column=4).value = str(row[3])
+                j = j + 1
+    
+    worksheet = workbook['experiment_bad_data']
 
     for row in worksheet.iter_rows():
         for cell in row:
@@ -460,6 +479,7 @@ def create_output_workbook (workbook_name):
         worksheet = workbook.create_sheet("experiment_data")
         worksheet_blue = workbook.create_sheet("experiment_bleu_result")
         worksheet_experiment_filtered_data = workbook.create_sheet("experiment_filtered_data")
+        worksheet_experiment_bad_data = workbook.create_sheet("experiment_bad_data")
         worksheet_performance = workbook.create_sheet("experiment_performance")
 
         if 'Sheet1' in  workbook.sheetnames:
@@ -467,11 +487,18 @@ def create_output_workbook (workbook_name):
         if 'Sheet' in  workbook.sheetnames:
                  workbook.remove( workbook['Sheet'])
 
-        # bleu_result   
+        # filtered data  
         worksheet_experiment_filtered_data.title = "experiment_filtered_data"
         worksheet_experiment_filtered_data['A1'] = 'question'
         worksheet_experiment_filtered_data['B1'] = 'answer'
         worksheet_experiment_filtered_data['C1'] = 'golden_anwser'
+        
+        # bad data
+        worksheet_experiment_bad_data.title = "experiment_bad_data"
+        worksheet_experiment_filtered_data['A1'] = 'question'
+        worksheet_experiment_filtered_data['B1'] = 'answer'
+        worksheet_experiment_filtered_data['C1'] = 'golden_anwser'
+        worksheet_experiment_filtered_data['D1'] = 'bad phrase'
 
         # bleu_result   
         worksheet_blue.title = "experiment_bleu_result"
@@ -1073,7 +1100,7 @@ def main(args):
                   # Second calc: 
                   # - with experiment_filtered_data
                   if (qa_service_on_cloud == 'False'):
-                        extract_unknown_response(workbook_name_file)
+                        new_header, new_rows, found_not_valid_values, extract_result = extract_unknown_response(workbook_name_file)
 
                   d_value = "********** Bleu 2 start ***********"
                   debug_show_value(d_value)
