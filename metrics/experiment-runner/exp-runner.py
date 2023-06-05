@@ -218,8 +218,8 @@ def extract_unknown_response (excel_output_file):
     worksheet = workbook['experiment_data']
     d_value = ""
     rows = []
-    not_valid_value = "NA"
-    not_valid_values = [ "(iv).", "I do not have information regarding", "Unfortunately, no relevant information is found." ]
+    not_valid_value = 'NA'
+    not_valid_values = [ '(iv).', 'I do not have information regarding', 'Unfortunately, no relevant information is found.', 'unanswerable' ]
     found_not_valid_values = []
     
     for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
