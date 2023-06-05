@@ -733,7 +733,7 @@ def load_qa_service_metrics(csv_filepath):
 
 # ******************************************
 # Add results from the qa service metrics to output excel
-def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, sacrebleu, str_rouge):
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, sacrebleu_1, str_rouge_1, sacrebleu_2, str_rouge_2 ):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
         d_value = "Metrics_results: \n" + str(len(metrics_results))
@@ -770,8 +770,15 @@ def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, sac
                 j = j + 1
                   
                 worksheet = workbook['experiment_bleu_result']
-                worksheet.cell(row=(2), column=1).value = str(sacrebleu)
-                worksheet.cell(row=(2), column=2).value = str_rouge
+                worksheet.cell(row=(2), column=1).value = str(sacrebleu_1)
+                worksheet.cell(row=(2), column=2).value = str_rouge_1
+                worksheet.cell(row=(2), column=3).value = 'all data'
+
+
+                worksheet = workbook['experiment_bleu_result']
+                worksheet.cell(row=(3), column=1).value = str(sacrebleu_2)
+                worksheet.cell(row=(3), column=2).value = str_rouge_2
+                worksheet.cell(row=(3), column=3).value = 'filtered data'
         
         worksheet = workbook['experiment_data']
         for row in worksheet.iter_rows():  
