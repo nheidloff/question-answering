@@ -246,7 +246,20 @@ def extract_unknown_response (excel_output_file):
     for row in rows:
         
         for verify_value in not_valid_values:
-                if ((verify_value in str(row[2])) or (not_valid_value == str(row[2]))):
+
+                if not_valid_value == str(row[1]):
+                        d_value = "Will not be added to the new result: " + str(row[2])
+                        debug_show_value(d_value)
+                        add_to_value = False
+                        
+                        question      = row[0]
+                        anwer         = row[1]
+                        golden_answer = row[2]
+                        
+                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
+                        break
+
+                if verify_value in str(row[1]):
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
                         add_to_value = False
