@@ -258,10 +258,16 @@ def extract_unknown_response (excel_output_file):
                 d_value = "Row: \n" + str(row)
                 debug_show_value(d_value)
 
-                worksheet.cell(row=(j+1), column=1).value = int(row[0])
-                worksheet.cell(row=(j+1), column=2).value = int(row[1])
-                worksheet.cell(row=(j+1), column=3).value = int(row[2])
+                worksheet.cell(row=(j+1), column=1).value = str(row[0])
+                worksheet.cell(row=(j+1), column=2).value = str(row[1])
+                worksheet.cell(row=(j+1), column=3).value = str(row[2])
                 j = j + 1
+    
+    worksheet = workbook['experiment_filtered_data']
+
+    for row in worksheet.iter_rows():
+        for cell in row:
+                cell.alignment = Alignment(wrapText=True,vertical='top')
     
     workbook.save(excel_output_file)
 
@@ -1021,6 +1027,8 @@ def main(args):
                   debug_show_value(d_value)
 
                   responses = [row[header['response']] for row in rows]
+                  d_value = "Responses: " + str(responses)
+                  debug_show_value(d_value)
                   golds = [[row[header['golden_anwser']]] for row in rows]
                    
                   metric = load_metric("sacrebleu")
