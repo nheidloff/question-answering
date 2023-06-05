@@ -253,6 +253,7 @@ def extract_unknown_response (excel_output_file):
     new_header = [ "question", "anwer", "golden_answer"]
 
     # 2. Save the new values in a new list
+    j = 0
     for row in new_rows:
                 worksheet = workbook['experiment_filtered_data']
                 d_value = "Row: \n" + str(row)
@@ -732,7 +733,7 @@ def load_qa_service_metrics(csv_filepath):
 
 # ******************************************
 # Add results from the qa service metrics to output excel
-def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str_rouge):
+def add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, sacrebleu, str_rouge):
 
         metrics_results = load_qa_service_metrics(qa_metrics_run_file)
         d_value = "Metrics_results: \n" + str(len(metrics_results))
@@ -1043,7 +1044,7 @@ def main(args):
                   d_value = "Qa_service_on_cloud: \n" + str(qa_service_on_cloud)
                   debug_show_value(d_value)
                   if (qa_service_on_cloud == 'False'):
-                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(rouge.mid.fmeasure))
+                        add_qa_service_metrics_to_excel(qa_metrics_run_file, workbook_name_file, str(sacrebleu), str(rouge.mid.fmeasure))
                         add_qa_service_performance_to_excel(qa_metrics_run_file, workbook_name_file)
                         extract_unknown_response(workbook_name_file)
 
