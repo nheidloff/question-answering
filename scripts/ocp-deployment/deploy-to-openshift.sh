@@ -380,12 +380,15 @@ function log_deployment_configuration(){
         sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../../service/.env  > $LOG_FOLDER/tmp1-service.env
     fi
 
-    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env    
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
-    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/service.env
+    # service
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env
+    sed 's/\ELASTIC_SEARCH_PASSWORD=.*/ELASTIC_SEARCH_PASSWORD=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/tmp4-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp4-service.env > $LOG_FOLDER/${SESSION_ID}-service.env
     rm $LOG_FOLDER/tmp1-service.env
     rm $LOG_FOLDER/tmp2-service.env
     rm $LOG_FOLDER/tmp3-service.env
+    rm $LOG_FOLDER/tmp4-service.env
 
     # Save configs
     REPO_URL=$(git config --get remote.origin.url)
