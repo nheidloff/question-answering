@@ -218,8 +218,8 @@ def extract_unknown_response (excel_output_file):
     worksheet = workbook['experiment_data']
     d_value = ""
     rows = []
-    not_valid_value = 'NA'
-    not_valid_values = [ '(iv).', 'I do not have information regarding', 'Unfortunately, no relevant information is found.', 'unanswerable' ]
+    #not_valid_value = 'NA'
+    not_valid_values = [ 'n/a', 'NA', '(iv).', 'I do not have information regarding', 'Unfortunately, no relevant information is found.', 'unanswerable' ]
     found_not_valid_values = []
     
     for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
@@ -247,7 +247,7 @@ def extract_unknown_response (excel_output_file):
         
         for verify_value in not_valid_values:
 
-                if not_valid_value == str(row[1]):
+                if verify_value == str(row[1]):
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
                         add_to_value = False
@@ -256,7 +256,7 @@ def extract_unknown_response (excel_output_file):
                         anwer         = row[1]
                         golden_answer = row[2]
                         
-                        found_not_valid_values.append([question, anwer, golden_answer, not_valid_value])
+                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
                         break
 
                 if verify_value in str(row[1]):
@@ -990,6 +990,14 @@ def main(args):
                         print(f"******* invoke REST API ********\n")
                         for row in rows:
                                 very_golden_answer = row[1]
+
+                                if not very_golden_answer:
+                                        message = "Data value " + str(i) + " ____" + " 'Golden answer' is emtpy for question: " + row[0]
+                                        print(f"Error: {message}")
+                                        logger.error(message)
+                                        end_experiment = True
+                                        break                                      
+
                                 if (end_experiment == True):
                                         break
                                 d_value = "Row:" + str(row) + "Length:" + str(len(row))
@@ -1070,7 +1078,7 @@ def main(args):
                                                 print(f"Error: {message}")
                                                 logger.error(message)
                                 else:
-                                        message = "Data value " + str(i) + " ____" + " 'Golden answer' is emtpy: " + row[1]
+                                        message = "Data value " + str(i) + " ____" + " 'Golden answer' is emtpy for question: "+ row[0]
                                         print(f"Error: {message}")
                                         logger.error(message)
                                 i = i + 1
