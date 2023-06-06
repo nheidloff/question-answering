@@ -437,7 +437,8 @@ public class Metrics {
                             resultString = resultString + System.getProperty("line.separator");
                         } 
                     }
-                    resultStringChuckId = answer.results.get(index).document_id;
+                    //resultStringChuckId = answer.results.get(index).document_id;
+                    resultStringChuckId = answer.results.get(index).url;
                 }
                 this.resultElastic[index] = resultString;
                 this.resultElasticChunkIds[index] = resultStringChuckId;
