@@ -108,9 +108,14 @@ function build_and_push_container () {
         ibmcloud cr namespace-add $CR_REPOSITORY
     fi
 
-    # 8. Log in to IBM Cloud Registry with the Docker login command
-    docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION 
-    docker push "$CODEENGINE_APP_IMAGE_URL"
+    # 8. Create new container image if it doesn't exists
+    CURR_CONTAINER_IMAGE=$(ibmcloud cr image-list | grep $CI_TAG | awk '{print $2;}')
+    if [ "$CI_TAG" != "$CURR_CONTAINER_IMAGE" ]; then
+        docker login -u iamapikey -p $IBM_CLOUD_API_KEY $CR_REGION 
+        docker push "$CODEENGINE_APP_IMAGE_URL"
+    else
+        echo "Container exists: ($CODEENGINE_APP_IMAGE_URL)"
+    fi
 
     # 9. Set back to the right IBM Cloud resource group, in case the resource group was changed
     ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
