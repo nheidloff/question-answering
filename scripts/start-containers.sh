@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Restore and deploy by an existing commit ID
+export ARG_KEYS=${1:-"no_keys"}
+
 # **************** Global variables
 export HOME_PATH=$(pwd)
 export SESSION_ID=$(date +%s)
@@ -10,6 +13,18 @@ export LOG_FOLDER=""
 # Functions definition
 # **********************************************************************************
 
+function check_parameters () {
+    echo "Keys: $ARG_KEYS"
+    if [ "$ARG_KEYS" == "no_keys" ]; then
+        export USE_KEYS="false"
+        echo "Don't use '.keys' configuration."
+    else       
+        export USE_KEYS="true"
+        echo "Use '.keys' configuration."
+        verify_key_configuration
+    fi
+}
+
 function check_docker () {
     ERROR=$(docker ps 2>&1)
     RESULT=$(echo $ERROR | grep 'Cannot' | awk '{print $1;}')
@@ -18,6 +33,18 @@ function check_docker () {
         echo "Docker is not running. Stop script execution."
         exit 1 
     fi
+}
+
+function verify_key_configuration () {
+    
+    cd  $HOME_PATH
+    KEYS_RESULT=$(ls -a | grep .keys | head -n 1)
+    if [ "$KEYS_RESULT" != ".keys" ]; then
+       echo "No '.keys' file exists."
+       exit 1
+    fi
+    
+    #ENV_RESULT=$(ls -a | grep .env | head -n 1)
 }
 
 function log_environment_configuration(){
@@ -62,7 +89,9 @@ echo "- 'Maas-mock'"
 echo "************************************"
 
 check_docker
+check_parameters
 log_environment_configuration
+
 
 # 1. set needed common environment
 echo "Home path:    $HOME_PATH"
@@ -100,7 +129,10 @@ echo $INPUT_MOUNTPOINT
 cd $HOME_PATH
 
 # 8. load keys
-source $HOME_PATH/.keys
+if [ "$USE_KEYS" == "true" ]; then
+    source $HOME_PATH/.keys
+fi
+
 
 # 9. Start compose
 docker compose version
