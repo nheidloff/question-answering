@@ -38,7 +38,8 @@ public class QueryElasticReRankerMaaS {
         for (int index = 0; index < inputReRankerAmountDocuments; index++) {
             com.ibm.question_answering.reranker.Document document = new com.ibm.question_answering.reranker.Document();
             document.text = getResultAsText(answer, index);
-            document.document_id = answer.results.get(index).document_id;
+            //document.document_id = answer.results.get(index).document_id;
+            document.document_id = answer.results.get(index).url;
             document.title = answer.results.get(index).title;
             double score = 0.0;
             try {
