@@ -147,56 +147,57 @@ function deploy_ce_application(){
            exit 1
         fi
     fi
-
+    
+    echo "*** Create application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME"
     ibmcloud ce application create --name "$CODEENGINE_APP_NAME" \
                                    --image "$CODEENGINE_APP_IMAGE_URL" \
                                    --cpu "$CODEENGINE_APP_CPU_CONFIG" \
                                    --memory "$CODEENGINE_APP_MEMORY_CONFIG" \
                                    --registry-secret "$CODEENGINE_CR_ACCESS_NAME" \
-                                   --env QA_API_KEY=${QA_API_KEY} \
-                                   --env DISCOVERY_API_KEY=${DISCOVERY_API_KEY} \
-                                   --env DISCOVERY_URL=${DISCOVERY_URL} \
-                                   --env DISCOVERY_INSTANCE=${DISCOVERY_INSTANCE} \
-                                   --env DISCOVERY_PROJECT=${DISCOVERY_PROJECT} \
-                                   --env DISCOVERY_COLLECTION_ID=${DISCOVERY_COLLECTION_ID} \
-                                   --env PRIME_QA_URL=${PRIME_QA_URL} \
-                                   --env RERANKER_URL=${RERANKER_URL} \
-                                   --env MAAS_URL=${MAAS_URL} \
-                                   --env MAAS_API_KEY=${MAAS_API_KEY} \
-                                   --env PROXY_URL=${PROXY_URL} \
-                                   --env PROXY_API_KEY=${PROXY_API_KEY} \
-                                   --env ELASTIC_SEARCH_URL=${ELASTIC_SEARCH_URL} \
-                                   --env ELASTIC_SEARCH_INDEX=${ELASTIC_SEARCH_INDEX} \
-                                   --env ELASTIC_SEARCH_USER=${ELASTIC_SEARCH_USER} \
-                                   --env ELASTIC_SEARCH_PASSWORD=${ELASTIC_SEARCH_PASSWORD} \
-                                   --env ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS=${ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS} \
-                                   --env ELASTIC_SEARCH_FIELD_1=${ELASTIC_SEARCH_FIELD_1} \
-                                   --env ELASTIC_SEARCH_FIELD_2=${ELASTIC_SEARCH_FIELD_2} \
-                                   --env ELASTIC_SEARCH_HIGHLIGHT_FIELD=${ELASTIC_SEARCH_HIGHLIGHT_FIELD} \
-                                   --env ELASTIC_SEARCH_FILTER_NAME_1=${ELASTIC_SEARCH_FILTER_NAME_1} \
-                                   --env ELASTIC_SEARCH_FILTER_VALUE_1=${ELASTIC_SEARCH_FILTER_VALUE_1} \
-                                   --env ELASTIC_SEARCH_FILTER_NAME_2=${ELASTIC_SEARCH_FILTER_NAME_2} \
-                                   --env ELASTIC_SEARCH_FILTER_VALUE_2=${ELASTIC_SEARCH_FILTER_VALUE_2} \
-                                   --env ELASTIC_SEARCH_FILTER_NAME_3=${ELASTIC_SEARCH_FILTER_NAME_3} \
-                                   --env ELASTIC_SEARCH_FILTER_VALUE_3=${ELASTIC_SEARCH_FILTER_VALUE_3} \
-                                   --env ELASTIC_SEARCH_FIELD_ARRAY_TEXT=${ELASTIC_SEARCH_FIELD_ARRAY_TEXT} \
-                                   --env ELASTIC_SEARCH_FIELD_SINGLE_ID=${ELASTIC_SEARCH_FIELD_SINGLE_ID} \
-                                   --env ELASTIC_SEARCH_FIELD_SINGLE_TITLE=${ELASTIC_SEARCH_FIELD_SINGLE_TITLE} \
-                                   --env ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1=${ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1} \
-                                   --env ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2=${ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2} \
-                                   --env ELASTIC_SEARCH_RESULT_URL=${ELASTIC_SEARCH_RESULT_URL} \
-                                   --env EXPERIMENT_METRICS_SESSION=${SESSION_ID} \
-                                   --env EXPERIMENT_LLM_NAME=${EXPERIMENT_LLM_NAME} \
-                                   --env EXPERIMENT_LLM_MIN_NEW_TOKENS=${EXPERIMENT_LLM_MIN_NEW_TOKENS} \
-                                   --env EXPERIMENT_LLM_MAX_NEW_TOKENS=${EXPERIMENT_LLM_MAX_NEW_TOKENS} \
-                                   --env EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS=${EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS} \
-                                   --env EXPERIMENT_LLM_PROMPT=${EXPERIMENT_LLM_PROMPT} \
-                                   --env EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS=${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS} \
-                                   --env EXPERIMENT_RERANKER_MODEL=${EXPERIMENT_RERANKER_MODEL} \
-                                   --env EXPERIMENT_RERANKER_ID=${EXPERIMENT_RERANKER_ID} \
-                                   --env EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS=${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS} \
-                                   --env EXPERIMENT_DISCOVERY_CHARACTERS=${EXPERIMENT_DISCOVERY_CHARACTERS} \
-                                   --env EXPERIMENT_DISCOVERY_FIND_ANSWERS=${EXPERIMENT_DISCOVERY_FIND_ANSWERS} \
+                                   --env QA_API_KEY="${QA_API_KEY}" \
+                                   --env DISCOVERY_API_KEY="${DISCOVERY_API_KEY}" \
+                                   --env DISCOVERY_URL="${DISCOVERY_URL}" \
+                                   --env DISCOVERY_INSTANCE="${DISCOVERY_INSTANCE}" \
+                                   --env DISCOVERY_PROJECT="${DISCOVERY_PROJECT}" \
+                                   --env DISCOVERY_COLLECTION_ID="${DISCOVERY_COLLECTION_ID}" \
+                                   --env PRIME_QA_URL="${PRIME_QA_URL}" \
+                                   --env RERANKER_URL="${RERANKER_URL}" \
+                                   --env MAAS_URL="${MAAS_URL}" \
+                                   --env MAAS_API_KEY="${MAAS_API_KEY}" \
+                                   --env PROXY_URL="${PROXY_URL}" \
+                                   --env PROXY_API_KEY="${PROXY_API_KEY}" \
+                                   --env ELASTIC_SEARCH_URL="${ELASTIC_SEARCH_URL}" \
+                                   --env ELASTIC_SEARCH_INDEX="${ELASTIC_SEARCH_INDEX}" \
+                                   --env ELASTIC_SEARCH_USER="${ELASTIC_SEARCH_USER}" \
+                                   --env ELASTIC_SEARCH_PASSWORD="${ELASTIC_SEARCH_PASSWORD}" \
+                                   --env ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS="${ELASTIC_SEARCH_MAX_OUTPUT_DOCUMENTS}" \
+                                   --env ELASTIC_SEARCH_FIELD_1="${ELASTIC_SEARCH_FIELD_1}" \
+                                   --env ELASTIC_SEARCH_FIELD_2="${ELASTIC_SEARCH_FIELD_2}" \
+                                   --env ELASTIC_SEARCH_HIGHLIGHT_FIELD="${ELASTIC_SEARCH_HIGHLIGHT_FIELD}" \
+                                   --env ELASTIC_SEARCH_FILTER_NAME_1="${ELASTIC_SEARCH_FILTER_NAME_1}" \
+                                   --env ELASTIC_SEARCH_FILTER_VALUE_1="${ELASTIC_SEARCH_FILTER_VALUE_1}" \
+                                   --env ELASTIC_SEARCH_FILTER_NAME_2="${ELASTIC_SEARCH_FILTER_NAME_2}" \
+                                   --env ELASTIC_SEARCH_FILTER_VALUE_2="${ELASTIC_SEARCH_FILTER_VALUE_2}" \
+                                   --env ELASTIC_SEARCH_FILTER_NAME_3="${ELASTIC_SEARCH_FILTER_NAME_3}" \
+                                   --env ELASTIC_SEARCH_FILTER_VALUE_3="${ELASTIC_SEARCH_FILTER_VALUE_3}" \
+                                   --env ELASTIC_SEARCH_FIELD_ARRAY_TEXT="${ELASTIC_SEARCH_FIELD_ARRAY_TEXT}" \
+                                   --env ELASTIC_SEARCH_FIELD_SINGLE_ID="${ELASTIC_SEARCH_FIELD_SINGLE_ID}" \
+                                   --env ELASTIC_SEARCH_FIELD_SINGLE_TITLE="${ELASTIC_SEARCH_FIELD_SINGLE_TITLE}" \
+                                   --env ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1="${ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1}" \
+                                   --env ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2="${ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2}" \
+                                   --env ELASTIC_SEARCH_RESULT_URL="${ELASTIC_SEARCH_RESULT_URL}" \
+                                   --env EXPERIMENT_METRICS_SESSION="${SESSION_ID}" \
+                                   --env EXPERIMENT_LLM_NAME="${EXPERIMENT_LLM_NAME}" \
+                                   --env EXPERIMENT_LLM_MIN_NEW_TOKENS="${EXPERIMENT_LLM_MIN_NEW_TOKENS}" \
+                                   --env EXPERIMENT_LLM_MAX_NEW_TOKENS="${EXPERIMENT_LLM_MAX_NEW_TOKENS}" \
+                                   --env EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS="${EXPERIMENT_LLM_MAX_INPUT_DOCUMENTS}" \
+                                   --env EXPERIMENT_LLM_PROMPT="${EXPERIMENT_LLM_PROMPT}" \
+                                   --env EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS="${EXPERIMENT_RERANKER_MAX_INPUT_DOCUMENTS}" \
+                                   --env EXPERIMENT_RERANKER_MODEL="${EXPERIMENT_RERANKER_MODEL}" \
+                                   --env EXPERIMENT_RERANKER_ID="${EXPERIMENT_RERANKER_ID}" \
+                                   --env EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS="${EXPERIMENT_DISCOVERY_MAX_OUTPUT_DOCUMENTS}" \
+                                   --env EXPERIMENT_DISCOVERY_CHARACTERS="${EXPERIMENT_DISCOVERY_CHARACTERS}" \
+                                   --env EXPERIMENT_DISCOVERY_FIND_ANSWERS="${EXPERIMENT_DISCOVERY_FIND_ANSWERS}" \
                                    --env EXPERIMENT_METRICS_DIRECTORY="$EXPERIMENT_METRICS_DIRECTORY" \
                                    --env MAX_RESULTS="$MAX_RESULTS" \
                                    --max-scale $CODEENGINE_APP_MAX_SCALE \
