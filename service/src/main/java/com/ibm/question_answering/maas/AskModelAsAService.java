@@ -289,16 +289,16 @@ public class AskModelAsAService {
                 String EVIDENCE_MARKER3 = "? evidence:";
                 String RESPONSE_MARKER = "response: ";
                 if (generatedText.contains(EVIDENCE_MARKER1)) {
-                    //generatedText = generatedText.substring(RESPONSE_MARKER.length(), generatedText.indexOf(EVIDENCE_MARKER1));
-                    generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER1) + EVIDENCE_MARKER1.length(), generatedText.length()).trim();
+                    generatedText = generatedText.substring(RESPONSE_MARKER.length(), generatedText.indexOf(EVIDENCE_MARKER1));
+                    //generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER1) + EVIDENCE_MARKER1.length(), generatedText.length()).trim();
                 }
                 if (generatedText.contains(EVIDENCE_MARKER2)) {
-                    //generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER2) + 1);
-                    generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER2) + EVIDENCE_MARKER2.length(), generatedText.length()).trim();
+                    generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER2) + 1);
+                    //generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER2) + EVIDENCE_MARKER2.length(), generatedText.length()).trim();
                 }
                 if (generatedText.contains(EVIDENCE_MARKER3)) {
-                    //generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER3) + 1);
-                    generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER3) + EVIDENCE_MARKER3.length(), generatedText.length()).trim();
+                    generatedText = generatedText.substring(0, generatedText.indexOf(EVIDENCE_MARKER3) + 1);
+                    //generatedText = generatedText.substring(generatedText.indexOf(EVIDENCE_MARKER3) + EVIDENCE_MARKER3.length(), generatedText.length()).trim();
                 }
             }
         }
