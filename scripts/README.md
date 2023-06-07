@@ -126,6 +126,12 @@ It also creates an `~/.env_profile` file to save global variables.
 sh start_containers.sh
 ```
 
+If you use the parameter 'use_keys' the '.keys' file will be used for some of the environment variables.
+
+```sh
+sh start_containers.sh use_keys
+```
+
 * Example output:
 
 ```sh
