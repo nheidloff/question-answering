@@ -18,10 +18,16 @@ function check_parameters () {
     if [ "$ARG_KEYS" == "no_keys" ]; then
         export USE_KEYS="false"
         echo "Don't use '.keys' configuration."
-    else       
-        export USE_KEYS="true"
-        echo "Use '.keys' configuration."
-        verify_key_configuration
+    else
+
+        if [ "$ARG_KEYS" == "use_keys" ]; then
+            export USE_KEYS="true"
+            echo "Use '.keys' configuration."
+            verify_key_configuration
+        else
+            export USE_KEYS="false"
+            echo "Unknown argument ($ARG_KEYS), will not use keys configuration."
+        fi
     fi
 }
 
