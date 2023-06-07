@@ -19,7 +19,7 @@ fi
 
 # ***** Source experiment-runner configuration ****
 source ./.env
-source ${GLOBAL_HOME_PATH}/../metrics/.keys
+#source ${GLOBAL_HOME_PATH}/../scripts/.keys
 
 if [[ "${GLOBAL_SESSION_ID}" == "${verify}" ]]; then
 

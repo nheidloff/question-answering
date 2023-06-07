@@ -99,6 +99,10 @@ export INPUT_MOUNTPOINT="$(pwd)"
 echo $INPUT_MOUNTPOINT
 cd $HOME_PATH
 
+# 8. load keys
+source $HOME_PATH/.keys
+
+# 9. Start compose
 docker compose version
 echo "**************** BUILD ******************" 
 docker compose -f ./docker_compose.yaml build

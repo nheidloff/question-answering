@@ -103,11 +103,20 @@ cat ./env_template > .env
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
 ```sh
-cd ./service/experiment-runner
+cd ./service
 cat ./env_template > .env
 ```
 
-### 3.3 Start the automation
+### 2.3 Create a `.keys` file to save needed credentials
+
+Ensure you have created the needed environment variables file and adjusted it to your needs. 
+
+```sh
+cd ./scripts/
+cat ./.keys_template > .keys
+```
+
+### 2.4 Start the automation
 
 The bash automation `start_containers.sh` the execution of Docker.
 
