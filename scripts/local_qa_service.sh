@@ -21,6 +21,7 @@ fi
 
 # ***** Source qa service configuration ****
 source ./.env
+source ${GLOBAL_HOME_PATH}/../metrics/.keys
 
 verify=""
 
