@@ -136,25 +136,22 @@ function setup_ce_container_registry_access() {
     fi
 }
 
-function deploy_ce_application(){
+function update_ce_application(){
    
     # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
     RESULT=$(ibmcloud ce application get --name "$CODEENGINE_APP_NAME" --output  jsonpath='{.metadata.name}')
     if [[ $RESULT == $CODEENGINE_APP_NAME ]]; then
         echo "*** The ce application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME exists."
-        echo "*** Delete application!"
-        RESULT=$(ibmcloud ce application delete --name $CODEENGINE_APP_NAME --force)
-        VERIFY=$(echo $RESULT | grep OK | awk -F" " '{print $NF}')
-        if [[ $VERIFY != "OK" ]]; then
-           echo "Error problem to delete the $CODEENGINE_APP_NAME application"
-           echo "$RESULT"
-           echo "The script stops here."
-           exit 1
-        fi
+    else
+        echo "Application $CODEENGINE_APP_NAME doesn't exist."
+        echo "No update possible."
+        echo "$RESULT"
+        echo "The script stops here."
+        exit 1
     fi
     
-    echo "*** Create application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME"
-    ibmcloud ce application create --name "$CODEENGINE_APP_NAME" \
+    echo "*** Update application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME"
+    ibmcloud ce application update --name "$CODEENGINE_APP_NAME" \
                                    --image "$CODEENGINE_APP_IMAGE_URL" \
                                    --cpu "$CODEENGINE_APP_CPU_CONFIG" \
                                    --memory "$CODEENGINE_APP_MEMORY_CONFIG" \
@@ -318,7 +315,7 @@ login_to_ibm_cloud
 build_and_push_container
 setup_ce_project
 setup_ce_container_registry_access
-deploy_ce_application
+update_ce_application
 kube_information
 kube_pod_log
 set_global_env
