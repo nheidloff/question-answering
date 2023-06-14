@@ -46,7 +46,7 @@ cat ./env_template > .env
 Ensure you have created the needed environment variables file and adjusted it to your needs. 
 
 ```sh
-cd ./service/experiment-runner
+cd ./service
 cat ./env_template > .env
 ```
 
