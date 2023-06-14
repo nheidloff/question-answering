@@ -194,7 +194,7 @@ public class AskElasticService {
                                             result.text.text[indexText] = oneLine;
                                         }
                                     }
-                                    result = addFirstWords(result, hits.get(index));
+                                    //result = addFirstWords(result, hits.get(index));
                                 }
                                 results.add(result);
                             }
