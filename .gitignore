@@ -111,3 +111,4 @@ metrics/experiment-runner/ex-runner-env-3.11/
 service/tmp/*
 scripts/.keys
 scripts/ce-deployment/configmap_values.txt
+scripts/verify.md
