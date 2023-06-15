@@ -66,13 +66,15 @@ function log_environment_configuration(){
     # service
     sed 's/\QA_API_KEY=.*/QA_API_KEY=/' "$HOME_PATH"/../service/.env  > $LOG_FOLDER/tmp1-service.env
     sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $LOG_FOLDER/tmp1-service.env  > $LOG_FOLDER/tmp2-service.env
-    sed 's/\ELASTIC_SEARCH_PASSWORD=.*/ELASTIC_SEARCH_PASSWORD=/' $LOG_FOLDER/tmp2-service.env > $LOG_FOLDER/tmp3-service.env
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/tmp4-service.env
-    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp4-service.env > $LOG_FOLDER/${SESSION_ID}-service.env
+    sed 's/\RERANKER_API_KEY=.*/RERANKER_API_KEY=/' $LOG_FOLDER/tmp2-service.env  > $LOG_FOLDER/tmp3-service.env
+    sed 's/\ELASTIC_SEARCH_PASSWORD=.*/ELASTIC_SEARCH_PASSWORD=/' $LOG_FOLDER/tmp3-service.env > $LOG_FOLDER/tmp4-service.env
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $LOG_FOLDER/tmp4-service.env > $LOG_FOLDER/tmp5-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $LOG_FOLDER/tmp5-service.env > $LOG_FOLDER/${SESSION_ID}-service.env
     rm $LOG_FOLDER/tmp1-service.env
     rm $LOG_FOLDER/tmp2-service.env
     rm $LOG_FOLDER/tmp3-service.env
     rm $LOG_FOLDER/tmp4-service.env
+    rm $LOG_FOLDER/tmp5-service.env
 
     # experiment runner
     sed '/^#/d;s/\password=.*/password=/' "$HOME_PATH"/../metrics/experiment-runner/.env  > $LOG_FOLDER/${SESSION_ID}-experiment-runner.env
