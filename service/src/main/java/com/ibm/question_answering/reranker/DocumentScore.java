@@ -6,6 +6,10 @@ public class DocumentScore {
         this.document = document;
         this.score = score;
     }
+
+    public DocumentScore() {
+        this.score = 0;
+    }
     
     public Document document;
     public double score;
