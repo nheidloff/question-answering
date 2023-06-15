@@ -124,15 +124,22 @@ function build_and_push_container () {
 
 function setup_ce_container_registry_access() {
 
-    RESULT=$(ibmcloud ce registry get --name $CODEENGINE_CR_ACCESS_NAME --output  jsonpath='{.metadata.name}')
+    RESULT=$(ibmcloud ce registry get --name ${CODEENGINE_CR_ACCESS_NAME} --output  jsonpath='{.metadata.name}')
     if [[ $RESULT == $CODEENGINE_CR_ACCESS_NAME ]]; then
-        echo "*** The ce container registry $CODEENGINE_CR_ACCESS_NAME for the $CODEENGINE_PROJECT_NAME exists."
+        echo "*** The ce container registry ${CODEENGINE_CR_ACCESS_NAME} for the ${CODEENGINE_PROJECT_NAME} exists."
     else
-        ibmcloud ce registry create --name $CODEENGINE_CR_ACCESS_NAME \
-                               --server $CODEENGINE_CR_SERVER_NAME \
-                               --username $CODEENGINE_CR_USERNAME \
-                               --password $CODEENGINE_CR_PASSWORD \
-                               --email $CODEENGINE_CR_EMAIL
+        echo "*** Create new container registry assess: ${CODEENGINE_CR_ACCESS_NAME} in project ${CODEENGINE_PROJECT_NAME}."
+        echo "${CODEENGINE_CR_ACCESS_NAME}"
+        echo "${CODEENGINE_CR_SERVER_NAME}"
+        echo "${CODEENGINE_CR_USERNAME}"
+        echo "${CODEENGINE_CR_EMAIL}"
+        echo "${CODEENGINE_CR_PASSWORD}"
+        
+        ibmcloud ce registry create --name ${CODEENGINE_CR_ACCESS_NAME} \
+                                    --username ${CODEENGINE_CR_USERNAME} \
+                                    --password ${CODEENGINE_CR_PASSWORD} \
+                                    --server ${CODEENGINE_CR_SERVER_NAME} \
+                                    --email ${CODEENGINE_CR_EMAIL}
     fi
 }
 
@@ -257,10 +264,10 @@ function log_deployment_configuration_all(){
     
     # remove all comments of the envirement configuration and save in all
     # experiment-runner
-    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/ibm-cloud.env
-    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../metrics/experiment-runner/.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/experiment-runner.env
+    sed '/^#/d;s/\IBM_CLOUD_API_KEY=.*/IBM_CLOUD_API_KEY=/' $HOME_PATH/../.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/ibm-cloud.env
+    sed '/^#/d;s/\password=.*/password=/' $HOME_PATH/../../metrics/experiment-runner/.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/experiment-runner.env
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../../service/.env  > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env
     sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp1-service.env  > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp2-service.env    
     sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp2-service.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp3-service.env
     sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/all/$FOLDERNAME/tmp3-service.env > $HOME_PATH/../../deployment-log/all/$FOLDERNAME/service.env
@@ -284,7 +291,7 @@ function log_deployment_configuration_last(){
     
     # remove all comments of the envirement configuration and save in all
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../service/.env  > $HOME_PATH/../../deployment-log/last/tmp1-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../../service/.env  > $HOME_PATH/../../deployment-log/last/tmp1-service.env
     sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp1-service.env  > $HOME_PATH/../../deployment-log/last/tmp2-service.env    
     sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp2-service.env > $HOME_PATH/../../deployment-log/last/tmp3-service.env
     sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp3-service.env > $HOME_PATH/../../deployment-log/last/service.env
@@ -309,6 +316,52 @@ function set_global_env () {
     "/bin/sh" "${HOME_PATH}"/../env_profile_generate.sh > ~/.env_profile
 }
 
+function create_configmap () {
+    echo "************************************"
+    echo "Create configmap"
+    echo "************************************"
+    cd  $HOME_PATH
+
+    "/bin/sh" ./generate-configmap-file.sh > ./configmap_values.txt
+    ibmcloud ce configmap create --name ${CODEENGINE_CONFIGMAP_NAME} --from-env-file ./configmap_values.txt
+}
+
+function deploy_ce_application_configmap () {
+    
+    # Valid vCPU and memory combinations: https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo
+    RESULT=$(ibmcloud ce application get --name "$CODEENGINE_APP_NAME" --output  jsonpath='{.metadata.name}')
+    if [[ $RESULT == $CODEENGINE_APP_NAME ]]; then
+        echo "*** The ce application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME exists."
+        echo "*** Delete application!"
+        RESULT=$(ibmcloud ce application delete --name $CODEENGINE_APP_NAME --force)
+        VERIFY=$(echo $RESULT | grep OK | awk -F" " '{print $NF}')
+        if [[ $VERIFY != "OK" ]]; then
+           echo "Error problem to delete the ${CODEENGINE_APP_NAME} application"
+           echo "$RESULT"
+           echo "The script stops here."
+           exit 1
+        fi
+    fi
+    
+    echo "*** Create application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME"
+    ibmcloud ce application create --name "${CODEENGINE_APP_NAME}" \
+                                   --image "${CODEENGINE_APP_IMAGE_URL}" \
+                                   --cpu "${CODEENGINE_APP_CPU_CONFIG}" \
+                                   --memory "${CODEENGINE_APP_MEMORY_CONFIG}" \
+                                   --registry-secret "${CODEENGINE_CR_ACCESS_NAME}" \
+                                   --env-from-configmap "${CODEENGINE_CONFIGMAP_NAME}" \
+                                   --max-scale $CODEENGINE_APP_MAX_SCALE \
+                                   --min-scale $CODEENGINE_APP_MIN_SCALE \
+                                   --port $CODEENGINE_APP_PORT
+    
+    ibmcloud ce application get --name "$CODEENGINE_APP_NAME"
+    export CODEENGINE_APP_NAME_URL=$(ibmcloud ce application get --name "$CODEENGINE_APP_NAME" -o url)
+    echo "************************************"
+    echo "Access the application $CODEENGINE_APP_NAME - URL: $CODEENGINE_APP_NAME_URL/q/openapi"
+    echo "************************************"
+
+}
+
 #**********************************************************************************
 # Execution
 # *********************************************************************************
@@ -318,7 +371,9 @@ login_to_ibm_cloud
 build_and_push_container
 setup_ce_project
 setup_ce_container_registry_access
-deploy_ce_application
+create_configmap
+deploy_ce_application_configmap
+#deploy_ce_application
 kube_information
 kube_pod_log
 set_global_env
