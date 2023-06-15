@@ -112,8 +112,10 @@ public class QueryDiscoveryReRankerMaaS {
     public static String getDocumentUrl(String documentId, com.ibm.question_answering.api.Answer discoveryAnswer) {
         String output = "";
         for (int index = 0; index < discoveryAnswer.results.size(); index++) {
-            if (discoveryAnswer.results.get(index).document_id.equals(documentId)) {
-                output = discoveryAnswer.results.get(index).url;
+            if (discoveryAnswer.results.get(index).document_id != null) {
+                if (discoveryAnswer.results.get(index).document_id.equals(documentId)) {
+                    output = discoveryAnswer.results.get(index).url;
+                }
             }
         }
         return output;
