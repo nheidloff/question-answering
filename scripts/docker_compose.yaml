@@ -21,6 +21,7 @@ services:
     environment:
       - QA_API_KEY=${QA_API_KEY}
       - RERANKER2=${RERANKER2}
+      - TGIS=${TGIS}
       - RERANKER_API_KEY=${RERANKER_API_KEY}
       - DISCOVERY_API_KEY=${DISCOVERY_API_KEY}
       - DISCOVERY_URL=${DISCOVERY_URL}
