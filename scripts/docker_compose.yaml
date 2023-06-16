@@ -97,6 +97,7 @@ services:
       - container_run=True
       - qa_service_on_cloud=False
       - app_debug_channel=$app_debug_channel
+      - i_dont_know=$i_dont_know
     volumes:
       - ${OUTPUT_MOUNTPOINT}:/app/outputs:rw
       - ${INPUT_MOUNTPOINT}:/app/inputs:rw
