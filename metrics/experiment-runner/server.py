@@ -13,30 +13,36 @@ api = Api(app)
 class GetEnv(Resource):
     def get(self):
         # Customm debug information
-        print("INFO 1")
+        print("INFO: Customm debug information")
         app_debug_channel = os.environ.get("app_debug_channel")
-        print("INFO 2")
+              
         # qa service
+        print("INFO: qa service")
         endpoint = os.environ.get("endpoint")
         api_url = os.environ.get("api_url")
         username=os.environ.get("username")
         password=os.environ.get("password")
         verify_answer=os.environ.get("verify_answer")
         
-        print("INFO 3")
         # input
+        print("INFO: input")
         input_excel_filename = os.environ.get("input_excel_filename")
         input_folder_name = os.environ.get("input_folder_name")
         input_folder_name_qa_service_metrics = os.environ.get("input_folder_name_qa_service_metrics")
         container_run = os.environ.get("container_run")
+        i_dont_know = os.environ.get("i_dont_know")
 
         # output
+        print("INFO: output")
         output_question_resp_anwser_excel = os.environ.get("output_question_resp_anwser_excel")
         output_error_log = os.environ.get("output_error_log")
         output_session_id = os.environ.get("output_session_id")
         output_folder_name = os.environ.get("output_folder_name")
         number_of_retries = os.environ.get("number_of_retries")
-        print("INFO 4")
+        
+
+        # return
+        print("INFO: return")
         return_value = str(output_question_resp_anwser_excel) + ";" +  \
                        str(output_error_log) + ";" +  \
                        str(output_session_id) + ";" + \
@@ -51,6 +57,7 @@ class GetEnv(Resource):
                        str(username) + ";" + \
                        str(password) + ";" + \
                        str(verify_answer) + ";" + \
+                       str(i_dont_know) + ";" + \
                        str(app_debug_channel)
                
         return return_value

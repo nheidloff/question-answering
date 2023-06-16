@@ -54,6 +54,14 @@ if (os.environ.get("prefix_passage_id") == None):
 else:
         prefix_passage_id = os.environ.get("prefix_passage_id")
 
+# - Prefix passage ID groundtruth
+#       - If 'False': Invoke the microservice
+#            'True' : Use an existing data
+if (os.environ.get("i_dont_know") == None):
+        i_dont_know = "NO_VALUE_DEFINED"
+else:
+        i_dont_know = os.environ.get("i_dont_know")
+
 # -----------------------
 # Loaded from env file
 
@@ -102,6 +110,7 @@ def debug_show_env_settings():
         global output_session_id
         global output_folder_name
         global number_of_retries
+        global i_dont_know
 
         if (app_debug_channel == "True"):
                 print("********** app DEBUG ***************")
@@ -121,6 +130,7 @@ def debug_show_env_settings():
                 print(f"- Output Excel: {output_question_resp_anwser_excel}\n")
                 print(f"- Error log name: {output_error_log}")
                 print(f"- Container run: {container_run}")
+                print(f"- I don't know: {i_dont_know}")
                 return True
         else:   
                 return False
@@ -203,10 +213,12 @@ def get_input_qa_service_metrics_container_path():
         return new_directory
 
 # ******************************************
-# Extract data from output excel and create new data tab 
-# - NA (evidence)
-# - I do not have information regarding
-# - Unfortunately, no relevant information is found.
+# Extract 'i don't know' data from output excel 
+# and create new tabs in thr output excel 
+#
+# Example: - NA (evidence)
+#          - I do not have information regarding
+#          - Unfortunately, no relevant information is found.
 #
 # Defined by: 
 #  Tabs: 'experiment_data' and 'experiment_filtered_data'
@@ -214,12 +226,13 @@ def get_input_qa_service_metrics_container_path():
 def extract_unknown_response (excel_output_file):
 
     global logger
+    global i_dont_know
+    
     workbook = openpyxl.load_workbook(excel_output_file)
     worksheet = workbook['experiment_data']
     d_value = ""
     rows = []
-    #not_valid_value = 'NA'
-    not_valid_values = [ 'n/a', 'NA', '(iv).', 'I do not have information regarding', 'Unfortunately, no relevant information is found.', 'unanswerable' ]
+    not_valid_values = [ i_dont_know ]
     found_not_valid_values = []
     
     for rdx, row in enumerate(worksheet.iter_rows(values_only=True)):     
@@ -247,39 +260,33 @@ def extract_unknown_response (excel_output_file):
         
         for verify_value in not_valid_values:
 
-                if verify_value == str(row[1]):
+                if verify_value == "NO_VALUE_DEFINED":
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
-                        add_to_value = False
-                        
-                        question      = row[0]
-                        anwer         = row[1]
-                        golden_answer = row[2]
-                        
-                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
+                        add_to_value = True
                         break
 
-                if verify_value in str(row[1]):
+                if str(row[1]).startswith(verify_value):
                         d_value = "Will not be added to the new result: " + str(row[2])
                         debug_show_value(d_value)
                         add_to_value = False
                         
                         question      = row[0]
-                        anwer         = row[1]
+                        answer        = row[1]
                         golden_answer = row[2]
                         
-                        found_not_valid_values.append([question, anwer, golden_answer, verify_value])
+                        found_not_valid_values.append([question, answer, golden_answer, verify_value])
                         break
                 else:
                         question      = row[0]
-                        anwer         = row[1]
+                        answer        = row[1]
                         golden_answer = row[2]
                         add_to_value = True
 
         if (add_to_value == True):
-                new_rows.append([question, anwer, golden_answer])
+                new_rows.append([question, answer, golden_answer])
 
-    new_header = [ "question", "anwer", "golden_answer"]
+    new_header = [ "question", "answer", "golden_answer"]
 
     # 2. Save the filtered values
     j = 1
@@ -487,7 +494,13 @@ def create_logger():
         
         return logger
 
-# Create a "experiment_data" worksheet
+# ******************************************
+# Create worksheets in excel
+# - filtered data 
+# - bad data
+# - bleu_result
+# - performance
+# - data
 def create_output_workbook (workbook_name):
         workbook = openpyxl.Workbook()
         worksheet = workbook.create_sheet("experiment_data")
@@ -560,7 +573,7 @@ def create_output_workbook (workbook_name):
         return workbook
 
 # ******************************************
-# load input excel
+# Load ground truth input excel
 def load_input_excel(excel_input):
     global logger
     wb = openpyxl.load_workbook(excel_input)

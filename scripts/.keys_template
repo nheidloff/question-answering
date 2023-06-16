@@ -4,5 +4,6 @@ export DISCOVERY_API_KEY=
 export MAAS_API_KEY=
 export QA_API_KEY=
 export PROXY_API_KEY=
+export RERANKER_API_KEY=
 # experiment runner
 export password=${QA_API_KEY}

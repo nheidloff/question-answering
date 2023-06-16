@@ -3,7 +3,6 @@ FROM python:3.11.2-slim-buster
 # Install needed environment
 RUN apt-get -y update; apt-get -y install curl
 RUN python -m pip install --upgrade pip
-#RUN python -m pip install subprocess
 RUN python -m pip install requests
 RUN python -m pip install pandas
 RUN python -m pip install datasets
