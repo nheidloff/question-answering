@@ -303,6 +303,15 @@ public class AskModelAsAService {
             }
         }
         output = generatedText;
+
+        // another special case
+        String iDontKnowAnswer = "I cannot find an answer to your question.";
+        if (output.startsWith("I do not have information regarding")) {
+            output = iDontKnowAnswer;
+        }
+        if (output.startsWith("I don't know")) {
+            output = iDontKnowAnswer;
+        }
         return output;
     }
 

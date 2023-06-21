@@ -118,6 +118,7 @@ public class QueryDiscoveryReRankerMaaS {
                 }
             }
         }
+        if (output.equals("")) output = documentId;
         return output;
     }
 
