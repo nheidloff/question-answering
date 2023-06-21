@@ -308,17 +308,17 @@ function log_deployment_configuration_last(){
     
     # remove all comments of the envirement configuration and save in all
     # service
-    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../../service/.env  > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp1-service.env
-    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp1-service.env  > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp2-service.env
-    sed 's/\ELASTIC_SEARCH_PASSWORD=.*/ELASTIC_SEARCH_PASSWORD=/' $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp2-service.env  > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp3-service.env
-    sed 's/\RERANKER_API_KEY=.*/RERANKER_API_KEY=/'  $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp3-service.env  > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp4-service.env
-    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp4-service.env > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp5-service.env
-    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp5-service.env > $HOME_PATH/../../deployment-log/last/$FOLDERNAME/service.env
-    rm $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp1-service.env
-    rm $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp2-service.env
-    rm $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp3-service.env
-    rm $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp4-service.env
-    rm $HOME_PATH/../../deployment-log/last/$FOLDERNAME/tmp5-service.env
+    sed 's/\QA_API_KEY=.*/QA_API_KEY=/' $HOME_PATH/../../service/.env  > $HOME_PATH/../../deployment-log/last/tmp1-service.env
+    sed 's/\MAAS_API_KEY=.*/MAAS_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp1-service.env  > $HOME_PATH/../../deployment-log/last/tmp2-service.env
+    sed 's/\ELASTIC_SEARCH_PASSWORD=.*/ELASTIC_SEARCH_PASSWORD=/' $HOME_PATH/../../deployment-log/last/tmp2-service.env  > $HOME_PATH/../../deployment-log/last/tmp3-service.env
+    sed 's/\RERANKER_API_KEY=.*/RERANKER_API_KEY=/'  $HOME_PATH/../../deployment-log/last/tmp3-service.env  > $HOME_PATH/../../deployment-log/last/tmp4-service.env
+    sed '/^#/d;s/\DISCOVERY_API_KEY=.*/DISCOVERY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp4-service.env > $HOME_PATH/../../deployment-log/last/tmp5-service.env
+    sed '/^#/d;s/\PROXY_API_KEY=.*/PROXY_API_KEY=/' $HOME_PATH/../../deployment-log/last/tmp5-service.env > $HOME_PATH/../../deployment-log/last/service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp1-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp2-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp3-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp4-service.env
+    rm $HOME_PATH/../../deployment-log/last/tmp5-service.env
 
     # create new files
     REPO_URL=$(git config --get remote.origin.url)
