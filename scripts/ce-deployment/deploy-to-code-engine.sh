@@ -365,12 +365,12 @@ function deploy_ce_application_configmap () {
     fi
     
     echo "*** Create application $CODEENGINE_APP_NAME for the $CODEENGINE_PROJECT_NAME"
-    ibmcloud ce application create --name "${CODEENGINE_APP_NAME}" \
-                                   --image "${CODEENGINE_APP_IMAGE_URL}" \
-                                   --cpu "${CODEENGINE_APP_CPU_CONFIG}" \
-                                   --memory "${CODEENGINE_APP_MEMORY_CONFIG}" \
-                                   --registry-secret "${CODEENGINE_CR_ACCESS_NAME}" \
-                                   --env-from-configmap "${CODEENGINE_CONFIGMAP_NAME}" \
+    ibmcloud ce application create --name ${CODEENGINE_APP_NAME} \
+                                   --image ${CODEENGINE_APP_IMAGE_URL} \
+                                   --cpu ${CODEENGINE_APP_CPU_CONFIG} \
+                                   --memory ${CODEENGINE_APP_MEMORY_CONFIG} \
+                                   --registry-secret ${CODEENGINE_CR_ACCESS_NAME} \
+                                   --env-from-configmap ${CODEENGINE_CONFIGMAP_NAME} \
                                    --max-scale $CODEENGINE_APP_MAX_SCALE \
                                    --min-scale $CODEENGINE_APP_MIN_SCALE \
                                    --port $CODEENGINE_APP_PORT
