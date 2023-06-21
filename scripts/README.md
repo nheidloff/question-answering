@@ -86,7 +86,7 @@ Environment configuration save in '~/.env_profile'
 The start of three containers.
 
 * Experiment-runner
-* Question-answering servie
+* Question-answering service
 * MaaS mock
 
 ### 2.1 Create an experiment-runner `.env` file
