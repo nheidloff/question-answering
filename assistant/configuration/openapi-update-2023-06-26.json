@@ -1,0 +1,679 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "question-answering API",
+    "version" : "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://URL",
+      "description": "Question answering application"
+    }
+  ],
+  "security": [
+    {"basicAuth":[]}
+  ],
+  "paths" : {
+    "/query" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Reads documents from Elastic, re-ranks results and uses MaaS to return answer",
+        "description" : "Reads documents from Elastic, re-ranks results and uses MaaS to return answer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "401" : {
+            "description" : "Not authorized"
+          },
+          "200" : {
+            "description" : "Answer successfully returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-discovery" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Get an answer from Watson Discovery",
+        "description" : "Get an answer from Watson Discovery",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-discovery-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from Discovery and MaaS",
+        "description" : "Returns answer from Discovery and MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-discovery-maas-as-stream" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from Discovery and MaaS as stream",
+        "description" : "Returns answer from Discovery and MaaS as stream",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/OutboundSseEvent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-discovery-reranker-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Reads documents from Discovery, re-ranks results and uses MaaS to return answer",
+        "description" : "Reads documents from Discovery, re-ranks results and uses MaaS to return answer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-elastic-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from ElasticSearch and MaaS",
+        "description" : "Returns answer from ElasticSearch and MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-elastic-reranker-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from ElasticSearch, ReRanker and MaaS",
+        "description" : "Returns answer from ElasticSearch, ReRanker and MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Get an answer from MaaS",
+        "description" : "Get an answer from MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-maas-as-stream" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Get an answer from MaaS as stream",
+        "description" : "Get an answer from MaaS as stream",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/OutboundSseEvent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-mock-confident" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns hardcoded data for a confident answer",
+        "description" : "Returns hardcoded data for a confident answer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-mock-not-confident" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns hardcoded data for a non confident answer",
+        "description" : "Returns hardcoded data for a non confident answer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-primeqa" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Get an answer from PrimeQA",
+        "description" : "Get an answer from PrimeQA",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-primeqa-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from PrimeQA (connected to Discovery) and MaaS",
+        "description" : "Returns answer from PrimeQA (connected to Discovery) and MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-reranker" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from the reranker on PrimeQA with mock documents",
+        "description" : "Returns answer from the reranker on PrimeQA mock documents",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    },
+    "/query-reranker-maas" : {
+      "post" : {
+        "tags" : [ "Answer Resource" ],
+        "summary" : "Returns answer from ReRanker and MaaS",
+        "description" : "Returns answer from ReRanker and MaaS",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Data"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Answer"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "apikey" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "securitySchemes": {
+      "basicAuth" : {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas" : {
+      "Answer" : {
+        "type" : "object",
+        "properties" : {
+          "matching_results" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "retrievalDetails" : {
+            "$ref" : "#/components/schemas/RetrievalDetails"
+          },
+          "results" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Result"
+            }
+          }
+        }
+      },
+      "Data" : {
+        "type" : "object",
+        "properties" : {
+          "query" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DocumentPassage" : {
+        "type" : "object",
+        "properties" : {
+          "passage_text" : {
+            "type" : "string"
+          },
+          "field" : {
+            "type" : "string"
+          },
+          "answers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PassageAnswer"
+            }
+          }
+        }
+      },
+      "MediaType" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "subtype" : {
+            "type" : "string"
+          },
+          "parameters" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "wildcardType" : {
+            "type" : "boolean"
+          },
+          "wildcardSubtype" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "OutboundSseEvent" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "comment" : {
+            "type" : "string"
+          },
+          "reconnectDelay" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "reconnectDelaySet" : {
+            "type" : "boolean"
+          },
+          "type" : {
+            "type" : "object"
+          },
+          "genericType" : {
+            "type" : "object"
+          },
+          "mediaType" : {
+            "$ref" : "#/components/schemas/MediaType"
+          },
+          "data" : {
+            "type" : "object"
+          }
+        }
+      },
+      "PassageAnswer" : {
+        "type" : "object",
+        "properties" : {
+          "answer_text" : {
+            "type" : "string"
+          },
+          "field" : {
+            "type" : "string"
+          },
+          "confidence" : {
+            "format" : "double",
+            "type" : "number"
+          }
+        }
+      },
+      "Result" : {
+        "type" : "object",
+        "properties" : {
+          "document_id" : {
+            "type" : "string"
+          },
+          "chunckid" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "text" : {
+            "$ref" : "#/components/schemas/Text"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "document_passages" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DocumentPassage"
+            }
+          },
+          "result_metadata" : {
+            "$ref" : "#/components/schemas/ResultMetaData"
+          }
+        }
+      },
+      "ResultMetaData" : {
+        "type" : "object",
+        "properties" : {
+          "collection_id" : {
+            "type" : "string"
+          },
+          "document_retrieval_source" : {
+            "type" : "string"
+          },
+          "confidence" : {
+            "format" : "double",
+            "type" : "number"
+          }
+        }
+      },
+      "RetrievalDetails" : {
+        "type" : "object",
+        "properties" : {
+          "document_retrieval_strategy" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Text" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
