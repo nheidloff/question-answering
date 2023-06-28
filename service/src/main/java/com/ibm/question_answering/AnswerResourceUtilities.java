@@ -75,7 +75,9 @@ public class AnswerResourceUtilities {
                     String url = input.results.get(index).url;
                     boolean isRedundant = false;
                     for (int i = index - 1; i >= 0; i--) {
-                        if (url.equals(documentIds[i])) isRedundant = true;
+                        if (url != null) {
+                            if (url.equals(documentIds[i])) isRedundant = true;
+                        }
                     }
                     if (isRedundant == true) {
                         output.results.remove(index);
