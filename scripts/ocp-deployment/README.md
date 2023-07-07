@@ -1,4 +1,5 @@
 # Open Shift deployment
+**Currently, the integration of all the environment variables is pending**
 
 The automated deployment fully deploys the [`question answering service`](./../../service/) to an IBM Cloud Red Hat OpenShift cluster in a Virtual Private Cloud environment. The automation uses bash scripting and a [`Helm Chart`](./charts/question-answering-helm/).
 
