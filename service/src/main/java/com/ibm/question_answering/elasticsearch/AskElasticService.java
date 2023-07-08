@@ -32,6 +32,9 @@ public class AskElasticService {
     private String password;
     final static String ERROR_ELASTIC_SEARCH_PASSWORD_NOT_SET = ElasticExceptionMapper.ERROR_ELASTIC_PREFIX + "ELASTIC_SEARCH_PASSWORD not defined";
 
+    String vectorSearch = System.getenv("ELASTIC_SEARCH_USE_VECTOR");
+    private boolean useVectorSearch = false;
+
     String field1;
     String field2;
     String field3;
@@ -116,6 +119,11 @@ public class AskElasticService {
         if ((envVar != null) && (!envVar.equals(""))) {
             resultUrl = envVar;   
         } 
+        if ((vectorSearch != null) && (!vectorSearch.equals(""))) {
+            if (vectorSearch.equalsIgnoreCase("true")) {
+                useVectorSearch = true;
+            }
+        }
     }
 
     @Inject
@@ -134,31 +142,40 @@ public class AskElasticService {
 
     public com.ibm.question_answering.elasticsearch.Input createInput(String query) {
         com.ibm.question_answering.elasticsearch.Input output = new com.ibm.question_answering.elasticsearch.Input();
-        output.highlight = new Highlight();
         output.size = this.maxResults;
-        ArrayList<String> fields = new ArrayList<String>();
-        if (field1 != null) {
-            fields.add(field1);
+
+        if (useVectorSearch == false) {
+            output.highlight = new Highlight();        
+            ArrayList<String> fields = new ArrayList<String>();
+            if (field1 != null) {
+                fields.add(field1);
+            }
+            if (field2 != null) {
+                fields.add(field2);
+            }
+            if (field3 != null) {
+                fields.add(field3);
+            }
+            String[] fieldsAsString = fields.toArray(new String[fields.size()]);
+            MultiMatch multiMatch = new MultiMatch();
+            multiMatch.fields = fieldsAsString;
+            multiMatch.type = "cross_fields";
+            multiMatch.query = query;
+            Must must = new Must();
+            must.multi_match = multiMatch;
+            Bool bool = new Bool();
+            bool.must = must;
+            bool.filter = new Filter();
+            Query queryInput = new Query();
+            queryInput.bool = bool;
+            output.query = queryInput;
         }
-        if (field2 != null) {
-            fields.add(field2);
+        else {
+            Query queryInput = new Query();
+            queryInput.text_expansion = new TextExpansion();
+            queryInput.text_expansion.query = query;
+            output.query = queryInput;
         }
-        if (field3 != null) {
-            fields.add(field3);
-        }
-        String[] fieldsAsString = fields.toArray(new String[fields.size()]);
-        MultiMatch multiMatch = new MultiMatch();
-        multiMatch.fields = fieldsAsString;
-        multiMatch.type = "cross_fields";
-        multiMatch.query = query;
-        Must must = new Must();
-        must.multi_match = multiMatch;
-        Bool bool = new Bool();
-        bool.must = must;
-        bool.filter = new Filter();
-        Query queryInput = new Query();
-        queryInput.bool = bool;
-        output.query = queryInput;
         return output;
     }
 
@@ -183,7 +200,11 @@ public class AskElasticService {
                                 result.document_id = hits.get(index)._source.id;
                                 result.url = buildUrl(hits.get(index)._source);
                                 result.title = hits.get(index)._source.title;
+                                // TODO
                                 result.text = new com.ibm.question_answering.discovery.Text();
+                                result.text.text = new String[1];
+                                result.text.text[0] = hits.get(index)._source.text;  
+                                /* 
                                 if (hits.get(index).highlight != null) {
                                     result.text.text = hits.get(index).highlight.text;
                                     if (result.text.text != null) {
@@ -196,6 +217,7 @@ public class AskElasticService {
                                     }
                                     //result = addFirstWords(result, hits.get(index));
                                 }
+                                */
                                 results.add(result);
                             }
                             output.results = results;
@@ -219,7 +241,9 @@ public class AskElasticService {
                     }
                 } 
             } 
-            String fullText = getFullText(hit._source.text);
+            // TODO
+            //String fullText = getFullText(hit._source.text);
+            String fullText = hit._source.text;
             String firstWords = getFirstWords(amountWords, maxAmountWords, fullText);
             String[] allText = new String[result.text.text.length + 1];
             for (int index = 0; index < result.text.text.length; index++) {
@@ -275,10 +299,10 @@ public class AskElasticService {
         String urlPlaceholderPart1 = "ELASTIC_SEARCH_FIELD_RESULT_SINGLE_1";
         String urlPlaceholderPart2 = "ELASTIC_SEARCH_FIELD_RESULT_SINGLE_2";
         if (this.resultUrl != null) {
-            if ((urlPart1 != null) && (!urlPart1.equals(""))) {
+            if ((urlPart1 != null) && (!urlPart1.equals("") && (urlPlaceholderPart1 != null) && (result.urlField1 != null))) {
                 output = output.replaceAll(urlPlaceholderPart1, result.urlField1);
             }
-            if ((urlPart2 != null) && (!urlPart2.equals(""))) {
+            if ((urlPart2 != null) && (!urlPart2.equals("") && (urlPlaceholderPart2 != null) && (result.urlField2 != null))) {
                 output = output.replaceAll(urlPlaceholderPart2, result.urlField2);
             }
         }

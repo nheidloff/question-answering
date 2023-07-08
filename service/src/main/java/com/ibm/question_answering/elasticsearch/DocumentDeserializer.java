@@ -32,7 +32,9 @@ public class DocumentDeserializer extends StdDeserializer<Document> {
         } catch (Exception e) {
         }
         try {
-            output.title = node.get(title).asText();
+            // TODO
+            //output.title = node.get(title).asText();
+            output.title = node.get("title").asText();
         } catch (Exception e) {
         }
         try {
@@ -43,7 +45,13 @@ public class DocumentDeserializer extends StdDeserializer<Document> {
             output.urlField2 = node.get(urlPart2).asText();
         } catch (Exception e) {
         }
+
+        // TODO
         try {
+            output.text = node.get("text").asText();
+        } catch (Exception e) {
+        }
+        /*try {
             JsonNode textNode = node.get(text);
             String[] strings = new String[textNode.size()];
             for (int index = 0; index < textNode.size(); index++) {   
@@ -51,7 +59,7 @@ public class DocumentDeserializer extends StdDeserializer<Document> {
             }   
             output.text = strings;
         } catch (Exception e) {
-        }
+        }*/
         return output;
     }
 }

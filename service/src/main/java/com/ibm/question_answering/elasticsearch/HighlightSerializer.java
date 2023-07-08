@@ -38,9 +38,9 @@ public class HighlightSerializer extends StdSerializer<Highlight> {
             jsonGenerator.writeEndArray();
             jsonGenerator.writeEndObject();
         }
-        else {
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeEndObject();
-        }
+        //else {
+        //    jsonGenerator.writeStartObject();
+        //    jsonGenerator.writeEndObject();
+        //}
     }
 }

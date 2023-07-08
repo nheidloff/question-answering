@@ -6,7 +6,10 @@ public class Document {
     
     public String id;
     public String title;
-    public String[] text;
+
+    // TODO
+    public String text;
+    
     public String urlField1;
     public String urlField2;
 }

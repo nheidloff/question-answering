@@ -431,6 +431,8 @@ public class Metrics {
                 String resultString = "";
                 String resultStringChuckId = "";
                 if (index <= answer.results.size()) {
+                    //TODO
+                    /* 
                     for (int indexText = 0; indexText < answer.results.get(index).text.text.length; indexText++) {
                         resultString = resultString + answer.results.get(index).text.text[indexText];
                         if (indexText < answer.results.get(index).text.text.length - 1) {
@@ -439,6 +441,8 @@ public class Metrics {
                     }
                     //resultStringChuckId = answer.results.get(index).document_id;
                     resultStringChuckId = answer.results.get(index).url;
+                    */
+                    resultString = answer.results.get(index).text.text[0];
                 }
                 this.resultElastic[index] = resultString;
                 this.resultElasticChunkIds[index] = resultStringChuckId;
